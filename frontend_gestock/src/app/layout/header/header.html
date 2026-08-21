@@ -1,40 +1,40 @@
 <header class="header">
-
   <div class="header-left">
-
     <a routerLink="/gestock" class="brand">
       <div class="brand-icon">
         GS
       </div>
-
       <div class="brand-text">
         <span class="brand-name">GESTOCK</span>
         <span class="brand-subtitle">Gestión de Inventario</span>
       </div>
     </a>
-
   </div>
 
   <div class="header-right">
-
     <div class="header-status">
       <span class="status-dot"></span>
       Sistema activo
     </div>
 
-    <div class="user-profile">
+    <!-- Campana de notificaciones agregada -->
+    <div 
+      class="notifications" 
+      [routerLink]="['/app/configuracion']" 
+      [queryParams]="{ tab: 'notificaciones' }"
+      style="cursor: pointer;">
+      <span class="bell-icon">🔔</span>
+      <span class="badge">3</span>
+    </div>
 
+    <div class="user-profile">
       <div class="user-avatar">
         A
       </div>
-
       <div class="user-info">
         <strong>Administrador</strong>
         <span>Administrador</span>
       </div>
-
     </div>
-
   </div>
-
 </header>

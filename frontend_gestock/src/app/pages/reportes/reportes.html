@@ -1,0 +1,199 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>Reporte y análisis</h1>
+    <p>Visualiza el estado de tu inventario</p>
+  </header>
+
+  <!-- KPIS DE INVENTARIOS Y BODEGA -->
+  @if (tabActiva === 'inventarios' || tabActiva === 'bodega') {
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Valor total del inventario</span>
+        <h2 class="kpi-value">${{ kpis.valorTotal | number:'1.2-2' }}</h2>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Coste total</span>
+        <h2 class="kpi-value">${{ kpis.costeTotal | number:'1.2-2' }}</h2>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Margen de ganancia</span>
+        <h2 class="kpi-value">${{ kpis.margenGanancia | number:'1.2-2' }}</h2>
+        <span class="kpi-subtext">{{ kpis.porcentajeMargen }}% margen</span>
+      </div>
+    </div>
+  }
+
+  <!-- KPIS DE MOVIMIENTOS -->
+  @if (tabActiva === 'movimientos') {
+    <div class="kpi-grid">
+      <div class="kpi-card card-entradas">
+        <span class="kpi-label">Total Entradas</span>
+        <div class="kpi-content">
+          <h2 class="kpi-value green-text">+{{ movimientosKpi.totalEntradas }}</h2>
+          <span class="icon-trend green-icon">↗</span>
+        </div>
+      </div>
+      <div class="kpi-card card-salidas">
+        <span class="kpi-label">Total salidas</span>
+        <div class="kpi-content">
+          <h2 class="kpi-value red-text">-{{ movimientosKpi.totalSalidas }}</h2>
+          <span class="icon-trend red-icon">↘</span>
+        </div>
+        <span class="kpi-subtext">Unidades</span>
+      </div>
+    </div>
+  }
+
+  <!-- BARRA DE CONTROLES -->
+  <div class="controls-bar">
+    <div class="tabs">
+      <button [class.active]="tabActiva === 'inventarios'" (click)="cambiarTab('inventarios')">Inventarios</button>
+      <button [class.active]="tabActiva === 'movimientos'" (click)="cambiarTab('movimientos')">Movimientos</button>
+      <button [class.active]="tabActiva === 'bodega'" (click)="cambiarTab('bodega')">Por bodega</button>
+    </div>
+    <button class="btn-primary" (click)="abrirModalConfirmacion()">
+      📥 Exportar {{ tabActiva === 'movimientos' ? 'movimientos' : 'inventario' }}
+    </button>
+  </div>
+
+  <!-- TAB INVENTARIOS -->
+  @if (tabActiva === 'inventarios') {
+    <div class="card-panel">
+      <h3>Por categorías</h3>
+      <div class="categories-list">
+        @for (cat of categorias; track cat.nombre) {
+          <div class="category-item">
+            <div class="cat-info">
+              <span class="dot" [style.background-color]="cat.colorHex"></span>
+              <span class="cat-name">{{ cat.nombre }}</span>
+            </div>
+            <div class="cat-stats">
+              <span class="cat-count">{{ cat.cantidadProductos }} Productos | ${{ cat.totalValor | number:'1.2-2' }}</span>
+              <span class="cat-percent">{{ cat.porcentaje }}%</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB MOVIMIENTOS -->
+  @if (tabActiva === 'movimientos') {
+    <div class="card-panel shadow-panel">
+      <h3>Productos con Mayor Movimiento</h3>
+      <div class="movimientos-list">
+        @for (prod of productosMovimiento; track prod.sku) {
+          <div class="movimiento-item">
+            <div class="prod-details">
+              <h4>{{ prod.nombre }}</h4>
+              <span class="prod-sku">{{ prod.sku }}</span>
+            </div>
+            <div class="prod-metrics">
+              <div class="metric-group green">
+                <span class="metric-val">+{{ prod.entradas }}</span>
+                <span class="metric-lbl">Entradas</span>
+              </div>
+              <div class="metric-group red">
+                <span class="metric-val">{{ prod.salidas }}</span>
+                <span class="metric-lbl">Salidas</span>
+              </div>
+              <div class="metric-group balance" [ngClass]="{'green': prod.balance > 0, 'red': prod.balance < 0}">
+                <span class="metric-val">{{ prod.balance > 0 ? '+' + prod.balance : prod.balance }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB POR BODEGA -->
+  @if (tabActiva === 'bodega') {
+    <div class="bodegas-cards-container">
+      <h3>Distribución por Bodega</h3>
+      
+      <div class="bodegas-list">
+        @for (bodega of bodegas; track bodega.id) {
+          <div class="bodega-card" [class.expanded]="bodegaExpandidaId === bodega.id">
+            <!-- CABECERA DE LA TARJETA -->
+            <div class="bodega-header">
+              <div class="bodega-main-info">
+                <span class="dot" style="background-color: #3a86ff;"></span>
+                <div>
+                  <h4 class="bodega-title">{{ bodega.nombre }}</h4>
+                  <span class="bodega-subtitle">{{ bodega.ubicacion }} • {{ bodega.estado || 'Activa' }}</span>
+                </div>
+              </div>
+
+              <div class="bodega-stats-action">
+                <div class="bodega-metrics">
+                  <span class="metrics-main">{{ bodega.cantidadProductos }} Productos | ${{ bodega.valorTotal | number:'1.2-2' }}</span>
+                  <span class="metrics-percent">{{ bodega.porcentajeValorTotal }}% del total</span>
+                </div>
+
+                <button class="btn-toggle-detail" (click)="toggleDetalleBodega(bodega.id)">
+                  {{ bodegaExpandidaId === bodega.id ? 'Ocultar detalles ▲' : 'Ver más detalles ▼' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- SECCIÓN DESPLEGABLE CON DETALLES COMPLETOS -->
+            @if (bodegaExpandidaId === bodega.id) {
+              <div class="bodega-detail-panel">
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Responsable:</span>
+                    <span class="detail-value">{{ bodega.responsable || 'No asignado' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Dirección:</span>
+                    <span class="detail-value">{{ bodega.direccion || 'Sin dirección' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Capacidad Ocupada:</span>
+                    <span class="detail-value">{{ bodega.capacidadOcupada }}%</span>
+                  </div>
+                </div>
+
+                @if (bodega.topProductos && bodega.topProductos.length > 0) {
+                  <div class="top-products-section">
+                    <h5>Productos destacados en esta bodega</h5>
+                    <div class="top-products-grid">
+                      @for (prod of bodega.topProductos; track prod.nombre) {
+                        <div class="top-prod-chip">
+                          <span class="prod-name">{{ prod.nombre }}</span>
+                          <span class="prod-data">{{ prod.stock }} unid. | ${{ prod.valor | number:'1.2-2' }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- MODAL CENTRADO DE CONFIRMACIÓN -->
+@if (mostrarModalConfirmacion) {
+  <div class="modal-backdrop" (click)="cerrarModalConfirmacion()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon-container">
+        <span class="modal-icon">📄</span>
+      </div>
+      <h3 class="modal-title">¿Confirmar exportación?</h3>
+      <p class="modal-description">
+        Se generará y descargará automáticamente un reporte PDF con la información de la sección 
+        <strong style="color: #3a86ff;">{{ tabActiva.toUpperCase() }}</strong>.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" (click)="cerrarModalConfirmacion()">Cancelar</button>
+        <button class="btn-modal-confirm" (click)="confirmarYDescargarPDF()">Descargar PDF</button>
+      </div>
+    </div>
+  </div>
+}
