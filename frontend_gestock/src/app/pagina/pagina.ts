@@ -1,4 +1,5 @@
-import { Component, inject, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, AfterViewInit, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
@@ -21,6 +22,8 @@ interface TarjetaInfo {
 })
 export class PaginaComponent implements AfterViewInit, OnDestroy {
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
 
   // Escena Three.js
   private scene!: THREE.Scene;
@@ -107,6 +110,8 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
   };
 
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
+
     this.init3DScene();
     this.setupScrollAnimations();
   }
@@ -348,6 +353,8 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (!this.isBrowser) return;
+
     if (this.resizeListener) {
       window.removeEventListener('resize', this.resizeListener);
     }
