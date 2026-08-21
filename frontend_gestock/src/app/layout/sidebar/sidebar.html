@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <aside class="app-sidebar">
   <div class="sidebar-brand">
     <span class="brand-icon">📦</span>
@@ -7,53 +6,58 @@
 
   <nav class="sidebar-nav">
     <div class="nav-section-title">DASHBOARD</div>
-
     <a routerLink="/app/panel" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">📊</span>
       <span class="nav-text">Panel</span>
     </a>
-
     <a routerLink="/app/empresas" routerLinkActive="active" class="nav-item">
-        <span class="nav-icon">🏦</span>
-        <span class="nav-text">Empresas</span>
+      <span class="nav-icon">🏦</span>
+      <span class="nav-text">Empresas</span>
+    </a>
+
+    <div class="nav-section-title">GESTIÓN</div>
+    <a routerLink="/gestion/inventario/lista-productos" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📦</span>
+      <span class="nav-text">Inventario</span>
+    </a>
+    <a routerLink="/gestion/auditorias" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📋</span>
+      <span class="nav-text">Auditorías</span>
+    </a>
+    <a routerLink="/gestion/roles-yusuarios" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-text">Roles y Usuarios</span>
+    </a>
+    <a routerLink="/app/envios" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">🚚</span>
+      <span class="nav-text">Envíos</span>
     </a>
 
     <div class="nav-section-title">MANTENIMIENTO</div>
-
     <a routerLink="/app/programacion" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">🛠️</span>
-      <span class="nav-label">Programación</span>
+      <span class="nav-text">Programación</span>
     </a>
-
     <a routerLink="/app/incidencias" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">⚠️</span>
-      <span class="nav-label">Incidencias</span>
+      <span class="nav-text">Incidencias</span>
+    </a>
+
+    <div class="nav-section-title">SISTEMA</div>
+    <a routerLink="/app/reportes" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📈</span>
+      <span class="nav-text">Reportes</span>
+    </a>
+    <a routerLink="/app/configuracion" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-text">Configuración</span>
     </a>
   </nav>
 
   <div class="sidebar-footer">
     <button type="button" class="btn-logout" (click)="logout()">
       <span class="nav-icon">🚪</span>
-      <span class="nav-label">Cerrar Sesión</span>
+      <span class="nav-text">Cerrar Sesión</span>
     </button>
-=======
-<aside class="sidebar">
-  <div class="brand">
-    <div class="logo-box">📦</div>
-    <h2>Gestock</h2>
-  </div>
-
-  <div class="sidebar-section">
-    <span class="sidebar-title">GESTIÓN</span>
-    <a routerLink="/gestion/inventario/lista-productos" routerLinkActive="active" class="sidebar-item">
-      <i class="fas fa-boxes"></i> Inventario
-    </a>
-    <a routerLink="/gestion/auditorias" routerLinkActive="active" class="sidebar-item">
-      <i class="fas fa-clipboard-check"></i> Auditorías
-    </a>
-    <a routerLink="/gestion/roles-yusuarios" routerLinkActive="active" class="sidebar-item">
-      <i class="fas fa-users-cog"></i> Roles y Usuarios
-    </a>
->>>>>>> 6166258ec228d9f3699b3c007f7757005c72bda7
   </div>
 </aside>
