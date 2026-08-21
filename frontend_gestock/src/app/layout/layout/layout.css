@@ -1,0 +1,21 @@
+.layout-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh; /* Se cambia min-height por height exacto */
+  background-color: #070814;
+  overflow: hidden; /* Evita que el navegador genere scroll general */
+}
+
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; /* Mantiene la cabecera (Header) estática */
+}
+
+.content-area {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto; /* Permite scroll solo en esta área interna */
+}
