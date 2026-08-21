@@ -1,0 +1,70 @@
+<div class="admin-wrapper">
+  <!-- Pantalla de Acceso Denegado si no es Administrador -->
+  <div *ngIf="!esAdmin" class="apple-card access-denied">
+    <span class="denied-icon">🚫</span>
+    <h2>Acceso Restringido</h2>
+    <p>Solo los usuarios con rol de <strong>Administrador</strong> tienen permisos para gestionar las sesiones globales de Gestock.</p>
+  </div>
+
+  <!-- Panel Principal de Administración (HU011, HU012, HU013) -->
+  <div *ngIf="esAdmin" #cardRef class="apple-card sessions-card">
+    <div class="glow-overlay"></div>
+
+    <div class="card-header">
+      <div class="header-badge">
+        <span class="badge-dot"></span> Panel de Seguridad Admin
+      </div>
+      <h1>Control de Sesiones Activas</h1>
+      <p class="subtitle">Monitorea los dispositivos con acceso abierto a tu cuenta de Gestock y finaliza conexiones remotas.</p>
+    </div>
+
+    <!-- HU013: Notificación de Inicio de Sesión Inusual -->
+    <section *ngIf="alertas.length > 0" class="alerts-section">
+      <div class="alert-card" *ngFor="let alt of alertas">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <h4>{{ alt.mensaje }}</h4>
+          <p><strong>Ubicación:</strong> {{ alt.ubicacion }} | <strong>IP:</strong> {{ alt.ip }} ({{ alt.fecha }})</p>
+        </div>
+        <button class="btn-dismiss" (click)="descartarAlerta(alt.id)">Ignorar</button>
+      </div>
+    </section>
+
+    <!-- HU011: Listado de Sesiones Activas -->
+    <section class="sessions-section">
+      <div class="section-title">
+        <h3>Sesiones Abiertas ({{ sesiones.length }})</h3>
+        <button *ngIf="sesiones.length > 1" class="btn-danger-link" (click)="cerrarTodasLasDemas()">
+          Cerrar todas las demás sesiones
+        </button>
+      </div>
+
+      <div class="sessions-list">
+        <div *ngFor="let s of sesiones" class="session-item" [class.is-current]="s.esActual">
+          <div class="device-icon">
+            <span *ngIf="s.dispositivo.includes('Mac') || s.dispositivo.includes('Windows')">💻</span>
+            <span *ngIf="s.dispositivo.includes('iPhone')">📱</span>
+          </div>
+
+          <div class="session-details">
+            <div class="device-name">
+              {{ s.dispositivo }}
+              <span *ngIf="s.esActual" class="current-badge">Este dispositivo</span>
+            </div>
+            <div class="session-meta">
+              <span>{{ s.navegador }}</span> • <span>{{ s.ubicacion }}</span> • <span class="ip-code">{{ s.ip }}</span>
+            </div>
+            <div class="activity-time">Última actividad: {{ s.ultimaActividad }}</div>
+          </div>
+
+          <!-- HU012: Acción para cerrar sesión remota -->
+          <div class="session-action">
+            <button *ngIf="!s.esActual" class="apple-btn-outline-danger" (click)="cerrarSesion(s.id)">
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

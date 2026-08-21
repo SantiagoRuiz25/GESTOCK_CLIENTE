@@ -1,0 +1,29 @@
+.app-footer {
+  width: 100%;
+  background-color: #0f141d;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.footer-content p {
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.separator {
+  color: #334155;
+}

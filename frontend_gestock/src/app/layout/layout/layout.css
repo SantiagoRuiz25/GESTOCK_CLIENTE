@@ -1,0 +1,48 @@
+/* Layout Principal Gestock Pro */
+.sofia-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 64px 1fr 40px;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar content"
+    "sidebar footer";
+  height: 100vh;
+  background-color: #070a12;
+  color: #f8fafc;
+}
+
+/* 1. Sidebar fijo */
+.sidebar-wrapper {
+  grid-area: sidebar;
+  height: 100%;
+  background-color: #0d121d;
+  overflow: hidden;
+}
+
+/* 2. Header fijo arriba */
+.header-container {
+  grid-area: header;
+  background: rgba(13, 18, 29, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 32px;
+}
+
+/* 3. Única zona con scroll (Aquí es donde se mueven las tarjetas y tablas) */
+.content-container {
+  grid-area: content;
+  overflow-y: auto;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+/* 4. Footer fijo abajo */
+.footer-container {
+  grid-area: footer;
+  background-color: #060910;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

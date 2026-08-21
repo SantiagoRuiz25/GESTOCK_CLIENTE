@@ -1,1 +1,51 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   EFECTO MOUSE-TRACKING / GLOW BORDER PARA CARDS Y CONTENEDORES
+   ========================================================================== */
+
+/* Variables de brillo */
+:root {
+  --glow-color: rgba(59, 130, 246, 0.5);
+  --surface-bg: #0d121d;
+}
+
+/* Aplicamos el efecto de borde brillante y transición a las tarjetas y contenedores clave */
+.card, 
+.panel, 
+form, 
+table, 
+.table-container,
+button,
+.btn {
+  position: relative;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto de borde iluminado y sombra sofisticada al pasar el cursor */
+.card:hover, 
+.panel:hover, 
+form:hover {
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 
+              0 0 25px rgba(59, 130, 246, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+/* Efecto tipo neón fluido para los botones estilo la referencia */
+button, 
+.btn {
+  background: 
+    linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(13, 18, 29, 0.9)),
+    linear-gradient(135deg, #0d121d, #0d121d) padding-box,
+    linear-gradient(135deg, #3b82f6, #1e3a8a) border-box;
+  border: 1px solid transparent !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+button:hover, 
+.btn:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+  filter: brightness(1.2);
+}

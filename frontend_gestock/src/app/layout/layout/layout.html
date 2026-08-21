@@ -1,0 +1,28 @@
+<div class="sofia-layout">
+  
+  <!-- Columna Izquierda: Únicamente el Sidebar para evitar duplicados -->
+  <aside class="sidebar-wrapper">
+    <nav class="sidebar-content">
+      <app-sidebar></app-sidebar>
+    </nav>
+  </aside>
+
+  <!-- Área Derecha: Header + Contenido Principal -->
+  <div class="main-wrapper">
+    <header class="header-container">
+      <div class="header-right">
+        <app-header></app-header>
+      </div>
+    </header>
+
+    <main class="content-container">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Footer Inferior -->
+  <footer class="footer-container">
+    <app-footer></app-footer>
+  </footer>
+
+</div>
