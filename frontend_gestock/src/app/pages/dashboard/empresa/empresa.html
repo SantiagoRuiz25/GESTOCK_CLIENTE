@@ -1,0 +1,106 @@
+<div class="empresa-layout">
+  <!-- Cabecera de la Sección con Botón de Crear Nueva Empresa -->
+  <div class="page-header-flex">
+    <div>
+      <h1>Empresas</h1>
+      <p>Gestión y administración de empresas registradas en GESTOCK</p>
+    </div>
+    <button class="btn-primary-glow" (click)="abrirModalCrear()">
+      <span>+ Crear nueva empresa</span>
+    </button>
+  </div>
+
+  <!-- TABLA DE EMPRESAS -->
+  <div class="config-card">
+    <div class="card-title-section">
+      <h3>Empresas Registradas</h3>
+      <p>Listado general de organizaciones activas en el sistema</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Moneda</th>
+            <th>Formato Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of empresasLista" (click)="seleccionarEmpresa(emp.id)" class="clickable-row">
+            <td>
+              <div class="empresa-nombre-cell">
+                <span class="avatar-icon">🏢</span>
+                <strong>{{ emp.nombre }}</strong>
+              </div>
+            </td>
+            <td>{{ emp.email }}</td>
+            <td>{{ emp.moneda }}</td>
+            <td><code>{{ emp.formatoFecha }}</code></td>
+            <td>
+              <span class="badge" [ngClass]="emp.estado === 'Activa' ? 'badge-active' : 'badge-inactive'">
+                {{ emp.estado }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" title="Eliminar" (click)="eliminarEmpresa($event, emp.id)">🗑️</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="empresasLista.length === 0">
+            <td colspan="6" class="empty-state">No hay empresas registradas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Crear Nueva Empresa -->
+<div class="modal-overlay" *ngIf="mostrarModalCrear" (click)="cerrarModalCrear()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Registrar Nueva Empresa</h3>
+      <button class="close-btn" (click)="cerrarModalCrear()">×</button>
+    </div>
+
+    <form [formGroup]="nuevaEmpresaForm" (ngSubmit)="crearNuevaEmpresa()" class="form-grid">
+      <div class="input-group full-width">
+        <label>Nombre de la Empresa</label>
+        <input type="text" formControlName="nombre" placeholder="Nombre comercial..." />
+      </div>
+
+      <div class="input-group full-width">
+        <label>Email de contacto</label>
+        <input type="email" formControlName="email" placeholder="correo@empresa.com" />
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label>Moneda</label>
+          <select formControlName="moneda">
+            <option value="USD - Dólar">USD - Dólar</option>
+            <option value="COP - Peso Colombiano">COP - Peso Colombiano</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Formato de Fecha</label>
+          <select formControlName="formatoFecha">
+            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="cerrarModalCrear()">Cancelar</button>
+        <button type="submit" class="btn-save" [disabled]="nuevaEmpresaForm.invalid">Crear Empresa</button>
+      </div>
+    </form>
+  </div>
+</div>

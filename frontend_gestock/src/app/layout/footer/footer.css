@@ -1,7 +1,9 @@
-.footer {
-  background: #0b0f19; /* Mismo tono unificado */
+.app-footer {
+  width: 100%;
+  background-color: #0b0f19; /* Tono unificado */
   border-top: 1px solid #334155;
   padding: 20px 28px;
+  box-sizing: border-box;
   color: #f1f5f9;
 }
 
@@ -30,6 +32,7 @@
 
 .footer-links {
   display: flex;
+  align-items: center;
   gap: 18px;
 }
 
@@ -37,7 +40,7 @@
   color: #94a3b8;
   text-decoration: none;
   font-size: 12px;
-  transition: color .2s ease;
+  transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
@@ -49,8 +52,9 @@
   font-size: 11px;
 }
 
+/* Responsivo para móviles */
 @media (max-width: 768px) {
-  .footer {
+  .app-footer {
     padding: 18px 15px;
   }
   .footer-content {

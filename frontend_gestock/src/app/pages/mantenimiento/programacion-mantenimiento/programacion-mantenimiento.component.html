@@ -1,0 +1,97 @@
+<div class="page-container">
+  <!-- Encabezado del Módulo -->
+  <header class="page-header">
+    <div class="header-badge">Mantenimiento Preventivo</div>
+    <h1>Programación de Mantenimiento</h1>
+    <p class="subtitle">Gestiona y coordina las revisiones técnicas de los equipos en tiempo real.</p>
+  </header>
+
+  <div class="grid-layout">
+    <!-- Formulario Glassmorphism -->
+    <section class="apple-card form-card">
+      <div class="card-header">
+        <span class="card-icon">⚡</span>
+        <h2>Programar Evento</h2>
+      </div>
+
+      <form (ngSubmit)="guardarProgramacion()" class="apple-form">
+        <div class="form-group">
+          <label for="equipo">Equipo / Maquinaria</label>
+          <div class="input-container">
+            <input 
+              type="text" 
+              id="equipo" 
+              name="equipo" 
+              [(ngModel)]="nuevoMantenimiento.equipo" 
+              placeholder="Ej. Montacargas #2" 
+              required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tipo">Tipo de Mantenimiento</label>
+          <div class="select-container">
+            <select id="tipo" name="tipo" [(ngModel)]="nuevoMantenimiento.tipo">
+              <option value="Preventivo">Preventivo</option>
+              <option value="Correctivo">Correctivo</option>
+              <option value="Predictivo">Predictivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fecha">Fecha Programada</label>
+          <div class="input-container">
+            <input 
+              type="date" 
+              id="fecha" 
+              name="fecha" 
+              [(ngModel)]="nuevoMantenimiento.fecha" 
+              required>
+          </div>
+        </div>
+
+        <button type="submit" class="apple-btn-primary">
+          <span>Programar Mantenimiento</span>
+          <span class="btn-arrow">&rarr;</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Tabla Estilo Apple -->
+    <section class="apple-card table-card">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <h2>Cronograma Activo</h2>
+      </div>
+
+      <div class="table-responsive">
+        <table class="apple-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Equipo</th>
+              <th>Tipo</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of programaciones" class="table-row">
+              <td class="col-id">#{{ item.id }}</td>
+              <td class="col-equipo">{{ item.equipo }}</td>
+              <td><span class="type-pill">{{ item.tipo }}</span></td>
+              <td class="col-fecha">{{ item.fecha }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="item.estado.toLowerCase().replace(' ', '-')">
+                  <span class="status-dot"></span>
+                  {{ item.estado }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-<header class="header">
+<header class="app-header">
   <div class="header-left">
     <a routerLink="/gestock" class="brand">
       <div class="brand-icon">
@@ -12,28 +12,29 @@
   </div>
 
   <div class="header-right">
+    <!-- Indicador de estado -->
     <div class="header-status">
       <span class="status-dot"></span>
       Sistema activo
     </div>
 
-    <!-- Campana de notificaciones agregada -->
-    <div 
-      class="notifications" 
+    <!-- Icono de Notificaciones -->
+    <button 
+      type="button" 
+      class="icon-btn" 
+      aria-label="Notificaciones"
       [routerLink]="['/app/configuracion']" 
-      [queryParams]="{ tab: 'notificaciones' }"
-      style="cursor: pointer;">
+      [queryParams]="{ tab: 'notificaciones' }">
       <span class="bell-icon">🔔</span>
-      <span class="badge">3</span>
-    </div>
+      <span class="notification-badge"></span>
+    </button>
 
+    <!-- Perfil del Usuario -->
     <div class="user-profile">
-      <div class="user-avatar">
-        A
-      </div>
+      <div class="user-avatar">M</div>
       <div class="user-info">
-        <strong>Administrador</strong>
-        <span>Administrador</span>
+        <span class="user-name">Maicol Nore</span>
+        <span class="user-role">Operador &#9662;</span>
       </div>
     </div>
   </div>

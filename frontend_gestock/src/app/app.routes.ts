@@ -10,6 +10,33 @@ export const routes: Routes = [
       import('./pagina/pagina').then((m) => m.PaginaComponent),
   },
 
+  // Módulo de Autenticación (Pantallas independientes sin Header/Sidebar)
+  {
+    path: 'auth',
+    children: [
+      { 
+        path: '', 
+        redirectTo: 'login', 
+        pathMatch: 'full' 
+      },
+      { 
+        path: 'login', 
+        loadComponent: () => import('./pages/auth/login/login').then(m => m.LoginComponent),
+        title: 'Iniciar Sesión - Gestock'
+      },
+      { 
+        path: 'crear-usuario', 
+        loadComponent: () => import('./pages/auth/creacion-usuarios/creacion-usuarios').then(m => m.CreacionUsuariosComponent),
+        title: 'Crear Usuario - Gestock'
+      },
+      { 
+        path: 'recuperar-contrasena', 
+        loadComponent: () => import('./pages/auth/recuperacion-contrasena/recuperacion-contrasena').then(m => m.RecuperacionContrasenaComponent),
+        title: 'Recuperar Contraseña - Gestock'
+      }
+    ]
+  },
+
   // Ruta del sistema interno con Sidebar/Layout que agrupa todas las secciones
   {
     path: 'app',
@@ -41,7 +68,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/gestion/roles-yusuarios/roles-yusuarios').then(m => m.RolesUsuariosComponent)
       },
 
-      // Módulos adicionales de la otra rama
+      // Módulos adicionales
       {
         path: 'reportes',
         title: 'GESTOCK - Reportes y Estadísticas',
@@ -61,6 +88,18 @@ export const routes: Routes = [
           import('./pages/configuracion/configuracion').then(
             (m) => m.ConfiguracionComponent
           ),
+      },
+      
+      // Mantenimiento (del otro bloque)
+      {
+        path: 'programacion',
+        loadComponent: () => import('./pages/mantenimiento/programacion-mantenimiento/programacion-mantenimiento.component').then(m => m.ProgramacionMantenimientoComponent),
+        title: 'Programación - Gestock'
+      },
+      {
+        path: 'incidencias',
+        loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.RegistroIncidenciasComponent),
+        title: 'Registro de Incidencias - Gestock'
       },
       
       // Captura cualquier ruta interna errónea dentro de /app
