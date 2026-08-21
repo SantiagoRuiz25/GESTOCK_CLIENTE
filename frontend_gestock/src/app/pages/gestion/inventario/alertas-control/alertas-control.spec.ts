@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LayoutComponent } from './layout';
+import { AlertasControlComponent } from './alertas-control';
 
-describe('Layout', () => {
-  let component: LayoutComponent;
-  let fixture: ComponentFixture<LayoutComponent>;
+describe('AlertasControl', () => {
+  let component: AlertasControlComponent;
+  let fixture: ComponentFixture<AlertasControlComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LayoutComponent],
+      imports: [AlertasControlComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LayoutComponent);
+    fixture = TestBed.createComponent(AlertasControlComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

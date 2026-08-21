@@ -1,11 +1,13 @@
-/* Elimina todos los márgenes y paddings por defecto del navegador */
+/* Modo Oscuro Global para GESTOCK */
 html, body {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
   height: 100% !important;
   overflow-x: hidden;
-  background-color: #0b0f19; /* Fondo oscuro idéntico a tu tema */
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
 }
 
@@ -20,4 +22,18 @@ app-root, mat-sidenav-container, mat-sidenav-content {
   height: 100%;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+/* Contenedores de vistas principales */
+.content-container {
+  background-color: #0b0f19 !important;
+}
+
+/* Tarjetas generales heredadas */
+.card {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
 }

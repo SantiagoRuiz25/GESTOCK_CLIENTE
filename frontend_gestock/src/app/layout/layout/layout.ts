@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
-// Importaciones de los componentes secundarios
 import { HeaderComponent } from '../header/header';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { FooterComponent } from '../footer/footer';
@@ -10,12 +10,44 @@ import { FooterComponent } from '../footer/footer';
   selector: 'app-layout',
   standalone: true,
   imports: [
-    RouterOutlet,     // Resuelve el error de 
-    HeaderComponent,  // Resuelve el error de 
-    SidebarComponent, // Resuelve el error de 
-    FooterComponent   // Resuelve el error de 
+    CommonModule, 
+    RouterOutlet, 
+    RouterLink, 
+    RouterLinkActive, 
+    HeaderComponent, 
+    SidebarComponent, 
+    FooterComponent
   ],
-  templateUrl: './layout.html',
-  styleUrls: ['./layout.css']
+  template: `
+    <div class="app-layout">
+      <app-header></app-header>
+      <div class="main-body">
+        <app-sidebar></app-sidebar>
+        <main class="content-container">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+      <app-footer></app-footer>
+    </div>
+  `,
+  styles: [`
+    .app-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .main-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .content-container {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #0b0f19;
+    }
+  `]
 })
 export class LayoutComponent {}

@@ -1,9 +1,23 @@
 <header class="header">
-  <div class="header-title">
-    <span>GESTOCK</span>
+  <div class="header-left">
+    <a routerLink="/gestock" class="brand">
+      <div class="brand-icon">
+        GS
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">GESTOCK</span>
+        <span class="brand-subtitle">Gestión de Inventario</span>
+      </div>
+    </a>
   </div>
-  <div class="header-actions">
-    <!-- REDIRECCIÓN AGREGADA EN LA CAMPANA -->
+
+  <div class="header-right">
+    <div class="header-status">
+      <span class="status-dot"></span>
+      Sistema activo
+    </div>
+
+    <!-- Campana de notificaciones agregada -->
     <div 
       class="notifications" 
       [routerLink]="['/app/configuracion']" 
@@ -14,10 +28,12 @@
     </div>
 
     <div class="user-profile">
-      <div class="avatar">A</div>
+      <div class="user-avatar">
+        A
+      </div>
       <div class="user-info">
-        <span class="user-name">Administrador</span>
-        <span class="user-role">Administrador &#9660;</span>
+        <strong>Administrador</strong>
+        <span>Administrador</span>
       </div>
     </div>
   </div>

@@ -1,0 +1,187 @@
+<div class="roles-container">
+  <div class="header-section" *ngIf="!usuarioSeleccionado && !modoCrear">
+    <div>
+      <h2>Gestión de Roles, Usuarios y Permisos</h2>
+      <p class="text-subtitle">Administración de accesos, control de actividad y seguridad del sistema</p>
+    </div>
+    <button class="btn-action" (click)="abrirModalCrear()">
+      <i class="fas fa-user-plus"></i> Registrar Nuevo Usuario
+    </button>
+  </div>
+
+  <!-- Tarjetas de Estadísticas del Sistema -->
+  <div class="stats-grid" *ngIf="!usuarioSeleccionado && !modoCrear">
+    <div class="stat-card">
+      <div class="stat-icon bg-blue"><i class="fas fa-users"></i></div>
+      <div>
+        <h4>{{ listaUsuarios.length }}</h4>
+        <span>Usuarios Totales</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-green"><i class="fas fa-signal"></i></div>
+      <div>
+        <h4>{{ contarActivos() }}</h4>
+        <span>Activos Ahora</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-purple"><i class="fas fa-clock"></i></div>
+      <div>
+        <h4>{{ totalHorasTrabajadas() }} hrs</h4>
+        <span>Horas Registradas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de Lista de Usuarios -->
+  <div class="table-card animate-fade" *ngIf="!usuarioSeleccionado && !modoCrear">
+    <div class="card-header-title">
+      <h3><i class="fas fa-shield-alt"></i> Usuarios Registrados y Actividad</h3>
+      <p class="text-subtitle">Monitoreo de estado de conexión, horas de trabajo y configuración de roles</p>
+    </div>
+    <table class="dark-table">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Correo Electrónico</th>
+          <th>Rol Asignado</th>
+          <th>Estado Actual</th>
+          <th>Horas Trabajadas</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of listaUsuarios" class="table-row">
+          <td>
+            <div class="user-info">
+              <span class="avatar-dot" [ngClass]="user.activo ? 'dot-green' : 'dot-gray'"></span>
+              <strong>{{ user.nombre }}</strong>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td><span class="badge-rol">{{ user.rol }}</span></td>
+          <td>
+            <span class="status-indicator" [ngClass]="user.activo ? 'status-online' : 'status-offline'">
+              <i class="fas" [ngClass]="user.activo ? 'fa-circle text-success' : 'fa-clock'"></i> 
+              {{ user.estadoTexto }}
+            </span>
+          </td>
+          <td><span class="horas-badge">{{ user.horasTrabajadas }} hrs</span></td>
+          <td>
+            <button class="btn-config" (click)="seleccionarUsuario(user)">
+              <i class="fas fa-key"></i> Configurar Roles
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Formulario de Creación de Nuevo Usuario (Optimizado en 2 columnas) -->
+  <div class="card-form-container animate-fade" *ngIf="modoCrear">
+    <div class="form-header-back">
+      <button class="btn-back" (click)="volverALista()">
+        <i class="fas fa-arrow-left"></i> Volver a la lista
+      </button>
+      <h3><i class="fas fa-user-plus"></i> Registrar Nuevo Usuario en el Sistema</h3>
+      <p class="text-subtitle" style="margin-top: 4px;">Completa la información detallada para otorgar accesos y credenciales seguras.</p>
+    </div>
+
+    <form [formGroup]="nuevoUsuarioForm" (ngSubmit)="guardarNuevoUsuario()" class="mt-4">
+      <div class="row-inputs" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        
+        <div class="input-group">
+          <label class="form-label">🏷️ Nombre Completo *</label>
+          <input type="text" formControlName="nombre" class="dark-input w-100" placeholder="Ej: Sofía Martínez">
+        </div>
+
+        <div class="input-group">
+          <label class="form-label">✉️ Correo Electrónico *</label>
+          <input type="email" formControlName="email" class="dark-input w-100" placeholder="correo@gestock.com">
+        </div>
+
+        <div class="input-group">
+          <label class="form-label">🛡️ Rol Inicial *</label>
+          <select formControlName="rol" class="dark-input w-100 select-field" (change)="onRolNuevoChange($event)">
+            <option value="" disabled selected>Selecciona un rol</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Almacenista">Almacenista</option>
+            <option value="Auditor">Auditor</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="form-label">⏱️ Horas Estimadas de Trabajo *</label>
+          <input type="number" formControlName="horasTrabajadas" class="dark-input w-100" placeholder="Ej: 40" min="1" max="60">
+        </div>
+
+      </div>
+
+      <div class="form-actions mt-4" style="display: flex; justify-content: flex-end;">
+        <button type="submit" class="btn-submit" [disabled]="nuevoUsuarioForm.invalid">
+          <i class="fas fa-user-shield"></i> Crear Usuario y Asignar Permisos
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Formulario de Configuración de Permisos por Usuario -->
+  <div class="card-form-container animate-fade" *ngIf="usuarioSeleccionado">
+    <div class="form-header-back">
+      <button class="btn-back" (click)="volverALista()">
+        <i class="fas fa-arrow-left"></i> Volver a la lista
+      </button>
+      <h3><i class="fas fa-user-shield"></i> Configurando Accesos para: {{ usuarioSeleccionado.nombre }}</h3>
+    </div>
+    
+    <form [formGroup]="rolForm" (ngSubmit)="guardarRol()" class="mt-4">
+      <div class="row-inputs" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        
+        <div class="input-group">
+          <label class="form-label">🛡️ Rol Principal del Sistema</label>
+          <select formControlName="nombreRol" class="dark-input w-100 select-field" (change)="onRolSelectChange($event)">
+            <option value="Administrador">Administrador</option>
+            <option value="Almacenista">Almacenista</option>
+            <option value="Auditor">Auditor</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="form-label">💬 Observación de Seguridad</label>
+          <input type="text" formControlName="descripcion" class="dark-input w-100" placeholder="Ej: Permisos actualizados por auditoría">
+        </div>
+
+      </div>
+
+      <div class="permissions-section mt-4">
+        <div class="permission-header-info">
+          <label class="form-label mb-2">🔐 Permisos Asociados al Rol Seleccionado (Interactivos)</label>
+          <span class="text-subtitle-sm">Puedes marcar o desmarcar permisos adicionales de forma personalizada.</span>
+        </div>
+        <div formArrayName="permisos" class="permissions-grid mt-2">
+          <div *ngFor="let permiso of permisosArray.controls; let i = index" class="permission-item">
+            <input type="checkbox" [formControlName]="i" class="custom-checkbox" [id]="'permiso-'+i">
+            <label [for]="'permiso-'+i" class="permission-label">
+              {{ listaPermisosDisponibles[i] }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions mt-4" style="display: flex; justify-content: flex-end;">
+        <button type="submit" class="btn-submit">
+          💾 Guardar Cambios de Permisos
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sistema de Alertas / Toasts Flotantes Animados -->
+  <div class="toast-container" *ngIf="mensajeAlerta">
+    <div class="custom-toast" [ngClass]="tipoAlerta">
+      <i class="fas" [ngClass]="tipoAlerta === 'success' ? 'fa-check-circle' : 'fa-info-circle'"></i>
+      <span>{{ mensajeAlerta }}</span>
+    </div>
+  </div>
+</div>

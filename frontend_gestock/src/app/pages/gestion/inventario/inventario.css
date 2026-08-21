@@ -1,0 +1,55 @@
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.inventario-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #0b0f19;
+  color: #f1f5f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.inventario-nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background-color: transparent;
+  align-items: center;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-tab:hover {
+  background-color: rgba(30, 41, 59, 0.5);
+  color: #ffffff;
+}
+
+.nav-tab.active {
+  background-color: #3b82f6; /* Mismo color azul exacto que usas en el sistema */
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.inventario-content {
+  flex: 1;
+  background-color: #0b0f19;
+  padding: 0;
+}

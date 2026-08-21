@@ -1,0 +1,130 @@
+<div class="productos-container animate-fade">
+  <!-- Cabecera de la vista -->
+  <div class="productos-header">
+    <div class="header-titles">
+      <h2>📦 Inventario de Productos</h2>
+      <p class="text-subtitle">Listado general y control de existencias en bodegas</p>
+    </div>
+    <div class="productos-count">
+      📊 {{ productosFiltrados.length }} Productos Registrados
+    </div>
+  </div>
+
+  <!-- Barra de Búsqueda Interactiva -->
+  <div class="search-bar-container">
+    <div class="search-input-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="🔍 Buscar por nombre, código o categoría..." 
+        class="search-input"
+      >
+    </div>
+  </div>
+
+  <!-- Tabla Ultra Moderna -->
+  <div class="table-responsive">
+    <table class="productos-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre del Producto</th>
+          <th>Categoría</th>
+          <th>Bodega</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (prod of productosFiltrados; track prod.codigo) {
+          <tr>
+            <td><span class="badge-codigo">{{ prod.codigo }}</span></td>
+            <td style="font-weight: 600; color: #ffffff;">{{ prod.nombre }}</td>
+            <td><span class="badge-categoria">{{ prod.categoria }}</span></td>
+            <td><span class="text-bodega-info">🏢 {{ prod.bodega }}</span></td>
+            <td>COP {{ prod.precio | number }}</td>
+            <td>
+              <span [ngClass]="prod.stock > 10 ? 'badge-stock stock-alto' : 'badge-stock stock-bajo'">
+                {{ prod.stock > 10 ? '🟢' : '🔴' }} {{ prod.stock }} un.
+              </span>
+            </td>
+            <td class="acciones-cell">
+              <!-- Botón Editar Interactivo con Emoji -->
+              <button class="btn-accion-interactiva btn-editar-prod" (click)="abrirModalEditar(prod)" title="Editar producto">
+                ✏️
+              </button>
+              
+              <!-- Botón Eliminar Interactivo con Emoji -->
+              <button class="btn-accion-interactiva btn-eliminar-prod" (click)="eliminarProducto(prod)" title="Eliminar producto">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center empty-state">
+              <i class="fas fa-box-open"></i>
+              <p>📭 No se encontraron productos registrados en este momento.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL / FORMULARIO AVANZADO DE EDICIÓN -->
+@if (productoEnEdicion) {
+  <div class="modal-overlay">
+    <div class="modal-card-advanced">
+      <div class="modal-header-advanced">
+        <h3>✏️ Editar Producto</h3>
+        <p>Modifica los campos necesarios para actualizar las existencias del inventario.</p>
+      </div>
+
+      <form #editForm="ngForm" (ngSubmit)="guardarEdicion(editForm)">
+        <div class="form-grid-modal">
+          <div class="form-group-modal form-group-full">
+            <label class="form-label-modal">🏷️ Nombre del Producto *</label>
+            <input type="text" name="nombre" [(ngModel)]="productoEnEdicion.nombre" class="dark-input-modal" required>
+          </div>
+          
+          <div class="form-group-modal">
+            <label class="form-label-modal">📂 Categoría *</label>
+            <input type="text" name="categoria" [(ngModel)]="productoEnEdicion.categoria" class="dark-input-modal" required>
+          </div>
+
+          <div class="form-group-modal">
+            <label class="form-label-modal">🏢 Bodega Asignada *</label>
+            <input type="text" name="bodega" [(ngModel)]="productoEnEdicion.bodega" class="dark-input-modal" required>
+          </div>
+
+          <div class="form-group-modal">
+            <label class="form-label-modal">💰 Precio Unitario (COP) *</label>
+            <input type="number" name="precio" [(ngModel)]="productoEnEdicion.precio" class="dark-input-modal" min="0" required>
+          </div>
+
+          <div class="form-group-modal">
+            <label class="form-label-modal">📦 Stock Actual *</label>
+            <input type="number" name="stock" [(ngModel)]="productoEnEdicion.stock" class="dark-input-modal" min="0" required>
+          </div>
+        </div>
+
+        <div class="modal-actions-advanced">
+          <button type="button" class="btn-modal-cancel" (click)="cerrarModal()">❌ Cancelar</button>
+          <button type="submit" class="btn-modal-submit" [disabled]="editForm.invalid">
+            💾 Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- TOAST DE NOTIFICACIÓN FLOTANTE -->
+@if (mensajeNotificacion) {
+  <div class="toast-notification">
+    ✨ <span>{{ mensajeNotificacion }}</span>
+  </div>
+}
