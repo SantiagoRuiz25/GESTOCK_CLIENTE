@@ -37,7 +37,7 @@ jobs:
         run: npm ci
 
       - name: Build Angular
-        run: npm run build -- --base-href /Gestock_Clientes/
+        run: npm run build -- --base-href /GESTOCK_CLIENTE/
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
