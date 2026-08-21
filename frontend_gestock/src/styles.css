@@ -1,1 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+/* Modo Oscuro Global para GESTOCK */
+body, html {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedores de vistas principales */
+.content-container {
+  background-color: #0b0f19 !important;
+}
+
+/* Tarjetas generales heredadas */
+.card {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}

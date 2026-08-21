@@ -1,0 +1,19 @@
+<div class="inventario-layout">
+  <!-- Submenú de navegación del inventario -->
+  <nav class="inventario-nav">
+    <a routerLink="bodegas" routerLinkActive="active" class="nav-tab">
+      <i class="fas fa-warehouse"></i> Bodegas
+    </a>
+    <a routerLink="lista-productos" routerLinkActive="active" class="nav-tab">
+      <i class="fas fa-boxes"></i> Lista de Productos
+    </a>
+    <a routerLink="registrar-productos" routerLinkActive="active" class="nav-tab">
+      <i class="fas fa-plus-circle"></i> Registrar Producto
+    </a>
+  </nav>
+
+  <!-- Contenedor donde se renderizan las vistas hijas -->
+  <div class="inventario-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
