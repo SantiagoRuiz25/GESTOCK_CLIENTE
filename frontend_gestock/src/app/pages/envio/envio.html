@@ -2,7 +2,7 @@
 
 <div class="scroll-container">
   <!-- CAPÍTULO 1 -->
-  <section class="section-chapter step-1">
+  <section class="section-chapter step-1" id="section-0">
     <div class="chapter-content">
       <span class="chapter-badge">CAPÍTULO 1</span>
       <h1 class="title-giant">RECOLECCIÓN</h1>
@@ -13,34 +13,34 @@
   </section>
 
   <!-- CAPÍTULO 2 -->
-  <section class="section-chapter step-2">
+  <section class="section-chapter step-2" id="section-1">
     <div class="chapter-content">
       <span class="chapter-badge">CAPÍTULO 2</span>
       <h1 class="title-giant">TRANSFERENCIA</h1>
       <p class="subtitle-desc">
-        Sincronización automatizada para traspasar la carga desde la camioneta hacia la bahía del avión de transporte.
+        El avión de carga sobrevuela la ciudad en ruta directa, sincronizando la logística aérea en tiempo real.
       </p>
     </div>
   </section>
 
   <!-- CAPÍTULO 3 -->
-  <section class="section-chapter step-3">
+  <section class="section-chapter step-3" id="section-2">
     <div class="chapter-content">
       <span class="chapter-badge">CAPÍTULO 3</span>
       <h1 class="title-giant">DESPEGUE</h1>
       <p class="subtitle-desc">
-        Alineación en la pista principal, comprobación de motores e inicio de la maniobra de aceleración y despegue.
+        Maniobra de aproximación y aterrizaje en la pista principal, reduciendo velocidad y extendiendo el tren de aterrizaje.
       </p>
     </div>
   </section>
 
   <!-- CAPÍTULO 4 -->
-  <section class="section-chapter step-4">
+  <section class="section-chapter step-4" id="section-3">
     <div class="chapter-content">
       <span class="chapter-badge">CAPÍTULO 4</span>
       <h1 class="title-giant">EN TRÁNSITO</h1>
       <p class="subtitle-desc">
-        Vuelo logístico en ruta directa hacia su destino final, monitoreado en tiempo real en la plataforma.
+        La unidad terrestre de distribución final recorre la red vial urbana hacia el destino de entrega.
       </p>
     </div>
   </section>
@@ -48,19 +48,19 @@
 
 <!-- BARRA DE NAVEGACIÓN Y PROGRESO INFERIOR (4 CAPÍTULOS) -->
 <div class="timeline-bar">
-  <div class="timeline-step active">
+  <div class="timeline-step active" (click)="navigateToSection(0)">
     <span class="icon">📍</span>
     <span class="label">Recolección</span>
   </div>
-  <div class="timeline-step">
+  <div class="timeline-step" (click)="navigateToSection(1)">
     <span class="icon">📦</span>
     <span class="label">Transferencia</span>
   </div>
-  <div class="timeline-step">
+  <div class="timeline-step" (click)="navigateToSection(2)">
     <span class="icon">🛫</span>
     <span class="label">Despegue</span>
   </div>
-  <div class="timeline-step">
+  <div class="timeline-step" (click)="navigateToSection(3)">
     <span class="icon">🌍</span>
     <span class="label">En tránsito</span>
   </div>

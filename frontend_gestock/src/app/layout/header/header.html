@@ -3,10 +3,16 @@
     <span>GESTOCK</span>
   </div>
   <div class="header-actions">
-    <div class="notifications">
+    <!-- REDIRECCIÓN AGREGADA EN LA CAMPANA -->
+    <div 
+      class="notifications" 
+      [routerLink]="['/app/configuracion']" 
+      [queryParams]="{ tab: 'notificaciones' }"
+      style="cursor: pointer;">
       <span class="bell-icon">🔔</span>
       <span class="badge">3</span>
     </div>
+
     <div class="user-profile">
       <div class="avatar">A</div>
       <div class="user-info">

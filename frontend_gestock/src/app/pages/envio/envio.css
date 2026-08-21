@@ -6,6 +6,7 @@
   overflow-x: hidden;
   position: relative;
   background-color: #080a0f;
+  scroll-behavior: smooth;
 }
 
 #canvas-envios {
@@ -91,15 +92,31 @@
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.4s ease;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 14px;
+  border-radius: 30px;
+}
+
+.timeline-step:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.timeline-step:active {
+  transform: translateY(0);
 }
 
 .timeline-step .icon {
   font-size: 1.2rem;
   opacity: 0.6;
+  transition: opacity 0.3s ease;
 }
 
 .timeline-step.active {
   color: #ffffff;
+  background: rgba(249, 115, 22, 0.15);
 }
 
 .timeline-step.active .icon {

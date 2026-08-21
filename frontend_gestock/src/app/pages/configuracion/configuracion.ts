@@ -21,6 +21,17 @@ export interface OpcionesExportacion {
   incluirBackup: boolean;
 }
 
+// Estructura de datos para las incidencias y notificaciones
+export interface NotificacionHistorial {
+  id: string;
+  tipo: 'incidencia' | 'envio' | 'stock' | 'resolved';
+  titulo: string;
+  descripcion: string;
+  fecha: string;
+  leida: boolean;
+  icono: string;
+}
+
 @Component({
   selector: 'app-configuracion',
   standalone: true,
@@ -29,7 +40,7 @@ export interface OpcionesExportacion {
   styleUrl: './configuracion.css'
 })
 export class ConfiguracionComponent {
-  tabActiva: 'notificaciones' | 'seguridad' | 'backup' = 'seguridad';
+  tabActiva: 'notificaciones' | 'seguridad' | 'backup' = 'notificaciones';
   
   // Control del Modal de Guardado
   mostrarModalGuardar: boolean = false;
@@ -62,8 +73,58 @@ export class ConfiguracionComponent {
     frecuenciaBackup: 'diario'
   };
 
+  // Historial de incidencias y alertas del sistema
+  historialNotificaciones: NotificacionHistorial[] = [
+    {
+      id: '1',
+      tipo: 'incidencia',
+      titulo: 'Incidencia en Envío #ENV-8842',
+      descripcion: 'Retraso reportado en la zona de transferencia de pista por condiciones climáticas en Yopal.',
+      fecha: '21/08/2026 - 02:30 PM',
+      leida: false,
+      icono: '⚠️'
+    },
+    {
+      id: '2',
+      tipo: 'envio',
+      titulo: 'Despegue Confirmado',
+      descripcion: 'El paquete con guía #ENV-9011 ha completado la fase de recolección e inició tránsito.',
+      fecha: '21/08/2026 - 11:15 AM',
+      leida: false,
+      icono: '🚚'
+    },
+    {
+      id: '3',
+      tipo: 'stock',
+      titulo: 'Alerta de Stock Mínimo',
+      descripcion: 'El producto SKU-4029 alcanzó el umbral mínimo en la Bodega Central.',
+      fecha: '20/08/2026 - 09:45 AM',
+      leida: true,
+      icono: '📦'
+    },
+    {
+      id: '4',
+      tipo: 'resolved',
+      titulo: 'Incidencia Resuelta',
+      descripcion: 'Se autorizó la sustitución de mercancía averiada para el envío #ENV-8700.',
+      fecha: '19/08/2026 - 04:20 PM',
+      leida: true,
+      icono: '✅'
+    }
+  ];
+
   cambiarTab(tab: 'notificaciones' | 'seguridad' | 'backup'): void {
     this.tabActiva = tab;
+  }
+
+  // Marcar notificación individual como leída
+  marcarComoLeida(notificacion: NotificacionHistorial): void {
+    notificacion.leida = true;
+  }
+
+  // Limpiar/marcar todas las alertas como leídas
+  marcarTodasComoLeidas(): void {
+    this.historialNotificaciones.forEach(item => item.leida = true);
   }
 
   // --- MÉTODOS MODAL GUARDAR ---
@@ -90,7 +151,6 @@ export class ConfiguracionComponent {
   ejecutarBackupManual(): void {
     this.cargandoBackup = true;
 
-    // Simulamos un tiempo de procesamiento para simular la descarga/respuesta
     setTimeout(() => {
       const datosBackup = {
         sistema: 'GESTOCK',
@@ -130,6 +190,7 @@ export class ConfiguracionComponent {
     if (this.opcionesExportar.incluirNotificaciones) {
       payloadExportacion['Notificaciones por Email'] = this.config.notificacionesEmail ? 'Activado' : 'Desactivado';
       payloadExportacion['Resumen Semanal'] = this.config.resumenSemanal ? 'Activado' : 'Desactivado';
+      payloadExportacion['Incidencias Registradas'] = this.historialNotificaciones.length;
     }
 
     if (this.opcionesExportar.incluirSeguridad) {
@@ -147,13 +208,10 @@ export class ConfiguracionComponent {
 
     const fecha = new Date().toISOString().slice(0, 10);
 
-    // 1. Exportar JSON
     if (this.opcionesExportar.formato === 'json') {
       const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payloadExportacion, null, 2));
       this.dispararDescarga(dataStr, `gestock_config_${fecha}.json`);
     } 
-
-    // 2. Exportar CSV
     else if (this.opcionesExportar.formato === 'csv') {
       let contenidoCsv = 'Parametro,Valor\n';
       Object.entries(payloadExportacion).forEach(([clave, valor]) => {
@@ -165,8 +223,6 @@ export class ConfiguracionComponent {
       this.dispararDescarga(url, `gestock_config_${fecha}.csv`);
       URL.revokeObjectURL(url);
     } 
-
-    // 3. Exportar PDF
     else if (this.opcionesExportar.formato === 'pdf') {
       this.generarPdfImpresion(payloadExportacion, fecha);
     }
