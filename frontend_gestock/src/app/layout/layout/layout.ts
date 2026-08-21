@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
-// Importaciones de los componentes secundarios
+// Importa los componentes hijos del layout
 import { HeaderComponent } from '../header/header';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { FooterComponent } from '../footer/footer';
@@ -10,12 +11,15 @@ import { FooterComponent } from '../footer/footer';
   selector: 'app-layout',
   standalone: true,
   imports: [
-    RouterOutlet,     // Resuelve el error de 
-    HeaderComponent,  // Resuelve el error de 
-    SidebarComponent, // Resuelve el error de 
-    FooterComponent   // Resuelve el error de 
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    HeaderComponent,
+    SidebarComponent,
+    FooterComponent
   ],
   templateUrl: './layout.html',
-  styleUrls: ['./layout.css']
+  styleUrl: './layout.css'
 })
 export class LayoutComponent {}

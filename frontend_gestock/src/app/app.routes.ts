@@ -10,16 +10,65 @@ export const routes: Routes = [
       import('./pagina/pagina').then((m) => m.PaginaComponent),
   },
 
-  // Ruta del sistema interno con Sidebar/Layout
+  // Módulo de Autenticación (Pantallas independientes sin Header/Sidebar)
+  {
+    path: 'auth',
+    children: [
+      { 
+        path: '', 
+        redirectTo: 'login', 
+        pathMatch: 'full' 
+      },
+      { 
+        path: 'login', 
+        loadComponent: () => import('./pages/auth/login/login').then(m => m.LoginComponent),
+        title: 'Iniciar Sesión - Gestock'
+      },
+      { 
+        path: 'crear-usuario', 
+        loadComponent: () => import('./pages/auth/creacion-usuarios/creacion-usuarios').then(m => m.CreacionUsuariosComponent),
+        title: 'Crear Usuario - Gestock'
+      },
+      { 
+        path: 'recuperar-contrasena', 
+        loadComponent: () => import('./pages/auth/recuperacion-contrasena/recuperacion-contrasena').then(m => m.RecuperacionContrasenaComponent),
+        title: 'Recuperar Contraseña - Gestock'
+      }
+    ]
+  },
+
+  // Ruta del sistema interno con Sidebar/Layout que agrupa todas las secciones
   {
     path: 'app',
     component: LayoutComponent,
     children: [
+      { path: '', redirectTo: 'gestion/inventario', pathMatch: 'full' },
+      
+      // Módulo de Inventario con sus subrutas
       {
-        path: '',
-        redirectTo: 'reportes',
-        pathMatch: 'full',
+        path: 'gestion/inventario',
+        loadComponent: () => import('./pages/gestion/inventario/inventario').then(m => m.InventarioComponent),
+        children: [
+          { path: '', redirectTo: 'lista-productos', pathMatch: 'full' },
+          { path: 'lista-productos', loadComponent: () => import('./pages/gestion/inventario/lista-productos/lista-productos').then(m => m.ListaProductosComponent) },
+          { path: 'registrar-productos', loadComponent: () => import('./pages/gestion/inventario/registrar-productos/registrar-productos').then(m => m.RegistrarProductosComponent) },
+          { path: 'bodegas', loadComponent: () => import('./pages/gestion/inventario/bodegas/bodegas').then(m => m.BodegasComponent) }
+        ]
       },
+      
+      // Módulo de Auditoría
+      {
+        path: 'gestion/auditorias',
+        loadComponent: () => import('./pages/gestion/auditorias/auditorias').then(m => m.AuditoriasComponent)
+      },
+      
+      // Módulo de Roles y Usuarios
+      {
+        path: 'gestion/roles-yusuarios',
+        loadComponent: () => import('./pages/gestion/roles-yusuarios/roles-yusuarios').then(m => m.RolesUsuariosComponent)
+      },
+
+      // Módulos adicionales
       {
         path: 'reportes',
         title: 'GESTOCK - Reportes y Estadísticas',
@@ -40,15 +89,28 @@ export const routes: Routes = [
             (m) => m.ConfiguracionComponent
           ),
       },
-      // CAPTURA CUALQUIER OTRA RUTA O CLIC DENTRO DEL PANEL INTERNO
+      
+      // Mantenimiento (del otro bloque)
+      {
+        path: 'programacion',
+        loadComponent: () => import('./pages/mantenimiento/programacion-mantenimiento/programacion-mantenimiento.component').then(m => m.ProgramacionMantenimientoComponent),
+        title: 'Programación - Gestock'
+      },
+      {
+        path: 'incidencias',
+        loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.RegistroIncidenciasComponent),
+        title: 'Registro de Incidencias - Gestock'
+      },
+      
+      // Captura cualquier ruta interna errónea dentro de /app
       {
         path: '**',
-        redirectTo: 'reportes',
+        redirectTo: 'gestion/inventario',
       },
     ],
   },
 
-  // Redirige URLs externas inexistentes a la landing page
+  // Redirige URLs externas inexistentes a la landing page principal
   {
     path: '**',
     redirectTo: '',

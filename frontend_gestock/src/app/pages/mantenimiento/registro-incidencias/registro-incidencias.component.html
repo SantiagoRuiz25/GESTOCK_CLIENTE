@@ -1,0 +1,103 @@
+<div class="page-container">
+  <!-- Encabezado del Módulo con Badge de Estado -->
+  <header class="page-header">
+    <div class="header-badge status-critical">Monitoreo Activo</div>
+    <h1>Registro de Incidencias</h1>
+    <p class="subtitle">Reporta y gestiona fallos técnicos o anomalías operativas del sistema Gestorck.</p>
+  </header>
+
+  <div class="grid-layout">
+    <!-- Formulario Glassmorphism para Nuevo Reporte -->
+    <section class="apple-card form-card">
+      <div class="card-header">
+        <span class="card-icon">⚠️</span>
+        <h2>Reportar Incidencia</h2>
+      </div>
+
+      <form (ngSubmit)="registrarIncidencia()" class="apple-form">
+        <div class="form-group">
+          <label for="titulo">Título de la Incidencia</label>
+          <div class="input-container">
+            <input 
+              type="text" 
+              id="titulo" 
+              name="titulo" 
+              [(ngModel)]="nuevaIncidencia.titulo" 
+              placeholder="Ej. Fallo en sensor de temperatura" 
+              required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prioridad">Nivel de Prioridad</label>
+          <div class="select-container">
+            <select id="prioridad" name="prioridad" [(ngModel)]="nuevaIncidencia.prioridad">
+              <option value="Baja">🟢 Baja</option>
+              <option value="Media">🟡 Media</option>
+              <option value="Alta">🟠 Alta</option>
+              <option value="Crítica">🔴 Crítica</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción Detallada</label>
+          <div class="textarea-container">
+            <textarea 
+              id="descripcion" 
+              name="descripcion" 
+              [(ngModel)]="nuevaIncidencia.descripcion" 
+              rows="4" 
+              placeholder="Describe lo sucedido, equipo afectado y pasos para reproducir..." 
+              required></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="apple-btn-danger">
+          <span>Registrar Incidencia</span>
+          <span class="btn-arrow">&rarr;</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Tabla Estilo Apple para el Historial -->
+    <section class="apple-card table-card">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <h2>Historial de Reportes</h2>
+      </div>
+
+      <div class="table-responsive">
+        <table class="apple-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Prioridad</th>
+              <th>Reportado Por</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let inc of incidencias" class="table-row">
+              <td class="col-id">#{{ inc.id }}</td>
+              <td class="col-titulo">{{ inc.titulo }}</td>
+              <td>
+                <span class="prio-pill" [ngClass]="inc.prioridad.toLowerCase()">
+                  {{ inc.prioridad }}
+                </span>
+              </td>
+              <td class="col-user">{{ inc.reportadoPor }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="inc.estado.toLowerCase().replace(' ', '-')">
+                  <span class="status-dot"></span>
+                  {{ inc.estado }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

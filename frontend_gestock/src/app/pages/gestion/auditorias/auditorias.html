@@ -1,0 +1,85 @@
+<div class="audit-container">
+  <!-- Encabezado de la Sección -->
+  <div class="header-section">
+    <div>
+      <h2>Auditoría del Sistema</h2>
+      <p class="text-subtitle">Registro y monitoreo de actividades, acciones y accesos de los usuarios</p>
+    </div>
+    <button class="btn-action" (click)="exportarLogs()">
+      <i class="fas fa-download"></i> Exportar Reporte
+    </button>
+  </div>
+
+  <!-- Tarjetas de Estadísticas / Métricas -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon bg-blue"><i class="fas fa-shield-alt"></i></div>
+      <div>
+        <h4>{{ totalLogs() }}</h4>
+        <span>Total Registros</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-green"><i class="fas fa-check-circle"></i></div>
+      <div>
+        <h4>{{ accionesExitosas() }}</h4>
+        <span>Acciones Exitosas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Búsqueda y Filtros -->
+  <div class="filter-card">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" [(ngModel)]="filtroTexto" placeholder="Buscar por usuario o entidad..." (input)="filtrarLogs()">
+    </div>
+    <div class="filter-options">
+      <select [(ngModel)]="filtroAccion" (change)="filtrarLogs()" class="dark-input">
+        <option value="">Todas las acciones</option>
+        <option value="CREAR">Crear</option>
+        <option value="ACTUALIZAR">Actualizar</option>
+        <option value="ELIMINAR">Eliminar</option>
+      </select>
+      <button class="btn-reset" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- Tabla de Auditoría Profesional -->
+  <div class="table-card">
+    <table class="dark-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Acción Realizada</th>
+          <th>Módulo / Entidad</th>
+          <th>Fecha y Hora</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logsFiltrados()" class="table-row">
+          <td>#{{ log.id }}</td>
+          <td>
+            <div class="user-info">
+              <span class="avatar-dot"></span>
+              <strong>{{ log.usuario }}</strong>
+            </div>
+          </td>
+          <td>
+            <span class="badge-accion" [ngClass]="log.tipo">{{ log.accion }}</span>
+          </td>
+          <td>{{ log.entidad }}</td>
+          <td>{{ log.fecha | date:'medium' }}</td>
+          <td>
+            <span class="status-badge success">Completado</span>
+          </td>
+        </tr>
+        <tr *ngIf="logsFiltrados().length === 0">
+          <td colspan="6" class="text-center py-4 text-muted">No se encontraron registros de auditoría.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

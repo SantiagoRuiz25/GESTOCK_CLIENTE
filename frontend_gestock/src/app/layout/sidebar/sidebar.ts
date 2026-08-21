@@ -1,11 +1,28 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
-export class SidebarComponent {}
+export class SidebarComponent {
+  constructor(private router: Router) {}
+
+  // Métodos de navegación alternativa
+  irAProgramacion(): void {
+    this.router.navigate(['/app/programacion-mantenimiento']);
+  }
+
+  irAIncidencias(): void {
+    this.router.navigate(['/app/registro-incidencias']);
+  }
+
+  // Redirección al login en el módulo de autenticación
+  logout(): void {
+    this.router.navigate(['/auth/login']);
+  }
+}
