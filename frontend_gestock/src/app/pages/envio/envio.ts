@@ -1,4 +1,5 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -12,6 +13,9 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrls: ['./envio.css']
 })
 export class EnviosComponent implements AfterViewInit, OnDestroy {
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
@@ -25,6 +29,8 @@ export class EnviosComponent implements AfterViewInit, OnDestroy {
   private animationFrameId!: number;
 
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
+
     this.initScene();
     this.createEnvironment();
     this.createCityBuildings();
@@ -455,6 +461,8 @@ export class EnviosComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (!this.isBrowser) return;
+
     if (this.resizeListener) {
       window.removeEventListener('resize', this.resizeListener);
     }
