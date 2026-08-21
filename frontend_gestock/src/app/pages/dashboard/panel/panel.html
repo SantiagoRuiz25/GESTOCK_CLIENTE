@@ -1,0 +1,73 @@
+<div class="panel-layout" (click)="cerrarMenu()">
+  <div class="panel-header">
+    <h1>Panel</h1>
+  </div>
+
+  <!-- Botón de acciones con menú desplegable -->
+  <div class="panel-actions-container">
+    <button class="btn-action-trigger" (click)="toggleMenuInventario($event)">+</button>
+    
+    <div class="inventory-dropdown" *ngIf="mostrarMenuInventario" (click)="$event.stopPropagation()">
+      <ul>
+        <li>Registrar Entrada</li>
+        <li>Registrar Salida</li>
+        <li>Ver Reportes</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Cuadrícula de Estadísticas -->
+  <div class="stats-section">
+    <div class="stat-card">
+      <h3>Total precios</h3>
+      <p>19</p>
+      <span class="subtext">19 activos</span>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Valor de inventario</h3>
+      <p>$29.997</p>
+      <span class="subtext">+12% vs mes anterior</span>
+    </div>
+
+    <div class="stat-card">
+      <h3>Valor de inventario...</h3>
+      <p>4</p>
+      <span class="subtext">2 bajo | 2 agotado</span>
+    </div>
+
+    <div class="stat-card">
+      <h3>Bodegas activas</h3>
+      <p>3</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Usuarios activos</h3>
+      <p>4</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Tasa de ocupacion</h3>
+      <p>63%</p>
+    </div>
+  </div>
+
+  <!-- Bloques de alertas y movimientos -->
+  <div class="section-block">
+    <h3>Producto con stock bajo</h3>
+    <p>2 alertas</p>
+    <ul>
+      <li>Disco duro externo 1TB | Bodega central — 3/10</li>
+      <li>Mouse inalambrico logitech | Sucursal Norte — 8/20</li>
+    </ul>
+  </div>
+
+  <div class="section-block">
+    <h3>Ultimos movimientos</h3>
+    <ul>
+      <li>Pc +10 unidades | Administrador | 20/01/2025 (Entrada)</li>
+      <li>Monitor +5 unidades | Maicol Nore [Gerente] | 24/01/2025 (Salida)</li>
+      <li>Mouse +8 unidades | Erick Ruiz [Operador] | 28/01/2025 (Transferencia)</li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,278 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:host {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  color: #f5f5f7;
+  display: block;
+  padding: 2rem 1rem;
+}
+
+.admin-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.apple-card {
+  position: relative;
+  background: rgba(22, 22, 26, 0.75);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 2.5rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  transition: border-color 0.4s ease;
+}
+
+.apple-card:hover {
+  border-color: rgba(41, 151, 255, 0.3);
+}
+
+.glow-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(41, 151, 255, 0.08),
+    transparent 40%
+  );
+}
+
+/* Header */
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(41, 151, 255, 0.12);
+  border: 1px solid rgba(41, 151, 255, 0.25);
+  border-radius: 980px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2997ff;
+  margin-bottom: 1rem;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  background: #30d158;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #30d158;
+}
+
+.card-header h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(180deg, #ffffff 0%, #a1a1a6 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: #86868b;
+  font-size: 0.9rem;
+  margin: 0 0 2rem 0;
+}
+
+/* Alertas Inusuales (HU013) */
+.alerts-section {
+  margin-bottom: 2rem;
+}
+
+.alert-card {
+  background: rgba(255, 159, 10, 0.08);
+  border: 1px solid rgba(255, 159, 10, 0.25);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-content h4 {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.9rem;
+  color: #ff9f0a;
+}
+
+.alert-content p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #a1a1a6;
+}
+
+.btn-dismiss {
+  background: transparent;
+  border: 1px solid rgba(255, 159, 10, 0.3);
+  color: #ff9f0a;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dismiss:hover {
+  background: rgba(255, 159, 10, 0.2);
+}
+
+/* Lista de Sesiones (HU011, HU012) */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-title h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.btn-danger-link {
+  background: transparent;
+  border: none;
+  color: #ff453a;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-danger-link:hover {
+  text-decoration: underline;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.2rem;
+  transition: all 0.25s ease;
+}
+
+.session-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.session-item.is-current {
+  border-color: rgba(48, 209, 88, 0.3);
+  background: rgba(48, 209, 88, 0.03);
+}
+
+.device-icon {
+  font-size: 1.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.session-details {
+  flex: 1;
+}
+
+.device-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.current-badge {
+  background: rgba(48, 209, 88, 0.15);
+  color: #30d158;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.session-meta {
+  font-size: 0.82rem;
+  color: #86868b;
+  margin-top: 0.2rem;
+}
+
+.ip-code {
+  font-family: monospace;
+  color: #a1a1a6;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: #636366;
+  margin-top: 0.25rem;
+}
+
+.apple-btn-outline-danger {
+  background: transparent;
+  border: 1px solid rgba(255, 69, 58, 0.4);
+  color: #ff453a;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.apple-btn-outline-danger:hover {
+  background: rgba(255, 69, 58, 0.15);
+  border-color: #ff453a;
+  box-shadow: 0 0 12px rgba(255, 69, 58, 0.3);
+}
+
+/* Acceso Denegado */
+.access-denied {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.denied-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.access-denied h2 {
+  margin: 0 0 0.5rem 0;
+  color: #ff453a;
+}
+
+.access-denied p {
+  color: #86868b;
+  margin: 0;
+}

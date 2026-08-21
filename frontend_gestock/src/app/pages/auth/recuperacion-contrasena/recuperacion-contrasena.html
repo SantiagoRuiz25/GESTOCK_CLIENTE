@@ -1,0 +1,115 @@
+<div class="auth-wrapper">
+  <div #cardRef class="apple-card recovery-card">
+    <div class="glow-overlay"></div>
+
+    <div class="card-header">
+      <div class="brand-badge">
+        <span class="brand-icon">📦</span> Gestock
+      </div>
+      <h1 *ngIf="pasoActual === 1">Recuperar Acceso</h1>
+      <h1 *ngIf="pasoActual === 2">Verificar Código</h1>
+      <h1 *ngIf="pasoActual === 3">Nueva Contraseña</h1>
+      
+      <p class="subtitle" *ngIf="pasoActual === 1">Ingresa tu correo para recibir las instrucciones de restablecimiento.</p>
+      <p class="subtitle" *ngIf="pasoActual === 2">Ingresa el código enviado a {{ datosRecuperacion.correo }}.</p>
+      <p class="subtitle" *ngIf="pasoActual === 3">Crea una nueva contraseña segura para tu cuenta.</p>
+    </div>
+
+    <!-- PASO 1: Solicitar Recuperación (HU005) -->
+    <form *ngIf="pasoActual === 1" (ngSubmit)="solicitarRecuperacion()" class="apple-form">
+      <div class="form-group" [class.is-focused]="activeField === 'correo'">
+        <label for="correo">Correo Electrónico Registrado</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input 
+            type="email" 
+            id="correo" 
+            name="correo" 
+            [(ngModel)]="datosRecuperacion.correo" 
+            (focus)="setFocus('correo')"
+            (blur)="clearFocus()"
+            placeholder="usuario@gestock.com" 
+            required>
+        </div>
+      </div>
+
+      <button type="submit" class="apple-btn-submit" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Enviar Código de Recuperación</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+        <span *ngIf="!isLoading" class="btn-arrow">&rarr;</span>
+      </button>
+    </form>
+
+    <!-- PASO 2: Validación del Código (HU006) -->
+    <form *ngIf="pasoActual === 2" (ngSubmit)="validarCodigo()" class="apple-form">
+      <div class="form-group" [class.is-focused]="activeField === 'codigo'">
+        <label for="codigo">Código de 6 dígitos</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔑</span>
+          <input 
+            type="text" 
+            id="codigo" 
+            name="codigo" 
+            maxlength="6"
+            [(ngModel)]="datosRecuperacion.codigo" 
+            (focus)="setFocus('codigo')"
+            (blur)="clearFocus()"
+            placeholder="123456" 
+            class="code-input"
+            required>
+        </div>
+      </div>
+
+      <button type="submit" class="apple-btn-submit" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Verificar Código</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+        <span *ngIf="!isLoading" class="btn-arrow">&rarr;</span>
+      </button>
+      <button type="button" class="btn-link" (click)="pasoActual = 1">Cambiar correo</button>
+    </form>
+
+    <!-- PASO 3: Crear Nueva Contraseña (HU007) -->
+    <form *ngIf="pasoActual === 3" (ngSubmit)="guardarNuevaPassword()" class="apple-form">
+      <div class="form-group" [class.is-focused]="activeField === 'nuevaPassword'">
+        <label for="nuevaPassword">Nueva Contraseña</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input 
+            type="password" 
+            id="nuevaPassword" 
+            name="nuevaPassword" 
+            [(ngModel)]="datosRecuperacion.nuevaPassword" 
+            (focus)="setFocus('nuevaPassword')"
+            (blur)="clearFocus()"
+            placeholder="••••••••" 
+            required>
+        </div>
+      </div>
+
+      <div class="form-group" [class.is-focused]="activeField === 'confirmarPassword'">
+        <label for="confirmarPassword">Confirmar Nueva Contraseña</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🛡️</span>
+          <input 
+            type="password" 
+            id="confirmarPassword" 
+            name="confirmarPassword" 
+            [(ngModel)]="datosRecuperacion.confirmarPassword" 
+            (focus)="setFocus('confirmarPassword')"
+            (blur)="clearFocus()"
+            placeholder="••••••••" 
+            required>
+        </div>
+      </div>
+
+      <button type="submit" class="apple-btn-submit" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Restablecer Contraseña</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="card-footer">
+      <p>¿Recordaste tu contraseña? <a href="#" class="login-link">Iniciar sesión</a></p>
+    </div>
+  </div>
+</div>

@@ -1,10 +1,25 @@
-<div class="layout-container">
-  <app-sidebar></app-sidebar>
-  <div class="main-wrapper">
+<div class="sofia-layout">
+  
+  <!-- Columna Izquierda: Sidebar fijo -->
+  <aside class="sidebar-wrapper">
+    <nav class="sidebar-content">
+      <app-sidebar></app-sidebar>
+    </nav>
+  </aside>
+
+  <!-- Área Derecha: Header fijo arriba -->
+  <header class="header-container">
     <app-header></app-header>
-    <main class="content-area">
-      <router-outlet></router-outlet>
-    </main>
+  </header>
+
+  <!-- Contenido Principal con Scroll -->
+  <main class="content-container">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer Inferior fijo -->
+  <footer class="footer-container">
     <app-footer></app-footer>
-  </div>
+  </footer>
+
 </div>

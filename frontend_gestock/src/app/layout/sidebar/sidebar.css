@@ -1,59 +1,129 @@
-.sidebar {
-  width: 230px;
-  min-height: 100vh;
-  background-color: #0d0e23;
-  color: #a0a5b5;
+.app-sidebar {
+  width: 240px;
+  height: 100vh;
+  background-color: #131b2e;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  justify-content: space-between;
+  padding: 1.25rem 1rem;
+  box-sizing: border-box;
 }
 
-.brand {
+/* Header / Brand */
+.sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 20px 24px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.brand h2 {
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.brand-text {
   color: #ffffff;
-  font-size: 20px;
-  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-.logo-box {
-  background: #202242;
-  padding: 6px 10px;
-  border-radius: 8px;
-}
-
-.menu {
+/* Menú de Navegación */
+.sidebar-nav {
   display: flex;
   flex-direction: column;
-  margin-top: 16px;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.menu-item {
+.nav-section-title {
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding-left: 0.75rem;
+  display: block;
+  visibility: visible;
+}
+
+.nav-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 24px;
-  color: #9499ad;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  color: #94a3b8;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
-.menu-item:hover {
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.03);
 }
 
-.menu-item.active {
-  background-color: #3a86ff;
+.nav-item.active {
+  background-color: #2563eb;
   color: #ffffff;
   font-weight: 600;
-  border-radius: 0 8px 8px 0;
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+}
+
+/* Footer Sidebar / Logout */
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1rem;
+}
+
+.btn-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Adaptabilidad Responsive (móviles/tablets) */
+@media (max-width: 768px) {
+  .app-sidebar {
+    width: 65px;
+    padding: 1.25rem 0.5rem;
+  }
+
+  .brand-text,
+  .nav-section-title,
+  .nav-text {
+    display: none !important;
+  }
+
+  .sidebar-brand,
+  .nav-item,
+  .btn-logout {
+    justify-content: center;
+    padding: 0.75rem 0;
+  }
 }

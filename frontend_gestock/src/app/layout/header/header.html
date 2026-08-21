@@ -1,17 +1,40 @@
-<header class="header">
-  <div class="header-title">
-    <span>GESTOCK</span>
+<header class="app-header">
+  <div class="header-left">
+    <a routerLink="/gestock" class="brand">
+      <div class="brand-icon">
+        GS
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">GESTOCK</span>
+        <span class="brand-subtitle">Gestión de Inventario</span>
+      </div>
+    </a>
   </div>
-  <div class="header-actions">
-    <div class="notifications">
-      <span class="bell-icon">🔔</span>
-      <span class="badge">3</span>
+
+  <div class="header-right">
+    <!-- Indicador de estado -->
+    <div class="header-status">
+      <span class="status-dot"></span>
+      Sistema activo
     </div>
+
+    <!-- Icono de Notificaciones -->
+    <button 
+      type="button" 
+      class="icon-btn" 
+      aria-label="Notificaciones"
+      [routerLink]="['/app/configuracion']" 
+      [queryParams]="{ tab: 'notificaciones' }">
+      <span class="bell-icon">🔔</span>
+      <span class="notification-badge"></span>
+    </button>
+
+    <!-- Perfil del Usuario -->
     <div class="user-profile">
-      <div class="avatar">A</div>
+      <div class="user-avatar">M</div>
       <div class="user-info">
-        <span class="user-name">Administrador</span>
-        <span class="user-role">Administrador &#9660;</span>
+        <span class="user-name">Maicol Nore</span>
+        <span class="user-role">Operador &#9662;</span>
       </div>
     </div>
   </div>
