@@ -1,0 +1,41 @@
+<div class="module-container animate-fade-in">
+  <header class="module-header">
+    <div class="header-title">
+      <h1><i class="fas fa-exclamation-triangle"></i> Control de Alertas de Stock</h1>
+      <p>Monitoreo de productos con stock crítico o próximo a vencer</p>
+    </div>
+    <button class="btn-primary" type="button" (click)="cargarAlertas()">
+      <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> Refrescar
+    </button>
+  </header>
+
+  <div class="table-card animate-zoom-in">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Producto</th>
+          <th>Bodega</th>
+          <th>Stock Actual</th>
+          <th>Stock Mínimo</th>
+          <th>Nivel de Alerta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alerta of alertas" class="table-row">
+          <td>#{{ alerta.id }}</td>
+          <td><strong>{{ alerta.producto }}</strong></td>
+          <td>{{ alerta.bodega }}</td>
+          <td><span class="text-danger font-weight-bold">{{ alerta.stockActual }}</span></td>
+          <td>{{ alerta.stockMinimo }}</td>
+          <td>
+            <span class="badge-status {{ alerta.nivel.toLowerCase() }}">{{ alerta.nivel }}</span>
+          </td>
+        </tr>
+        <tr *ngIf="alertas.length === 0">
+          <td colspan="6" class="no-data">No hay alertas activas en este momento.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

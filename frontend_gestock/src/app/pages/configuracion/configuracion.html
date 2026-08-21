@@ -1,0 +1,388 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>Configuración</h1>
+    <p>Personaliza tu experiencia en GESTOCK</p>
+  </header>
+
+  <!-- NAVEGACIÓN POR PESTAÑAS (TABS) -->
+  <div class="controls-bar">
+    <div class="tabs">
+      <button 
+        [class.active]="tabActiva === 'notificaciones'" 
+        (click)="cambiarTab('notificaciones')">
+        🔔 Notificaciones
+      </button>
+      <button 
+        [class.active]="tabActiva === 'seguridad'" 
+        (click)="cambiarTab('seguridad')">
+        🛡️ Seguridad
+      </button>
+      <button 
+        [class.active]="tabActiva === 'backup'" 
+        (click)="cambiarTab('backup')">
+        💾 Backup
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB: NOTIFICACIONES -->
+  @if (tabActiva === 'notificaciones') {
+    <div class="card-panel">
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Alertas por Correo</h4>
+          <p>Recibe notificaciones cuando el stock llegue al nivel mínimo.</p>
+        </div>
+        <button 
+          class="btn-toggle-status" 
+          [class.is-active]="config.notificacionesEmail"
+          (click)="config.notificacionesEmail = !config.notificacionesEmail">
+          <span [class]="config.notificacionesEmail ? 'status-text green' : 'status-text red'">
+            {{ config.notificacionesEmail ? 'Activar' : 'Desactivar' }}
+          </span>
+        </button>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Resumen Semanal</h4>
+          <p>Envía un informe de movimientos e inventarios cada lunes.</p>
+        </div>
+        <button 
+          class="btn-toggle-status" 
+          [class.is-active]="config.resumenSemanal"
+          (click)="config.resumenSemanal = !config.resumenSemanal">
+          <span [class]="config.resumenSemanal ? 'status-text green' : 'status-text red'">
+            {{ config.resumenSemanal ? 'Activar' : 'Desactivar' }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN DE HISTORIAL DE NOTIFICACIONES E INCIDENCIAS -->
+    <div class="card-panel history-panel">
+      <div class="history-header">
+        <div class="setting-info">
+          <h4>Historial de Notificaciones e Incidencias</h4>
+          <p>Registro reciente de eventos, alertas de envíos y stock en el sistema</p>
+        </div>
+        <span class="history-badge">4 Recibidas</span>
+      </div>
+
+      <div class="notifications-feed">
+        <div class="notification-card unread">
+          <div class="notif-icon incidencia">⚠️</div>
+          <div class="notif-details">
+            <div class="notif-head">
+              <span class="notif-title">Incidencia en Envío #ENV-8842</span>
+              <span class="notif-time">21/08/2026 - 02:30 PM</span>
+            </div>
+            <p class="notif-body">Retraso reportado en la zona de transferencia de pista por condiciones climáticas en Yopal.</p>
+          </div>
+        </div>
+
+        <div class="notification-card unread">
+          <div class="notif-icon envio">🚚</div>
+          <div class="notif-details">
+            <div class="notif-head">
+              <span class="notif-title">Despegue Confirmado</span>
+              <span class="notif-time">21/08/2026 - 11:15 AM</span>
+            </div>
+            <p class="notif-body">El paquete con guía #ENV-9011 ha completado la fase de recolección e inició tránsito.</p>
+          </div>
+        </div>
+
+        <div class="notification-card">
+          <div class="notif-icon stock">📦</div>
+          <div class="notif-details">
+            <div class="notif-head">
+              <span class="notif-title">Alerta de Stock Mínimo</span>
+              <span class="notif-time">20/08/2026 - 09:45 AM</span>
+            </div>
+            <p class="notif-body">El producto SKU-4029 alcanzó el umbral mínimo en la Bodega Central.</p>
+          </div>
+        </div>
+
+        <div class="notification-card">
+          <div class="notif-icon resolved">✅</div>
+          <div class="notif-details">
+            <div class="notif-head">
+              <span class="notif-title">Incidencia Resuelta</span>
+              <span class="notif-time">19/08/2026 - 04:20 PM</span>
+            </div>
+            <p class="notif-body">Se autorizó la sustitución de mercancía averiada para el envío #ENV-8700.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- TAB: SEGURIDAD -->
+  @if (tabActiva === 'seguridad') {
+    <div class="card-panel">
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Configuracion de seguridad</h4>
+          <p>Protege tu cuenta y datos</p>
+        </div>
+        <button 
+          class="btn-toggle-status" 
+          [class.is-active]="config.seguridadActiva"
+          (click)="config.seguridadActiva = !config.seguridadActiva">
+          <span [class]="config.seguridadActiva ? 'status-text green' : 'status-text red'">
+            {{ config.seguridadActiva ? 'Activar' : 'Desactivar' }}
+          </span>
+        </button>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Autenticación de dos Factores</h4>
+          <p>Añade una capa extra de seguridad</p>
+        </div>
+        <button 
+          class="btn-toggle-status" 
+          [class.is-active]="config.dosFactores"
+          (click)="config.dosFactores = !config.dosFactores">
+          <span [class]="config.dosFactores ? 'status-text green' : 'status-text red'">
+            {{ config.dosFactores ? 'Activar' : 'Desactivar' }}
+          </span>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label for="tiempoSesion">Tiempo de sesión (minutos)</label>
+        <input 
+          id="tiempoSesion" 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="config.tiempoSesion" 
+          placeholder="30">
+      </div>
+
+      <div class="form-group">
+        <label for="expiracionPass">Expiración de Contraseña (días)</label>
+        <input 
+          id="expiracionPass" 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="config.expiracionPassword" 
+          placeholder="90">
+      </div>
+    </div>
+  }
+
+  <!-- TAB: BACKUP -->
+  @if (tabActiva === 'backup') {
+    <div class="card-panel">
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Copias de Seguridad</h4>
+          <p>Configura las copias de seguridad automaticas</p>
+        </div>
+        <button 
+          class="btn-toggle-status" 
+          [class.is-active]="config.copiasSeguridad"
+          (click)="config.copiasSeguridad = !config.copiasSeguridad">
+          <span [class]="config.copiasSeguridad ? 'status-text green' : 'status-text red'">
+            {{ config.copiasSeguridad ? 'Activar' : 'Desactivar' }}
+          </span>
+        </button>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Backup Automatico</h4>
+          <p>Realizar copias de seguridad automaticamente</p>
+        </div>
+        <button 
+          class="btn-toggle-status" 
+          [class.is-active]="config.backupAutomatico"
+          (click)="config.backupAutomatico = !config.backupAutomatico">
+          <span [class]="config.backupAutomatico ? 'status-text green' : 'status-text red'">
+            {{ config.backupAutomatico ? 'Activar' : 'Desactivar' }}
+          </span>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label for="frecuenciaBackup">Frecuencia</label>
+        <select id="frecuenciaBackup" class="form-control select-control" [(ngModel)]="config.frecuenciaBackup">
+          <option value="diario">Diario</option>
+          <option value="semanal">Semanal</option>
+          <option value="mensual">Mensual</option>
+          <option value="anual">Anual</option>
+        </select>
+      </div>
+
+      <div class="backup-actions">
+        <!-- BOTÓN CON ESTADO DE CARGA PARA BACKUP MANUAL -->
+        <button 
+          class="btn-action-outline" 
+          (click)="ejecutarBackupManual()" 
+          [disabled]="cargandoBackup">
+          @if (cargandoBackup) {
+            <span class="spinner-sm"></span> Generando respaldo...
+          } @else {
+            🗄️ Backup manual
+          }
+        </button>
+
+        <button class="btn-action-outline" (click)="exportarConfiguracion()">
+          ✉️ Exportar configuración
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- BOTÓN DE GUARDAR CAMBIOS -->
+  <div class="actions-footer">
+    <button class="btn-primary btn-save" (click)="abrirModalGuardar()">
+      Guardar cambios
+    </button>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN Y MENSAJE DE ÉXITO AL GUARDAR -->
+@if (mostrarModalGuardar) {
+  <div class="modal-backdrop" (click)="cerrarModalGuardar()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      
+      <!-- ESTADO 1: PREGUNTA DE CONFIRMACIÓN -->
+      @if (!guardadoExitoso) {
+        <div class="modal-icon-container">
+          <span class="modal-icon">⚙️</span>
+        </div>
+        <h3 class="modal-title">¿Guardar ajustes?</h3>
+        <p class="modal-description">
+          Se aplicarán los cambios realizados en la sección 
+          <strong style="color: #3a86ff;">{{ tabActiva.toUpperCase() }}</strong>.
+        </p>
+
+        <div class="modal-actions">
+          <button class="btn-modal-cancel" (click)="cerrarModalGuardar()">Cancelar</button>
+          <button class="btn-modal-confirm" (click)="confirmarGuardado()">Confirmar</button>
+        </div>
+      } 
+      <!-- ESTADO 2: MENSAJE DE ÉXITO -->
+      @else {
+        <div class="modal-icon-container success-icon-container">
+          <span class="modal-icon success-icon">✓</span>
+        </div>
+        <h3 class="modal-title text-success">¡Ajustes Guardados!</h3>
+        <p class="modal-description">
+          Los cambios en <strong style="color: #10b981;">{{ tabActiva.toUpperCase() }}</strong> se han actualizado con éxito.
+        </p>
+
+        <div class="modal-actions">
+          <button class="btn-modal-confirm btn-full-width" (click)="finalizarGuardado()">
+            Finalizar
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}
+
+<!-- MODAL DE EXPORTAR CONFIGURACIÓN -->
+@if (mostrarModalExportar) {
+  <div class="modal-backdrop" (click)="cerrarModalExportar()">
+    <div class="modal-card modal-export" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header-export">
+        <div class="modal-icon-container">
+          <span class="modal-icon">📤</span>
+        </div>
+        <h3 class="modal-title">Exportar Configuración</h3>
+        <p class="modal-description">Selecciona el formato y los datos que deseas incluir en la descarga.</p>
+      </div>
+
+      <div class="modal-body-export">
+        <!-- SELECCIÓN DE FORMATO DE ARCHIVO -->
+        <div class="form-group">
+          <label class="form-label">Formato de salida</label>
+          <div class="format-options">
+            <button 
+              type="button"
+              class="format-btn" 
+              [class.active]="opcionesExportar.formato === 'json'"
+              (click)="opcionesExportar.formato = 'json'">
+              <span class="format-icon">📄</span>
+              <span class="format-name">JSON</span>
+              <span class="format-desc">Respaldo técnico completo</span>
+            </button>
+
+            <button 
+              type="button"
+              class="format-btn" 
+              [class.active]="opcionesExportar.formato === 'csv'"
+              (click)="opcionesExportar.formato = 'csv'">
+              <span class="format-icon">📊</span>
+              <span class="format-name">CSV</span>
+              <span class="format-desc">Para hojas de cálculo</span>
+            </button>
+
+            <button 
+              type="button"
+              class="format-btn" 
+              [class.active]="opcionesExportar.formato === 'pdf'"
+              (click)="opcionesExportar.formato = 'pdf'">
+              <span class="format-icon">📑</span>
+              <span class="format-name">PDF</span>
+              <span class="format-desc">Reporte imprimible</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MÓDULOS A INCLUIR -->
+        <div class="form-group">
+          <label class="form-label">Secciones a incluir</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" [(ngModel)]="opcionesExportar.incluirNotificaciones">
+              <span>🔔 Notificaciones</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" [(ngModel)]="opcionesExportar.incluirSeguridad">
+              <span>🛡️ Seguridad y Permisos</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" [(ngModel)]="opcionesExportar.incluirBackup">
+              <span>💾 Copias de Seguridad</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" (click)="cerrarModalExportar()">Cancelar</button>
+        <button class="btn-modal-confirm" (click)="descargarArchivoConfiguracion()">
+          Descargar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- MODAL DE CONFIRMACIÓN DE BACKUP MANUAL EXITOSO -->
+@if (mostrarModalBackupExitoso) {
+  <div class="modal-backdrop" (click)="cerrarModalBackup()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon-container success-icon-container">
+        <span class="modal-icon success-icon">💾</span>
+      </div>
+      <h3 class="modal-title text-success">¡Copia de Seguridad Generada!</h3>
+      <p class="modal-description">
+        El respaldo manual del sistema finalizó con éxito a las <strong>{{ ultimoBackupFecha }}</strong> y el archivo JSON ha iniciado su descarga.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-modal-confirm btn-full-width" (click)="cerrarModalBackup()">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+}

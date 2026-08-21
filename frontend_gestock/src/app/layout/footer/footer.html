@@ -1,10 +1,19 @@
 <footer class="app-footer">
   <div class="footer-content">
-    <p>&copy; 2026 Gestock - Sistema de Gestión de Inventarios y Mantenimiento</p>
-    <div class="footer-links">
-      <span>Versión 1.0.0</span>
-      <span class="separator">•</span>
-      <span>SENA ADSO</span>
+    <div class="footer-brand">
+      <strong>GESTOCK</strong>
+      <span>Sistema de Gestión de Inventarios y Mantenimiento</span>
+    </div>
+
+    <nav class="footer-links">
+      <a routerLink="/gestock">Inicio</a>
+      <a routerLink="/gestock/gestion/inventario">Inventario</a>
+      <a routerLink="/gestock/gestion/auditorias">Auditorías</a>
+      <a routerLink="/gestock/gestion/roles-usuarios">Roles y Usuarios</a>
+    </nav>
+
+    <div class="footer-copy">
+      &copy; {{ currentYear }} GESTOCK. Todos los derechos reservados. | SENA ADSO
     </div>
   </div>
 </footer>

@@ -1,0 +1,134 @@
+<div class="bodegas-container animate-fade">
+  
+  <!-- Cabecera de la sección -->
+  <div class="bodegas-header">
+    <div>
+      <h2>Listado y Control de Bodegas</h2>
+      <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación</p>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <span class="bodegas-count">{{ bodegas().length }} Registradas</span>
+      <button class="btn-nueva" (click)="mostrarModal.set(true)">
+        <i class="fas fa-warehouse"></i> + Nueva Bodega
+      </button>
+    </div>
+  </div>
+
+  <!-- Cuadrícula de Tarjetas de Bodegas -->
+  <div class="bodegas-grid">
+    @for (bodega of bodegas(); track bodega.id) {
+      <div class="bodega-card" [ngClass]="{ 'inactiva': !bodega.activa }">
+        
+        <!-- Header de la tarjeta -->
+        <div class="card-header">
+          <div class="bodega-info-main">
+            <div class="bodega-icon">{{ bodega.icono }}</div>
+            <div>
+              <h3>{{ bodega.nombre }}</h3>
+              <span class="bodega-ciudad">📍 {{ bodega.ciudad }} ({{ bodega.codigo }})</span>
+            </div>
+          </div>
+
+          <div class="switch-container">
+            <span class="badge-status" [ngClass]="{ 'active': bodega.activa }">
+              {{ bodega.activa ? 'Activa' : 'Inactiva' }}
+            </span>
+            <label class="switch" title="Activar / Desactivar Bodega">
+              <input type="checkbox" [checked]="bodega.activa" (change)="toggleEstado(bodega.id)">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+
+        <hr class="card-divider">
+
+        <!-- Cuerpo de detalles -->
+        <div class="card-body">
+          <div class="detail-row">
+            <span class="label"><i class="fas fa-map-marked-alt text-muted"></i> Dirección:</span>
+            <span class="value">{{ bodega.direccion }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label"><i class="fas fa-user-shield text-muted"></i> Responsable:</span>
+            <span class="value">{{ bodega.responsable }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label"><i class="fas fa-phone-alt text-muted"></i> Teléfono:</span>
+            <span class="value">{{ bodega.telefono }}</span>
+          </div>
+        </div>
+
+        <!-- Barra de capacidad -->
+        <div class="capacidad-container">
+          <div class="capacidad-header">
+            <span>Capacidad: {{ getPorcentaje(bodega.ocupado, bodega.capacidad) }}%</span>
+            <span>{{ bodega.ocupado | number }} / {{ bodega.capacidad | number }} un.</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="getPorcentaje(bodega.ocupado, bodega.capacidad)"
+              [ngClass]="{ 'high-capacity': getPorcentaje(bodega.ocupado, bodega.capacidad) > 80 }">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL DE NUEVA BODEGA (ANIMADO Y OSCURO) -->
+<!-- ========================================== -->
+<div class="modal-overlay animate-fade" *ngIf="mostrarModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-plus-circle"></i> Registrar Nueva Bodega</h3>
+      <p class="text-subtitle-sm">Completa los datos para habilitar el espacio logístico</p>
+    </div>
+    
+    <form (ngSubmit)="crearBodega()" class="modal-form">
+      <div class="input-group">
+        <label class="form-label">Nombre de Bodega</label>
+        <input type="text" [(ngModel)]="nuevaBodega.nombre" name="nombre" class="dark-input w-100" placeholder="Ej. Bodega Principal" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Código</label>
+        <input type="text" [(ngModel)]="nuevaBodega.codigo" name="codigo" class="dark-input w-100" placeholder="Ej. BOD-004" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Dirección</label>
+        <input type="text" [(ngModel)]="nuevaBodega.direccion" name="direccion" class="dark-input w-100" placeholder="Ej. Calle 100 # 15-20" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Ciudad</label>
+        <input type="text" [(ngModel)]="nuevaBodega.ciudad" name="ciudad" class="dark-input w-100" placeholder="Ej. Yopal" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Teléfono</label>
+        <input type="text" [(ngModel)]="nuevaBodega.telefono" name="telefono" class="dark-input w-100" placeholder="Ej. 3101234567" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Responsable</label>
+        <input type="text" [(ngModel)]="nuevaBodega.responsable" name="responsable" class="dark-input w-100" placeholder="Ej. Juan Pérez" required>
+      </div>
+
+      <div class="input-group full-width">
+        <label class="form-label">Capacidad Máxima (Unidades)</label>
+        <input type="number" [(ngModel)]="nuevaBodega.capacidad" name="capacidad" class="dark-input w-100" placeholder="Ej. 10000" required>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-cancelar" (click)="mostrarModal.set(false)">Cancelar</button>
+        <button type="submit" class="btn-crear">Guardar Bodega</button>
+      </div>
+    </form>
+  </div>
+</div>

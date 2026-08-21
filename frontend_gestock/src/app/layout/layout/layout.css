@@ -10,6 +10,7 @@
   height: 100vh;
   background-color: #070a12;
   color: #f8fafc;
+  overflow: hidden; /* Evita scroll general en la ventana */
 }
 
 /* 1. Sidebar fijo */

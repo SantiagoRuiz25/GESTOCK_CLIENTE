@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
+import { LayoutComponent } from './layout/layout/layout';
 
 export const routes: Routes = [
-  // Redirección inicial
-  { 
-    path: '', 
-    redirectTo: 'auth/login', 
-    pathMatch: 'full' 
+  // Ruta raíz: landing page informativa
+  {
+    path: '',
+    title: 'GESTOCK - Inicio',
+    loadComponent: () =>
+      import('./pagina/pagina').then((m) => m.PaginaComponent),
   },
 
   // Módulo de Autenticación (Pantallas independientes sin Header/Sidebar)
@@ -35,31 +37,60 @@ export const routes: Routes = [
     ]
   },
 
-  // Layout Principal (Contiene Sidebar, Header, Footer y vistas centrales)
+  // Ruta del sistema interno con Sidebar/Layout que agrupa todas las secciones
   {
     path: 'app',
-    loadComponent: () => import('./layout/layout/layout').then(m => m.LayoutComponent),
+    component: LayoutComponent,
     children: [
-      { 
-        path: '', 
-        redirectTo: 'panel', 
-        pathMatch: 'full' 
+      { path: '', redirectTo: 'gestion/inventario', pathMatch: 'full' },
+      
+      // Módulo de Inventario con sus subrutas
+      {
+        path: 'gestion/inventario',
+        loadComponent: () => import('./pages/gestion/inventario/inventario').then(m => m.InventarioComponent),
+        children: [
+          { path: '', redirectTo: 'lista-productos', pathMatch: 'full' },
+          { path: 'lista-productos', loadComponent: () => import('./pages/gestion/inventario/lista-productos/lista-productos').then(m => m.ListaProductosComponent) },
+          { path: 'registrar-productos', loadComponent: () => import('./pages/gestion/inventario/registrar-productos/registrar-productos').then(m => m.RegistrarProductosComponent) },
+          { path: 'bodegas', loadComponent: () => import('./pages/gestion/inventario/bodegas/bodegas').then(m => m.BodegasComponent) }
+        ]
+      },
+      
+      // Módulo de Auditoría
+      {
+        path: 'gestion/auditorias',
+        loadComponent: () => import('./pages/gestion/auditorias/auditorias').then(m => m.AuditoriasComponent)
+      },
+      
+      // Módulo de Roles y Usuarios
+      {
+        path: 'gestion/roles-yusuarios',
+        loadComponent: () => import('./pages/gestion/roles-yusuarios/roles-yusuarios').then(m => m.RolesUsuariosComponent)
+      },
+
+      // Módulos adicionales
+      {
+        path: 'reportes',
+        title: 'GESTOCK - Reportes y Estadísticas',
+        loadComponent: () =>
+          import('./pages/reportes/reportes').then((m) => m.ReportesComponent),
       },
       {
-        path: 'panel',
-        loadComponent: () => import('./pages/dashboard/panel/panel').then(m => m.PanelComponent),
-        title: 'Panel de Control - Gestock'
+        path: 'envios',
+        title: 'GESTOCK - Gestión de Envíos',
+        loadComponent: () =>
+          import('./pages/envio/envio').then((m) => m.EnviosComponent),
       },
       {
-        path: 'panel/:id',
-        loadComponent: () => import('./pages/dashboard/panel/panel').then(m => m.PanelComponent),
-        title: 'Panel de Control - Gestock'
+        path: 'configuracion',
+        title: 'GESTOCK - Configuración del Sistema',
+        loadComponent: () =>
+          import('./pages/configuracion/configuracion').then(
+            (m) => m.ConfiguracionComponent
+          ),
       },
-      {
-        path: 'empresas',
-        loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresaComponent),
-        title: 'Empresas - Gestock'
-      },
+      
+      // Mantenimiento (del otro bloque)
       {
         path: 'programacion',
         loadComponent: () => import('./pages/mantenimiento/programacion-mantenimiento/programacion-mantenimiento.component').then(m => m.ProgramacionMantenimientoComponent),
@@ -69,13 +100,19 @@ export const routes: Routes = [
         path: 'incidencias',
         loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.RegistroIncidenciasComponent),
         title: 'Registro de Incidencias - Gestock'
-      }
-    ]
+      },
+      
+      // Captura cualquier ruta interna errónea dentro de /app
+      {
+        path: '**',
+        redirectTo: 'gestion/inventario',
+      },
+    ],
   },
 
-  // Ruta Comodín (Redirige cualquier URL no válida al Login)
+  // Redirige URLs externas inexistentes a la landing page principal
   {
     path: '**',
-    redirectTo: 'auth/login'
-  }
+    redirectTo: '',
+  },
 ];

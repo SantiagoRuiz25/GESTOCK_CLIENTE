@@ -1,4 +1,38 @@
 /* ==========================================================================
+   MODO OSCURO GLOBAL Y RESET PARA GESTOCK
+   ========================================================================== */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow-x: hidden;
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Evita que los contenedores principales de Angular agreguen margen */
+app-root, mat-sidenav-container, mat-sidenav-content {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Contenedores de vistas principales */
+.content-container {
+  background-color: #0b0f19 !important;
+}
+
+
+/* ==========================================================================
    EFECTO MOUSE-TRACKING / GLOW BORDER PARA CARDS Y CONTENEDORES
    ========================================================================== */
 
@@ -19,6 +53,14 @@ button,
   position: relative;
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilo base para las tarjetas */
+.card {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Efecto de borde iluminado y sombra sofisticada al pasar el cursor */

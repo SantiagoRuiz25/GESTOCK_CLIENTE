@@ -1,0 +1,287 @@
+<div class="landing-container">
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="logo-box">
+        <span class="logo-icon">📦</span>
+      </div>
+      <span class="brand-name">GESTOCK</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#inicio">inicio</a>
+      <a href="#blog">blog</a>
+      <a href="#contacto">contactanos</a>
+      <button class="btn-start" (click)="irAlSistema()">
+        <span>Registrate</span>
+        <span class="user-icon">👤</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Google Fonts para Orbitron y Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;1,300&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- 1. Hero Section Impactante -->
+  <section id="inicio" class="hero-section-striking">
+    <div class="hero-bg-glow"></div>
+    
+    <!-- Elementos Flotantes de Ilustración -->
+    <div class="floating-element float-1">📦</div>
+    <div class="floating-element float-2">📊</div>
+    <div class="floating-element float-3">🏷️</div>
+
+    <!-- Refrán / Proverbio Promocional -->
+    <div class="quote-card-glow">
+      <span class="quote-icon">💡</span>
+      <blockquote class="proverb-text">
+        "Lo que no se mide, no se controla; y lo que no se controla, no se puede mejorar."
+      </blockquote>
+    </div>
+
+    <!-- Título Principal -->
+    <div class="hero-title-container">
+      <h1 class="gestock-glow-title">GESTOCK</h1>
+    </div>
+  </section>
+
+  <!-- Sección Interactiva 3D (Estilo Apple) -->
+  <section class="section-3d-experience">
+    <div class="pin-container">
+      <div id="canvas-container"></div>
+
+      <div class="features-overlay">
+        <div class="feature-card f-1">
+          <span class="badge">01. Visibilidad Total</span>
+          <h3>Control de Inventario en Tiempo Real</h3>
+          <p>Monitorea cada entrada, salida y movimiento exacto con precisión milimétrica.</p>
+        </div>
+
+        <div class="feature-card f-2">
+          <span class="badge">02. Automatización RFID</span>
+          <h3>Cero Errores Manuales</h3>
+          <p>Escaneo masivo e instantáneo sin necesidad de abrir las cajas ni realizar conteos uno a uno.</p>
+        </div>
+
+        <div class="feature-card f-3">
+          <span class="badge">03. Máxima Seguridad</span>
+          <h3>Fiabilidad de Datos al 100%</h3>
+          <p>Toma decisiones estratégicas respaldadas por informes financieros y analíticas precisas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Galería Interactiva -->
+  <section class="gallery-section" id="blog">
+    <div class="kofdun-galeri">
+      <div class="card-item card-1" (click)="abrirModal(1)">
+        <div class="card-overlay">
+          <h3>Control de Inventario RFID</h3>
+          <p>Visibilidad y automatización en tiempo real.</p>
+        </div>
+      </div>
+      <div class="card-item card-2" (click)="abrirModal(2)">
+        <div class="card-overlay">
+          <h3>Fiabilidad de Datos</h3>
+          <p>Toma de decisiones rápidas con información 100% segura.</p>
+        </div>
+      </div>
+      <div class="card-item card-3" (click)="abrirModal(3)">
+        <div class="card-overlay">
+          <h3>Gestor de Objetos</h3>
+          <p>Gestión inteligente de entradas, salidas y existencias.</p>
+        </div>
+      </div>
+      <div class="card-item card-4" (click)="abrirModal(4)">
+        <div class="card-overlay">
+          <h3>¿Quiénes somos?</h3>
+          <p>Tu aliado en transformación y desarrollo tecnológico.</p>
+        </div>
+      </div>
+      <div class="card-item card-5" (click)="abrirModal(5)">
+        <div class="card-overlay">
+          <h3>Reseñas de Usuarios</h3>
+          <p>⭐ 4.8 Calificación de satisfacción de nuestros clientes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Botón Ingreso al Sistema -->
+  <section class="system-entry-section">
+    <div class="system-entry-content">
+      <h2 class="system-title">Sistema de inventarios</h2>
+      <button class="btn-ingresar-capsule" (click)="irAlSistema()">
+        Ingresar
+      </button>
+    </div>
+  </section>
+
+  <!-- 4. Ubicación -->
+  <section class="location-standalone-section">
+    <div class="standalone-location-card">
+      <h3>Ubicación</h3>
+      <p class="city-title">YOPAL - CASANARE</p>
+      <p class="address">Crr. 19 # cll 36 - 14</p>
+      <p class="phone">📞 Teléfono: 3222336216</p>
+      
+      <div class="map-container">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.138378523292!2d-72.3958!3d5.3375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6b0c2a5e8c15a1%3A0x1!2sCra.+19+%26+Cl.+36%2C+Yopal%2C+Casanare!5e0!3m2!1ses!2sco!4v1700000000000" 
+          width="100%" 
+          height="220" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Contáctenos -->
+  <section id="contacto" class="contact-banner-section">
+    <div class="contact-banner-header">
+      <h2>Contáctenos</h2>
+      <p>¿Podemos ayudarte?</p>
+      <p class="subtitle-desc">
+        Encuentra la solución o el producto que cumpla tus necesidades de negocio. Pregúntanos para ayudarte a encontrar la decisión correcta.
+      </p>
+    </div>
+
+    <div class="contact-cards-container">
+      <div class="info-box-card">
+        <div class="icon-circle phone-icon">📞</div>
+        <h4>Llámanos</h4>
+        <p>Teléfono: 3222336216</p>
+      </div>
+
+      <div class="info-box-card">
+        <div class="icon-circle location-icon">📍</div>
+        <h4>YOPAL - CASANARE</h4>
+        <p>CRR 19 # 36 - 14</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Formulario ("¿Deseas más información?") -->
+  <section class="form-section">
+    <div class="form-card-container">
+      <div class="form-left-info">
+        <h3>Ubicación</h3>
+        <p>Crr. 19 # cll 36 - 14, Yopal, Casanare</p>
+      </div>
+      <div class="form-right-content">
+        <h3>¿Deseas más información? <span class="badge-contacto">Contáctanos</span></h3>
+        <form class="contact-form-elements" (submit)="$event.preventDefault()">
+          <input type="text" placeholder="Ingresa nombre" required />
+          <input type="email" placeholder="Correo" required />
+          <textarea placeholder="Descripción" rows="3" required></textarea>
+          <div class="form-btn-wrapper">
+            <button type="submit" class="btn-form-submit">Enviar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Botón WhatsApp centrado abajo -->
+  <section class="whatsapp-centered-section">
+    <button class="btn-whatsapp-capsule" (click)="abrirWhatsApp()">
+      <span class="whatsapp-icon">💬</span>
+      <span>Contáctanos por WhatsApp</span>
+    </button>
+  </section>
+
+  <!-- 8. Créditos / Footer -->
+  <footer class="footer-detailed">
+    <div class="footer-columns">
+      <div class="footer-col">
+        <h4>Productos</h4>
+        <ul>
+          <li><a href="#">Puntos de venta</a></li>
+          <li><a href="#">Pagos</a></li>
+          <li><a href="#">En Línea</a></li>
+          <li><a href="#">Facturas</a></li>
+          <li><a href="#">Marketing</a></li>
+          <li><a href="#">Fidelidad</a></li>
+          <li><a href="#">Directorio de clientes</a></li>
+          <li><a href="#">Personal</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Tipos de Negocios</h4>
+        <ul>
+          <li><a href="#">Alimentos y Bebidas</a></li>
+          <li><a href="#">Servicio Rápido</a></li>
+          <li><a href="#">Servicio completo</a></li>
+          <li><a href="#">Tiendas</a></li>
+          <li><a href="#">Barberías</a></li>
+          <li><a href="#">Cuidado físico</a></li>
+          <li><a href="#">Servicios profesionales</a></li>
+          <li><a href="#">Hogar y servicios e reparación franquicia</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="#">Precios</a></li>
+          <li><a href="#">¿Por qué GeSTOCK?</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Ventas</a></li>
+          <li><a href="#">Atención al Cliente</a></li>
+          <li><a href="#">Comunidad GeSTOCK</a></li>
+          <li><a href="#">Servicios de comercio</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <p class="contact-info">Atención al cliente: +57 322 233 6216</p>
+        <p class="contact-info">Ventas: (608) 310 753 7540</p>
+
+        <h4 class="sub-heading">GeSTOCK</h4>
+        <ul>
+          <li><a href="#">Acerca de</a></li>
+          <li><a href="#">Medios de Comunicación</a></li>
+          <li><a href="#">Puestos de Trabajo</a></li>
+          <li><a href="#">Referidos</a></li>
+          <li><a href="#">Socios</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-disclaimer">
+      <p>
+        Aviso sobre la traducción: Parte del contenido pudo haberse traducido con IA para ayudar a nuestra comunidad local. Aunque revisamos todo el material, a veces podría publicarse antes. Si tienes alguna pregunta, no dudes en comunicarte con Atención al Cliente en el idioma de tu preferencia.
+      </p>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div class="country-selector">
+        🌐 Colombia (español)
+      </div>
+      <div class="social-links">
+        <a href="#" aria-label="Twitter">🐦</a>
+        <a href="#" aria-label="Facebook">📘</a>
+        <a href="#" aria-label="Instagram">📷</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal Emergente -->
+  @if (tarjetaSeleccionada) {
+    <div class="modal-backdrop" (click)="cerrarModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="cerrarModal()">✕</button>
+        <h2 class="modal-title">{{ tarjetaSeleccionada.titulo }}</h2>
+        <h4 class="modal-subtitle">{{ tarjetaSeleccionada.subtitulo }}</h4>
+        <hr class="modal-divider" />
+        <div class="modal-body" [innerHTML]="tarjetaSeleccionada.contenidoHtml"></div>
+      </div>
+    </div>
+  }
+</div>

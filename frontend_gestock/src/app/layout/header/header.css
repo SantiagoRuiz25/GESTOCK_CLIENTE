@@ -1,26 +1,75 @@
 .app-header {
   width: 100%;
-  height: 60px;
-  background-color: #131b2e;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  height: 70px;
+  background-color: #0b0f19; /* Color de fondo unificado */
+  border-bottom: 1px solid #334155;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 28px;
   box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: #f1f5f9;
 }
 
-.system-title {
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
   color: #ffffff;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.brand-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 20px;
+}
+
+/* Indicador de estado del sistema */
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
 }
 
 /* Botón de Notificación */
@@ -36,6 +85,7 @@
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s;
+  color: #f1f5f9;
 }
 
 .icon-btn:hover {
@@ -56,7 +106,7 @@
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
@@ -67,16 +117,16 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.avatar {
-  width: 36px;
-  height: 36px;
+.user-avatar {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background-color: #2563eb;
-  color: #ffffff;
-  font-weight: 700;
+  background: #3b82f6;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
   font-size: 0.95rem;
 }
 
@@ -85,14 +135,28 @@
   flex-direction: column;
 }
 
+.user-info strong,
 .user-name {
-  color: #ffffff;
-  font-size: 0.85rem;
+  font-size: 13px;
+  color: #f1f5f9;
   font-weight: 600;
   line-height: 1.2;
 }
 
+.user-info span,
 .user-role {
+  font-size: 11px;
   color: #94a3b8;
-  font-size: 0.75rem;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 15px;
+  }
+  .header-status,
+  .brand-subtitle,
+  .user-info {
+    display: none;
+  }
 }
