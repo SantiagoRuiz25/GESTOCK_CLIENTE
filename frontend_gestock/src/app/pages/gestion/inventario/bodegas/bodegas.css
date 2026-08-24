@@ -13,6 +13,7 @@
   color: #f1f5f9;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
 .bodegas-header {
@@ -263,26 +264,34 @@ input:checked + .slider:before {
   background: linear-gradient(90deg, #f59e0b, #ef4444);
 }
 
-/* --- MODAL OSCURO --- */
+/* --- MODAL OSCURO CENTRADO REAL (CORREGIDO) --- */
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(11, 15, 25, 0.8);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(11, 15, 25, 0.85) !important;
+  backdrop-filter: blur(6px) !important;
+  display: flex !important;
+  align-items: center !important;     /* Centrado vertical perfecto */
+  justify-content: center !important; /* Centrado horizontal perfecto */
+  z-index: 99999 !important;
+  overflow: hidden !important;        /* Elimina barras de scroll por el fondo */
+  margin: 0 !important;
 }
 
 .modal-content {
-  background: #1e293b;
-  border: 1px solid #334155;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  padding: 2rem !important;
+  border-radius: 16px !important;
+  width: 90% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+  box-sizing: border-box !important;
+  position: relative !important;
 }
 
 .modal-header {

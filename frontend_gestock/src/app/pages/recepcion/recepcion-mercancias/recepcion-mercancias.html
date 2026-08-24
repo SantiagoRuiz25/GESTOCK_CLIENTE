@@ -1,42 +1,89 @@
-<!-- Modal de Registro / Validación (HU035 & HU036) -->
-<div class="modal-overlay" *ngIf="isModalOpen">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Registrar y Validar Entrada</h3>
-      <button class="close-btn" (click)="cerrarModalRegistro()">&times;</button>
+<div class="inventory-container">
+  <!-- Cabecera de la Sección -->
+  <div class="section-header">
+    <div>
+      <h2>Historial de Movimientos en Bodega</h2>
+      <p>Visualización y seguimiento corporativo de entradas, salidas y estados de validación</p>
     </div>
-    
-    <div class="form-grid">
-      <div class="input-group">
-        <label>Nº Orden de Compra</label>
-        <input type="text" [(ngModel)]="nuevaRecepcion.orden" placeholder="Ej: OC-2026-900" />
-      </div>
-      <div class="input-group">
-        <label>Nombre del Producto</label>
-        <input type="text" [(ngModel)]="nuevaRecepcion.producto" placeholder="Ej: Teclado Mecánico RGB" />
-      </div>
-      <div class="input-row">
-        <div class="input-group">
-          <label>Cantidad Recibida</label>
-          <input type="number" [(ngModel)]="nuevaRecepcion.cantidad" />
-        </div>
-        <div class="input-group">
-          <label>Estado de Validación</label>
-          <select [(ngModel)]="nuevaRecepcion.estado">
-            <option value="Validado">Validado (Conforme)</option>
-            <option value="Discrepancia">Discrepancia</option>
-          </select>
-        </div>
-      </div>
-      <div class="input-group">
-        <label>Proveedor</label>
-        <input type="text" [(ngModel)]="nuevaRecepcion.proveedor" placeholder="Nombre del proveedor" />
-      </div>
-    </div>
+  </div>
 
-    <div class="modal-actions">
-      <button class="btn-cancel" (click)="cerrarModalRegistro()">Cancelar</button>
-      <button class="btn-save" (click)="registrarEntrada()">Guardar Recepción</button>
+  <!-- Tarjetas de Filtros por Tipo de Movimiento -->
+  <div class="process-cards-grid">
+    <div class="process-card clickable" (click)="filtrarPorTipo('TODOS')" [class.active-card]="filtroTipo === 'TODOS'">
+      <span class="process-icon">📋</span>
+      <div>
+        <h4>Todos los Movimientos</h4>
+        <p>Historial consolidado global</p>
+      </div>
     </div>
+    <div class="process-card clickable" (click)="filtrarPorTipo('ENTRADA')" [class.active-card]="filtroTipo === 'ENTRADA'">
+      <span class="process-icon">📥</span>
+      <div>
+        <h4>Solo Entradas</h4>
+        <p>Recepción de proveedores</p>
+      </div>
+    </div>
+    <div class="process-card clickable" (click)="filtrarPorTipo('SALIDA')" [class.active-card]="filtroTipo === 'SALIDA'">
+      <span class="process-icon">📤</span>
+      <div>
+        <h4>Solo Salidas</h4>
+        <p>Despachos y distribución</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Filtro Secundaria por Estado (Validado / Discrepancia) -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Filtrar por Estado:</label>
+      <select [(ngModel)]="filtroEstado" class="status-select">
+        <option value="TODOS">Todos los estados (Validados y Discrepancias)</option>
+        <option value="Validado">Solo Validados (Conformes)</option>
+        <option value="Discrepancia">Solo con Discrepancia (Novedades)</option>
+      </select>
+    </div>
+    <div class="counter-badge">
+      Mostrando <strong>{{ recepcionesFiltradas.length }}</strong> registros
+    </div>
+  </div>
+
+  <!-- Tabla de Historial -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>TIPO</th>
+          <th>Nº ORDEN / REF</th>
+          <th>PRODUCTO</th>
+          <th>CANTIDAD</th>
+          <th>DESTINO / PROVEEDOR</th>
+          <th>ESTADO</th>
+          <th>ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of recepcionesFiltradas">
+          <td>
+            <span class="type-badge" [ngClass]="item.tipo === 'ENTRADA' ? 'type-entry' : 'type-exit'">
+              {{ item.tipo }}
+            </span>
+          </td>
+          <td><span class="badge-code">{{ item.id }}</span></td>
+          <td class="font-medium">{{ item.producto }}</td>
+          <td>{{ item.cantidad }} un.</td>
+          <td>{{ item.proveedor }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="item.estado === 'Validado' ? 'status-green' : 'status-yellow'">
+              {{ item.estado }}
+            </span>
+          </td>
+          <td>
+            <button class="action-btn" title="Ver Detalle" (click)="generarInforme(item)">
+              📄
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

@@ -1,20 +1,11 @@
-<<<<<<< Updated upstream
 .app-sidebar {
-  width: 240px;
+  width: 260px;
   height: 100vh;
-  background-color: #131b2e;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-=======
-.sidebar-container {
-  grid-area: sidebar;
   background-color: #0d121d;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
->>>>>>> Stashed changes
   display: flex;
   flex-direction: column;
-  height: 100vh;
   box-sizing: border-box;
-  width: 260px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -46,46 +37,28 @@
 }
 
 /* Menú con desplazamiento interno */
-.sidebar-menu {
+.sidebar-nav {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px 16px;
   display: flex;
   flex-direction: column;
-<<<<<<< Updated upstream
-  gap: 0.4rem;
-  margin-top: 1.5rem;
-  flex: 1;
-  overflow-y: auto;
-=======
   gap: 4px;
->>>>>>> Stashed changes
 }
 
 /* Categorías (PANEL, GESTIÓN, MANTENIMIENTO, SISTEMA) */
-.menu-category {
+.nav-section-title {
   font-size: 0.7rem;
-<<<<<<< Updated upstream
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-  padding-left: 0.75rem;
-  display: block;
-  visibility: visible;
-=======
   font-weight: 600;
   color: #64748b;
   letter-spacing: 0.08em;
   margin: 18px 0 8px 10px;
   text-transform: uppercase;
->>>>>>> Stashed changes
 }
 
 /* Elementos del menú */
-.menu-item {
+.nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -98,19 +71,19 @@
   transition: all 0.2s ease;
 }
 
-.menu-item:hover {
+.nav-item:hover {
   background-color: rgba(255, 255, 255, 0.03);
   color: #f8fafc;
 }
 
-.menu-item.active {
+.nav-item.active {
   background-color: #3b82f6; /* Color azul sólido idéntico al de tu captura */
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.menu-icon {
+.nav-icon {
   font-size: 1rem;
 }
 
@@ -139,7 +112,6 @@
 
 .btn-logout:hover {
   background-color: rgba(239, 68, 68, 0.1);
-<<<<<<< Updated upstream
 }
 
 /* Adaptabilidad Responsive (móviles/tablets) */
@@ -149,7 +121,7 @@
     padding: 1.25rem 0.5rem;
   }
 
-  .brand-text,
+  .brand-title,
   .nav-section-title,
   .nav-text {
     display: none !important;
@@ -161,6 +133,4 @@
     justify-content: center;
     padding: 0.75rem 0;
   }
-=======
->>>>>>> Stashed changes
 }

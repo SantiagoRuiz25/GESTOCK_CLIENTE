@@ -1,32 +1,37 @@
-<<<<<<< Updated upstream
 <aside class="app-sidebar">
-=======
-<aside class="sidebar-container">
   <!-- Logo de la App -->
->>>>>>> Stashed changes
   <div class="sidebar-brand">
     <div class="brand-icon">📦</div>
     <span class="brand-title">Gestock</span>
   </div>
 
-<<<<<<< Updated upstream
   <nav class="sidebar-nav">
-    <div class="nav-section-title">DASHBOARD</div>
+    <!-- DASHBOARD -->
+    <div class="nav-section-title">PANEL</div>
     <a routerLink="/app/panel" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">📊</span>
       <span class="nav-text">Panel</span>
     </a>
     <a routerLink="/app/empresas" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">🏦</span>
+      <span class="nav-icon">🏢</span>
       <span class="nav-text">Empresas</span>
     </a>
 
+    <!-- GESTIÓN -->
     <div class="nav-section-title">GESTIÓN</div>
     <a routerLink="/app/gestion/inventario/lista-productos" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">📦</span>
       <span class="nav-text">Inventario</span>
     </a>
-    <a routerLink="/app//gestion/auditorias" routerLinkActive="active" class="nav-item">
+    <a routerLink="/app/recepcion/recepcion-mercancias" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📥</span>
+      <span class="nav-text">Recepción</span>
+    </a>
+    <a routerLink="/app/recepcion/historial-logistico" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📋</span>
+      <span class="nav-text">Historial Logístico</span>
+    </a>
+    <a routerLink="/app/gestion/auditorias" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">📋</span>
       <span class="nav-text">Auditorías</span>
     </a>
@@ -39,6 +44,7 @@
       <span class="nav-text">Envíos</span>
     </a>
 
+    <!-- MANTENIMIENTO -->
     <div class="nav-section-title">MANTENIMIENTO</div>
     <a routerLink="/app/programacion" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">🛠️</span>
@@ -49,6 +55,7 @@
       <span class="nav-text">Incidencias</span>
     </a>
 
+    <!-- SISTEMA -->
     <div class="nav-section-title">SISTEMA</div>
     <a routerLink="/app/reportes" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">📈</span>
@@ -57,68 +64,14 @@
     <a routerLink="/app/configuracion" routerLinkActive="active" class="nav-item">
       <span class="nav-icon">⚙️</span>
       <span class="nav-text">Configuración</span>
-=======
-  <div class="sidebar-menu">
-    <!-- PANEL -->
-    <div class="menu-category">PANEL</div>
-    <a routerLink="/app/panel" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">📊</span> Panel
     </a>
-    <a routerLink="/app/empresas" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">🏢</span> Empresas
-    </a>
-
-    <!-- GESTIÓN -->
-    <div class="menu-category">GESTIÓN</div>
-    <a routerLink="/app/gestion/inventario/lista-productos" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">📦</span> Inventario
-    </a>
-    <a routerLink="/app/recepcion/recepcion-mercancias" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">📥</span> Recepción
-    </a>
-    <a routerLink="/app/recepcion/historial-logistico" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">📋</span> Historial Logístico
-    </a>
-    <a routerLink="/app/auditorias" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">📋</span> Auditorías
-    </a>
-    <a routerLink="/app/roles-usuarios" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">⚙️</span> Roles y Usuarios
-    </a>
-    <a routerLink="/app/envios" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">🚚</span> Envíos
-    </a>
-
-    <!-- MANTENIMIENTO -->
-    <div class="menu-category">MANTENIMIENTO</div>
-    <a routerLink="/app/programacion" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">🛠️</span> Programación
-    </a>
-    <a routerLink="/app/incidencias" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">⚠️</span> Incidencias
-    </a>
-
-    <!-- SISTEMA -->
-    <div class="menu-category">SISTEMA</div>
-    <a routerLink="/app/informes" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">📈</span> Informes
->>>>>>> Stashed changes
-    </a>
-    <a routerLink="/app/configuracion" routerLinkActive="active" class="menu-item">
-      <span class="menu-icon">⚙️</span> Configuración
-    </a>
-  </div>
+  </nav>
 
   <!-- Botón Cerrar Sesión Abajo -->
   <div class="sidebar-footer">
-<<<<<<< Updated upstream
     <button type="button" class="btn-logout" (click)="logout()">
       <span class="nav-icon">🚪</span>
       <span class="nav-text">Cerrar Sesión</span>
-=======
-    <button class="btn-logout" (click)="cerrarSesion()">
-      <span class="menu-icon">🚪</span> Cerrar Sesión
->>>>>>> Stashed changes
     </button>
   </div>
 </aside>
