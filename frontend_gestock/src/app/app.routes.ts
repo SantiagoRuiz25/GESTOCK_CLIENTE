@@ -33,6 +33,11 @@ export const routes: Routes = [
         path: 'recuperar-contrasena', 
         loadComponent: () => import('./pages/auth/recuperacion-contrasena/recuperacion-contrasena').then(m => m.RecuperacionContrasenaComponent),
         title: 'Recuperar Contraseña - Gestock'
+      },
+      {
+        path: 'sesiones-activas',
+        loadComponent: () => import('./pages/auth/sesiones-activas/sesiones-activas').then(m => m.SesionesActivasComponent),
+        title: 'Sesiones Activas - Gestock'
       }
     ]
   },
@@ -75,6 +80,18 @@ export const routes: Routes = [
         ]
       },
       
+      // Nuevos Módulos de Recepción y Logística
+      {
+        path: 'recepcion/recepcion-mercancias',
+        title: 'GESTOCK - Recepción de Mercancías',
+        loadComponent: () => import('./pages/recepcion/recepcion-mercancias/recepcion-mercancias').then(m => m.RecepcionMercanciasComponent)
+      },
+      {
+        path: 'recepcion/historial-logistico',
+        title: 'GESTOCK - Historial Logístico',
+        loadComponent: () => import('./pages/recepcion/historial-logistico/historial-logistico').then(m => m.HistorialLogisticoComponent)
+      },
+
       // Módulo de Auditoría
       {
         path: 'gestion/auditorias',
@@ -109,7 +126,7 @@ export const routes: Routes = [
           ),
       },
       
-      // Mantenimiento (del otro bloque)
+      // Mantenimiento
       {
         path: 'programacion',
         loadComponent: () => import('./pages/mantenimiento/programacion-mantenimiento/programacion-mantenimiento.component').then(m => m.ProgramacionMantenimientoComponent),
