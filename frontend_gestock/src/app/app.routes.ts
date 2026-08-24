@@ -42,7 +42,26 @@ export const routes: Routes = [
     path: 'app',
     component: LayoutComponent,
     children: [
-      { path: '', redirectTo: 'gestion/inventario', pathMatch: 'full' },
+      {  path: '', redirectTo: 'gestion/inventario', pathMatch: 'full' },
+
+      // Dashboard
+      {
+        path: 'panel',
+        loadComponent: () => import('./pages/dashboard/panel/panel').then(m => m.PanelComponent),
+        title: 'GESTOCK - Panel'
+      },
+      {
+        path: 'panel/:id',
+        loadComponent: () => import('./pages/dashboard/panel/panel').then(m => m.PanelComponent),
+        title: 'GESTOCK - Panel'
+      },
+      {
+        path: 'empresas',
+        loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresaComponent),
+        title: 'GESTOCK - Empresas'
+      },
+
+      // Módulo de Inventario con sus subrutas },
       
       // Módulo de Inventario con sus subrutas
       {

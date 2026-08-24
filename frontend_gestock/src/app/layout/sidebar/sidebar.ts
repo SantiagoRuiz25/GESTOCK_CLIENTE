@@ -14,12 +14,11 @@ export class SidebarComponent {
 
   // Métodos de navegación alternativa
   irAProgramacion(): void {
-    this.router.navigate(['/app/programacion-mantenimiento']);
-  }
-
-  irAIncidencias(): void {
-    this.router.navigate(['/app/registro-incidencias']);
-  }
+  this.router.navigate(['/app/programacion']);
+}
+irAIncidencias(): void {
+  this.router.navigate(['/app/incidencias']);
+}
 
   // Redirección al login en el módulo de autenticación
   logout(): void {
