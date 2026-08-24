@@ -1,0 +1,17 @@
+<!-- Sección de Filtros -->
+  <div class="config-card filter-card">
+    <div class="input-row">
+      <div class="input-group">
+        <label>Filtrar por Fecha (HU042)</label>
+        <input type="date" [(ngModel)]="filtroFecha" />
+      </div>
+      <div class="input-group">
+        <label>Filtrar por Responsable</label>
+        <select [(ngModel)]="filtroResponsable">
+          <option value="">Todos los usuarios</option>
+          <option value="Maicol Nore">Maicol Nore [Gerente]</option>
+          <option value="Erick Ruiz">Erick Ruiz [Operador]</option>
+        </select>
+      </div>
+    </div>
+  </div>
