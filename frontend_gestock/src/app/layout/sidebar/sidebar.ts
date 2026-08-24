@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,8 +16,19 @@ import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 export class SidebarComponent {
   constructor(private router: Router) {}
 
-  logout() {
+  // Métodos de navegación alternativa (opcionales por si los usas por código)
+  irAProgramacion(): void {
+    this.router.navigate(['/app/programacion']);
+  }
+
+  irAIncidencias(): void {
+    this.router.navigate(['/app/incidencias']);
+  }
+
+  // Redirección al login y limpieza de sesión
+  logout(): void {
     localStorage.clear();
+    sessionStorage.clear();
     this.router.navigate(['/auth/login']);
   }
 }

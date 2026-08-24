@@ -1,73 +1,125 @@
 <div class="panel-layout" (click)="cerrarMenu()">
   <div class="panel-header">
-    <h1>Panel</h1>
-  </div>
+    <div class="panel-header-title">
+      <span class="panel-header-icon">📊</span>
+      <div>
+        <h1>Panel</h1>
+        <p class="panel-subtitle">Resumen general del sistema de inventario</p>
+      </div>
+    </div>
 
-  <!-- Botón de acciones con menú desplegable -->
-  <div class="panel-actions-container">
-    <button class="btn-action-trigger" (click)="toggleMenuInventario($event)">+</button>
-    
-    <div class="inventory-dropdown" *ngIf="mostrarMenuInventario" (click)="$event.stopPropagation()">
-      <ul>
-        <li>Registrar Entrada</li>
-        <li>Registrar Salida</li>
-        <li>Ver Reportes</li>
-      </ul>
+    <!-- Botón de acciones con menú desplegable -->
+    <div class="panel-actions-container">
+      <button class="btn-action-trigger" (click)="toggleMenuInventario($event)">
+        <span>+</span> Nueva acción
+      </button>
+
+      <div class="inventory-dropdown" *ngIf="mostrarMenuInventario" (click)="$event.stopPropagation()">
+        <ul>
+          <li><span class="dropdown-icon">📥</span> Registrar Entrada</li>
+          <li><span class="dropdown-icon">📤</span> Registrar Salida</li>
+          <li><span class="dropdown-icon">📈</span> Ver Reportes</li>
+        </ul>
+      </div>
     </div>
   </div>
 
   <!-- Cuadrícula de Estadísticas -->
   <div class="stats-section">
-    <div class="stat-card">
+    <div class="stat-card accent-blue">
+      <div class="stat-icon">🏷️</div>
       <h3>Total precios</h3>
       <p>19</p>
-      <span class="subtext">19 activos</span>
+      <span class="subtext positive">19 activos</span>
     </div>
-    
-    <div class="stat-card">
+
+    <div class="stat-card accent-green">
+      <div class="stat-icon">💰</div>
       <h3>Valor de inventario</h3>
       <p>$29.997</p>
-      <span class="subtext">+12% vs mes anterior</span>
+      <span class="subtext positive">▲ 12% vs mes anterior</span>
     </div>
 
-    <div class="stat-card">
-      <h3>Valor de inventario...</h3>
+    <div class="stat-card accent-amber">
+      <div class="stat-icon">⚠️</div>
+      <h3>Alertas de stock</h3>
       <p>4</p>
-      <span class="subtext">2 bajo | 2 agotado</span>
+      <span class="subtext warning">2 bajo · 2 agotado</span>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card accent-purple">
+      <div class="stat-icon">🏬</div>
       <h3>Bodegas activas</h3>
       <p>3</p>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card accent-cyan">
+      <div class="stat-icon">👥</div>
       <h3>Usuarios activos</h3>
       <p>4</p>
     </div>
 
-    <div class="stat-card">
-      <h3>Tasa de ocupacion</h3>
+    <div class="stat-card accent-pink">
+      <div class="stat-icon">📈</div>
+      <h3>Tasa de ocupación</h3>
       <p>63%</p>
     </div>
   </div>
 
   <!-- Bloques de alertas y movimientos -->
-  <div class="section-block">
-    <h3>Producto con stock bajo</h3>
-    <p>2 alertas</p>
-    <ul>
-      <li>Disco duro externo 1TB | Bodega central — 3/10</li>
-      <li>Mouse inalambrico logitech | Sucursal Norte — 8/20</li>
-    </ul>
-  </div>
+  <div class="panel-grid">
+    <div class="section-block">
+      <div class="section-block-header">
+        <h3><span class="section-icon warning-icon">⚠️</span> Producto con stock bajo</h3>
+        <span class="section-badge warning">2 alertas</span>
+      </div>
+      <ul>
+        <li>
+          <span class="item-dot warning-dot"></span>
+          <div class="item-text">
+            <strong>Disco duro externo 1TB</strong>
+            <span>Bodega central</span>
+          </div>
+          <span class="item-value warning">3/10</span>
+        </li>
+        <li>
+          <span class="item-dot warning-dot"></span>
+          <div class="item-text">
+            <strong>Mouse inalámbrico Logitech</strong>
+            <span>Sucursal Norte</span>
+          </div>
+          <span class="item-value warning">8/20</span>
+        </li>
+      </ul>
+    </div>
 
-  <div class="section-block">
-    <h3>Ultimos movimientos</h3>
-    <ul>
-      <li>Pc +10 unidades | Administrador | 20/01/2025 (Entrada)</li>
-      <li>Monitor +5 unidades | Maicol Nore [Gerente] | 24/01/2025 (Salida)</li>
-      <li>Mouse +8 unidades | Erick Ruiz [Operador] | 28/01/2025 (Transferencia)</li>
-    </ul>
+    <div class="section-block">
+      <div class="section-block-header">
+        <h3><span class="section-icon">🕘</span> Últimos movimientos</h3>
+      </div>
+      <ul>
+        <li>
+          <div class="item-text">
+            <strong>Pc <span class="qty positive">+10 unidades</span></strong>
+            <span>Administrador · 20/01/2025</span>
+          </div>
+          <span class="movement-badge entrada">Entrada</span>
+        </li>
+        <li>
+          <div class="item-text">
+            <strong>Monitor <span class="qty negative">+5 unidades</span></strong>
+            <span>Maicol Nore [Gerente] · 24/01/2025</span>
+          </div>
+          <span class="movement-badge salida">Salida</span>
+        </li>
+        <li>
+          <div class="item-text">
+            <strong>Mouse <span class="qty neutral">+8 unidades</span></strong>
+            <span>Erick Ruiz [Operador] · 28/01/2025</span>
+          </div>
+          <span class="movement-badge transferencia">Transferencia</span>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>

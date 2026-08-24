@@ -1,0 +1,42 @@
+<!-- Modal de Registro / Validación (HU035 & HU036) -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Registrar y Validar Entrada</h3>
+      <button class="close-btn" (click)="cerrarModalRegistro()">&times;</button>
+    </div>
+    
+    <div class="form-grid">
+      <div class="input-group">
+        <label>Nº Orden de Compra</label>
+        <input type="text" [(ngModel)]="nuevaRecepcion.orden" placeholder="Ej: OC-2026-900" />
+      </div>
+      <div class="input-group">
+        <label>Nombre del Producto</label>
+        <input type="text" [(ngModel)]="nuevaRecepcion.producto" placeholder="Ej: Teclado Mecánico RGB" />
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Cantidad Recibida</label>
+          <input type="number" [(ngModel)]="nuevaRecepcion.cantidad" />
+        </div>
+        <div class="input-group">
+          <label>Estado de Validación</label>
+          <select [(ngModel)]="nuevaRecepcion.estado">
+            <option value="Validado">Validado (Conforme)</option>
+            <option value="Discrepancia">Discrepancia</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Proveedor</label>
+        <input type="text" [(ngModel)]="nuevaRecepcion.proveedor" placeholder="Nombre del proveedor" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarModalRegistro()">Cancelar</button>
+      <button class="btn-save" (click)="registrarEntrada()">Guardar Recepción</button>
+    </div>
+  </div>
+</div>
