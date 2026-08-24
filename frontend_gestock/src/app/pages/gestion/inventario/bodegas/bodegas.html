@@ -89,7 +89,7 @@
       <p class="text-subtitle-sm">Completa los datos para habilitar el espacio logístico</p>
     </div>
     
-    <form (ngSubmit)="crearBodega()" class="modal-form">
+    <form #f="ngForm" (ngSubmit)="crearBodega(f)" class="modal-form">
       <div class="input-group">
         <label class="form-label">Nombre de Bodega</label>
         <input type="text" [(ngModel)]="nuevaBodega.nombre" name="nombre" class="dark-input w-100" placeholder="Ej. Bodega Principal" required>
