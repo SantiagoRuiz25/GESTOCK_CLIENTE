@@ -128,7 +128,12 @@ export class RolesUsuariosComponent {
         estadoTexto: 'Activo ahora',
         horasTrabajadas: Number(val.horasTrabajadas)
       };
+
       this.listaUsuarios.push(nuevoUser);
+
+      // 👉 AQUÍ SE IMPRIME EL JSON DEL NUEVO USUARIO CREADO
+      console.log('👤 [JSON Usuario Creado]:', JSON.stringify(nuevoUser, null, 2));
+
       this.mostrarNotificacion(`¡Usuario ${nuevoUser.nombre} registrado con éxito!`, 'success');
       this.volverALista();
     }
@@ -137,6 +142,10 @@ export class RolesUsuariosComponent {
   guardarRol() {
     if (this.rolForm.valid && this.usuarioSeleccionado) {
       this.usuarioSeleccionado.rol = this.rolForm.value.nombreRol;
+
+      // 👉 AQUÍ SE IMPRIME EL JSON DEL USUARIO CON SU ROL/PERMISOS MODIFICADOS
+      console.log('✏️ [JSON Usuario Modificado (Rol/Permisos)]:', JSON.stringify(this.usuarioSeleccionado, null, 2));
+
       this.mostrarNotificacion(`¡Permisos y rol actualizados para ${this.usuarioSeleccionado.nombre}!`, 'success');
       this.volverALista();
     }

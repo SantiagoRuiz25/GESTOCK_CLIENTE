@@ -15,8 +15,8 @@
       <p class="subtitle">Ingresa tus datos para acceder al sistema de gestión.</p>
     </div>
 
-    <!-- Formulario -->
-    <form (ngSubmit)="onLogin()" class="login-form">
+    <!-- Contenedor del Formulario -->
+    <div class="login-form">
       
       <!-- Correo -->
       <div class="form-group" [class.is-focused]="activeField === 'email'">
@@ -24,14 +24,13 @@
         <div class="input-wrapper">
           <span class="input-icon">✉️</span>
           <input 
-            type="email" 
+            type="text" 
             id="email" 
             [(ngModel)]="credentials.email" 
             name="email"
             placeholder="usuario@gestock.com"
             (focus)="setFocus('email')"
-            (blur)="clearFocus()"
-            required>
+            (blur)="clearFocus()">
         </div>
       </div>
 
@@ -47,8 +46,7 @@
             name="password"
             placeholder="••••••••"
             (focus)="setFocus('password')"
-            (blur)="clearFocus()"
-            required>
+            (blur)="clearFocus()">
         </div>
         <div class="forgot-password-container">
           <a routerLink="/auth/recuperar-contrasena" class="forgot-link">¿Olvidaste tu contraseña?</a>
@@ -66,13 +64,18 @@
         </label>
       </div>
 
+      <!-- Alerta de Errores Comunes -->
+      <div *ngIf="errorMessage" class="error-banner" style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 4px; text-align: center; font-weight: 500;">
+        {{ errorMessage }}
+      </div>
+
       <!-- Botón Principal -->
-      <button type="submit" class="btn-primary" [disabled]="isLoading">
+      <button type="button" class="btn-primary" [disabled]="isLoading" (click)="onLogin()">
         <span *ngIf="!isLoading">Acceder a la Plataforma &rarr;</span>
         <span *ngIf="isLoading" class="spinner"></span>
       </button>
 
-    </form>
+    </div>
 
     <!-- Footer -->
     <div class="card-footer">

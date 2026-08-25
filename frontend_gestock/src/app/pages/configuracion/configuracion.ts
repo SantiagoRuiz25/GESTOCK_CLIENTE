@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 export interface ConfiguracionGestock {
   notificacionesEmail: boolean;
@@ -32,6 +33,17 @@ export interface NotificacionHistorial {
   icono: string;
 }
 
+// Estructura para las sesiones activas de seguridad
+export interface SesionActiva {
+  id: string;
+  device: string;
+  browser: string;
+  ip: string;
+  location: string;
+  current: boolean;
+  timestamp: string;
+}
+
 @Component({
   selector: 'app-configuracion',
   standalone: true,
@@ -40,7 +52,7 @@ export interface NotificacionHistorial {
   styleUrl: './configuracion.css'
 })
 export class ConfiguracionComponent {
-  tabActiva: 'notificaciones' | 'seguridad' | 'backup' = 'notificaciones';
+  tabActiva: 'notificaciones' | 'seguridad' | 'backup' | 'sesiones' = 'notificaciones';
   
   // Control del Modal de Guardado
   mostrarModalGuardar: boolean = false;
@@ -113,8 +125,92 @@ export class ConfiguracionComponent {
     }
   ];
 
-  cambiarTab(tab: 'notificaciones' | 'seguridad' | 'backup'): void {
+  // Lista ampliada de sesiones activas con múltiples dispositivos y ubicaciones simuladas
+  activeSessions: SesionActiva[] = [];
+
+  constructor(private router: Router) {
+    this.cargarSesionesActivas();
+  }
+
+  cambiarTab(tab: 'notificaciones' | 'seguridad' | 'backup' | 'sesiones'): void {
     this.tabActiva = tab;
+  }
+
+  // --- MÉTODOS DE SESIONES ACTIVAS ---
+  cargarSesionesActivas(): void {
+    const sessionData = localStorage.getItem('gestock_session');
+    let loginTime = 'Hace un momento';
+    
+    if (sessionData) {
+      try {
+        const parsed = JSON.parse(sessionData);
+        if (parsed.timestamp) {
+          const date = new Date(parsed.timestamp);
+          loginTime = `Conectado el ${date.toLocaleDateString()} a las ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    this.activeSessions = [
+      {
+        id: '1',
+        device: 'Computador Escritorio (Windows)',
+        browser: 'Google Chrome',
+        ip: '190.60.22.14 (Local)',
+        location: 'Yopal, Casanare, Colombia',
+        current: true,
+        timestamp: loginTime
+      },
+      {
+        id: '2',
+        device: 'Laptop Portátil (MacBook Pro)',
+        browser: 'Mozilla Firefox',
+        ip: '186.29.114.5',
+        location: 'Bogotá D.C., Colombia',
+        current: false,
+        timestamp: 'Hace 45 minutos'
+      },
+      {
+        id: '3',
+        device: 'Dispositivo Móvil (Android - Samsung Galaxy)',
+        browser: 'Chrome Mobile',
+        ip: '190.60.22.89',
+        location: 'Yopal, Casanare, Colombia',
+        current: false,
+        timestamp: 'Hace 2 horas'
+      },
+      {
+        id: '4',
+        device: 'Tablet (iPad Air)',
+        browser: 'Safari',
+        ip: '181.130.8.22',
+        location: 'Villavicencio, Meta, Colombia',
+        current: false,
+        timestamp: 'Ayer a las 06:15 PM'
+      },
+      {
+        id: '5',
+        device: 'Estación de Trabajo - Bodega Central',
+        browser: 'Microsoft Edge',
+        ip: '190.60.22.105',
+        location: 'Yopal, Casanare, Colombia',
+        current: false,
+        timestamp: 'Hace 3 días'
+      }
+    ];
+  }
+
+  revocarSesion(id: string): void {
+    if (id === '1') {
+      localStorage.removeItem('gestock_session');
+      console.log('%c[GESTOCK] Sesión actual cerrada por seguridad.', 'color: #f59e0b; font-weight: bold;');
+      this.router.navigate(['/auth/login']);
+    } else {
+      this.activeSessions = this.activeSessions.filter(s => s.id !== id);
+      console.log(`%c[GESTOCK] Sesión ${id} revocada exitosamente.`, 'color: #34d399; font-weight: bold;');
+    }
   }
 
   // Marcar notificación individual como leída
@@ -184,7 +280,7 @@ export class ConfiguracionComponent {
     this.mostrarModalExportar = false;
   }
 
-  descargarArchivoConfiguracion(): void {
+descargarArchivoConfiguracion(): void {
     const payloadExportacion: Record<string, string | number | boolean> = {};
 
     if (this.opcionesExportar.incluirNotificaciones) {
@@ -198,6 +294,7 @@ export class ConfiguracionComponent {
       payloadExportacion['Autenticación en Dos Pasos (2FA)'] = this.config.dosFactores ? 'Activado' : 'Desactivado';
       payloadExportacion['Tiempo de Sesión (min)'] = this.config.tiempoSesion;
       payloadExportacion['Expiración Contraseña (días)'] = this.config.expiracionPassword;
+      payloadExportacion['Sesiones Activas Totales'] = this.activeSessions.length;
     }
 
     if (this.opcionesExportar.incluirBackup) {
@@ -227,9 +324,9 @@ export class ConfiguracionComponent {
       this.generarPdfImpresion(payloadExportacion, fecha);
     }
 
+    // CORREGIDO: Se llama correctamente a la función sin la letra extra
     this.cerrarModalExportar();
   }
-
   private dispararDescarga(uri: string, nombreArchivo: string): void {
     const anchor = document.createElement('a');
     anchor.setAttribute('href', uri);

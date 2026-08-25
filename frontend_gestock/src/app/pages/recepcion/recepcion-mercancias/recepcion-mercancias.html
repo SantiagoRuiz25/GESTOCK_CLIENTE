@@ -1,9 +1,21 @@
 <div class="inventory-container">
-  <!-- Cabecera de la Sección -->
+  <!-- Cabecera de la Sección con el Botón de Acciones -->
   <div class="section-header">
     <div>
       <h2>Historial de Movimientos en Bodega</h2>
-      <p>Visualización y seguimiento corporativo de entradas, salidas y estados de validación</p>
+      <p>Visualización, registro y control de entradas, salidas y estados de validación</p>
+    </div>
+    <div class="action-dropdown-container">
+      <button class="btn-primary-action" (click)="toggleMenuAcciones()">
+        + Nueva acción
+      </button>
+      <!-- Menú Desplegable (Solo Entrada y Salida) -->
+      <div class="dropdown-menu-custom" *ngIf="menuAccionesAbierto">
+        <div class="dropdown-item" (click)="abrirFormulario('ENTRADA')">
+          <span class="icon">📥</span> Registrar Entrada/Salida
+        </div>
+        
+      </div>
     </div>
   </div>
 
@@ -32,7 +44,7 @@
     </div>
   </div>
 
-  <!-- Barra de Filtro Secundaria por Estado (Validado / Discrepancia) -->
+  <!-- Barra de Filtro Secundaria por Estado -->
   <div class="filter-bar">
     <div class="filter-group">
       <label>Filtrar por Estado:</label>
@@ -47,43 +59,120 @@
     </div>
   </div>
 
-  <!-- Tabla de Historial -->
+  <!-- Tabla de Historial Ampliada -->
   <div class="table-card">
     <table class="data-table">
       <thead>
         <tr>
+          <th>FECHA / HORA</th>
           <th>TIPO</th>
-          <th>Nº ORDEN / REF</th>
+          <th>SKU / REF</th>
           <th>PRODUCTO</th>
-          <th>CANTIDAD</th>
-          <th>DESTINO / PROVEEDOR</th>
+          <th>CANT.</th>
+          <th>MOTIVO</th>
+          <th>RESPONSABLE</th>
+          <th>OBSERVACIONES</th>
           <th>ESTADO</th>
           <th>ACCIONES</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of recepcionesFiltradas">
+          <td class="text-muted">{{ item.fecha }}</td>
           <td>
             <span class="type-badge" [ngClass]="item.tipo === 'ENTRADA' ? 'type-entry' : 'type-exit'">
               {{ item.tipo }}
             </span>
           </td>
-          <td><span class="badge-code">{{ item.id }}</span></td>
+          <td><span class="badge-code">{{ item.sku }}</span></td>
           <td class="font-medium">{{ item.producto }}</td>
           <td>{{ item.cantidad }} un.</td>
-          <td>{{ item.proveedor }}</td>
+          <td>{{ item.motivo }}</td>
+          <td>{{ item.responsable }}</td>
+          <td><span class="text-obs" title="{{ item.observaciones }}">{{ item.observaciones }}</span></td>
           <td>
             <span class="status-badge" [ngClass]="item.estado === 'Validado' ? 'status-green' : 'status-yellow'">
               {{ item.estado }}
             </span>
           </td>
           <td>
-            <button class="action-btn" title="Ver Detalle" (click)="generarInforme(item)">
-              📄
-            </button>
+            <button class="action-btn" title="Ver Detalle" (click)="generarInforme(item)">📄</button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- MODAL / FORMULARIO INTERACTIVO AMPLIADO -->
+  <div class="modal-backdrop" *ngIf="modalActivo">
+    <div class="modal-card modal-wide">
+      <div class="modal-header">
+        <h3>{{ modalTitulo }}</h3>
+        <button class="close-btn" (click)="cerrarModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="guardarMovimiento()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo de Movimiento</label>
+              <select [(ngModel)]="nuevoItem.tipo" name="tipo" class="form-input">
+                <option value="ENTRADA">Entrada</option>
+                <option value="SALIDA">Salida</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Código o SKU del Producto</label>
+              <input type="text" [(ngModel)]="nuevoItem.sku" name="sku" placeholder="Ej. SKU-PROD-005" required class="form-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Descripción del Artículo (Nombre y características)</label>
+            <input type="text" [(ngModel)]="nuevoItem.producto" name="producto" placeholder="Ej. Laptop Enterprise 15 i7 16GB RAM" required class="form-input">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cantidad de Unidades</label>
+              <input type="number" [(ngModel)]="nuevoItem.cantidad" name="cantidad" placeholder="Ej. 25" required class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Motivo del Movimiento</label>
+              <select [(ngModel)]="nuevoItem.motivo" name="motivo" class="form-input">
+                <option value="Compra">Compra</option>
+                <option value="Venta">Venta</option>
+                <option value="Devolución">Devolución</option>
+                <option value="Transferencia">Transferencia</option>
+                <option value="Ajuste">Ajuste de inventario</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Responsable (Entrega / Transporta / Recibe)</label>
+              <input type="text" [(ngModel)]="nuevoItem.responsable" name="responsable" placeholder="Ej. Carlos Mendoza" required class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Estado de Validación Inicial</label>
+              <select [(ngModel)]="nuevoItem.estado" name="estado" class="form-input">
+                <option value="Validado">Validado (Conforme)</option>
+                <option value="Discrepancia">Con Discrepancia (Novedad)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Observaciones (Nº de factura, remisión o estado de carga)</label>
+            <input type="text" [(ngModel)]="nuevoItem.observaciones" name="observaciones" placeholder="Ej. Factura FE-9842 / Carga en perfecto estado" class="form-input">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn-primary">Guardar Registro</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>

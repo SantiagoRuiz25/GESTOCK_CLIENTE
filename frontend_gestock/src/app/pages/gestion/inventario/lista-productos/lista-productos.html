@@ -1,29 +1,30 @@
 <div class="productos-container animate-fade">
-  <!-- Cabecera de la vista -->
+  
+  <!-- CABECERA -->
   <div class="productos-header">
     <div class="header-titles">
-      <h2>📦 Inventario de Productos</h2>
-      <p class="text-subtitle">Listado general y control de existencias en bodegas</p>
+      <h2>Gestión de Inventario</h2>
+      <p class="text-subtitle">Administra, edita y supervisa las existencias en tiempo real.</p>
     </div>
     <div class="productos-count">
-      📊 {{ productosFiltrados.length }} Productos Registrados
+      Total Registrados: {{ productosFiltrados.length }}
     </div>
   </div>
 
-  <!-- Barra de Búsqueda Interactiva -->
+  <!-- BARRA DE BÚSQUEDA -->
   <div class="search-bar-container">
     <div class="search-input-wrapper">
-      <i class="fas fa-search search-icon"></i>
+      <span class="search-icon">🔍</span>
       <input 
         type="text" 
-        placeholder="🔍 Buscar por nombre, código o categoría..." 
-        class="search-input"
+        class="search-input" 
+        placeholder="Buscar por nombre, código, categoría o bodega..." 
         [(ngModel)]="filtroBusqueda"
-      >
+      />
     </div>
   </div>
 
-  <!-- Tabla Ultra Moderna -->
+  <!-- TABLA DE PRODUCTOS -->
   <div class="table-responsive">
     <table class="productos-table">
       <thead>
@@ -38,26 +39,31 @@
         </tr>
       </thead>
       <tbody>
-        @for (prod of productosFiltrados; track prod.codigo) {
+        @for (prod of productosFiltrados; track prod.codigo; let idx = $index) {
           <tr>
-            <td><span class="badge-codigo">{{ prod.codigo }}</span></td>
-            <td style="font-weight: 600; color: #ffffff;">{{ prod.nombre }}</td>
-            <td><span class="badge-categoria">{{ prod.categoria }}</span></td>
-            <td><span class="text-bodega-info">🏢 {{ prod.bodega }}</span></td>
-            <td>COP {{ prod.precio | number }}</td>
             <td>
-              <span [ngClass]="prod.stock > 10 ? 'badge-stock stock-alto' : 'badge-stock stock-bajo'">
-                {{ prod.stock > 10 ? '🟢' : '🔴' }} {{ prod.stock }} un.
+              <span class="badge-codigo">{{ prod.codigo }}</span>
+            </td>
+            <td><strong>{{ prod.nombre }}</strong></td>
+            <td>
+              <span class="badge-categoria">{{ prod.categoria }}</span>
+            </td>
+            <td>
+              <span class="text-bodega-info">📍 {{ prod.bodega }}</span>
+            </td>
+            <td>{{ prod.precio | currency:'USD':'symbol':'1.0-0' }}</td>
+            <td>
+              <span class="badge-stock" [ngClass]="prod.stock > 10 ? 'stock-alto' : 'stock-bajo'">
+                ● {{ prod.stock }} un.
               </span>
             </td>
             <td class="acciones-cell">
-              <!-- Botón Editar Interactivo con Emoji -->
+              <!-- Botón Editar -->
               <button class="btn-accion-interactiva btn-editar-prod" (click)="abrirModalEditar(prod)" title="Editar producto">
                 ✏️
               </button>
-              
-              <!-- Botón Eliminar Interactivo con Emoji -->
-              <button class="btn-accion-interactiva btn-eliminar-prod" (click)="eliminarProducto(prod)" title="Eliminar producto">
+              <!-- Botón Eliminar -->
+              <button class="btn-accion-interactiva btn-eliminar-prod" (click)="confirmarEliminacion(prod)" title="Eliminar producto">
                 🗑️
               </button>
             </td>
@@ -65,67 +71,167 @@
         } @empty {
           <tr>
             <td colspan="7" class="text-center empty-state">
-              <i class="fas fa-box-open"></i>
-              <p>📭 No se encontraron productos registrados en este momento.</p>
+              No se encontraron productos que coincidan con la búsqueda.
             </td>
           </tr>
         }
       </tbody>
     </table>
   </div>
-</div>
 
-<!-- MODAL / FORMULARIO AVANZADO DE EDICIÓN -->
-@if (productoEnEdicion) {
-  <div class="modal-overlay">
-    <div class="modal-card-advanced">
-      <div class="modal-header-advanced">
-        <h3>✏️ Editar Producto</h3>
-        <p>Modifica los campos necesarios para actualizar las existencias del inventario.</p>
-      </div>
-
-      <form #editForm="ngForm" (ngSubmit)="guardarEdicion(editForm)">
-        <div class="form-grid-modal">
-          <div class="form-group-modal form-group-full">
-            <label class="form-label-modal">🏷️ Nombre del Producto *</label>
-            <input type="text" name="nombre" [(ngModel)]="productoEnEdicion.nombre" class="dark-input-modal" required>
-          </div>
-          
-          <div class="form-group-modal">
-            <label class="form-label-modal">📂 Categoría *</label>
-            <input type="text" name="categoria" [(ngModel)]="productoEnEdicion.categoria" class="dark-input-modal" required>
-          </div>
-
-          <div class="form-group-modal">
-            <label class="form-label-modal">🏢 Bodega Asignada *</label>
-            <input type="text" name="bodega" [(ngModel)]="productoEnEdicion.bodega" class="dark-input-modal" required>
-          </div>
-
-          <div class="form-group-modal">
-            <label class="form-label-modal">💰 Precio Unitario (COP) *</label>
-            <input type="number" name="precio" [(ngModel)]="productoEnEdicion.precio" class="dark-input-modal" min="0" required>
-          </div>
-
-          <div class="form-group-modal">
-            <label class="form-label-modal">📦 Stock Actual *</label>
-            <input type="number" name="stock" [(ngModel)]="productoEnEdicion.stock" class="dark-input-modal" min="0" required>
-          </div>
+  <!-- MODAL FLOTANTE DE EDICIÓN -->
+  @if (productoEnEdicion) {
+    <div class="modal-overlay">
+      <div class="modal-card-advanced">
+        <div class="modal-header-advanced">
+          <h3>Editar Producto</h3>
+          <p>Modifica los datos necesarios del artículo seleccionado.</p>
         </div>
 
-        <div class="modal-actions-advanced">
-          <button type="button" class="btn-modal-cancel" (click)="cerrarModal()">❌ Cancelar</button>
-          <button type="submit" class="btn-modal-submit" [disabled]="editForm.invalid">
-            💾 Guardar Cambios
+        <form #formEdicion="ngForm" (ngSubmit)="guardarEdicion(formEdicion)">
+          <div class="form-grid-modal">
+            
+            <!-- Código (Solo lectura) -->
+            <div class="form-group-modal form-group-full">
+              <label class="form-label-modal">Código del Producto</label>
+              <input 
+                type="text" 
+                class="dark-input-modal" 
+                [value]="productoEnEdicion.codigo" 
+                disabled 
+                style="opacity: 0.6; cursor: not-allowed;"
+              />
+            </div>
+
+            <!-- Nombre -->
+            <div class="form-group-modal form-group-full">
+              <label class="form-label-modal">Nombre del Producto</label>
+              <input 
+                type="text" 
+                class="dark-input-modal" 
+                name="nombre" 
+                [(ngModel)]="productoEnEdicion.nombre" 
+                required 
+              />
+            </div>
+
+            <!-- Categoría -->
+            <div class="form-group-modal">
+              <label class="form-label-modal">Categoría</label>
+              <select class="dark-input-modal" name="categoria" [(ngModel)]="productoEnEdicion.categoria" required>
+                @for (cat of categoriasDisponibles; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Bodega -->
+            <div class="form-group-modal">
+              <label class="form-label-modal">Bodega Asignada</label>
+              <select class="dark-input-modal" name="bodega" [(ngModel)]="productoEnEdicion.bodega" required>
+                @for (bod of bodegasDisponibles; track bod) {
+                  <option [value]="bod">{{ bod }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Precio -->
+            <div class="form-group-modal">
+              <label class="form-label-modal">Precio ($)</label>
+              <input 
+                type="number" 
+                class="dark-input-modal" 
+                name="precio" 
+                [(ngModel)]="productoEnEdicion.precio" 
+                min="0" 
+                required 
+              />
+            </div>
+
+            <!-- Stock -->
+            <div class="form-group-modal">
+              <label class="form-label-modal">Stock / Cantidad</label>
+              <input 
+                type="number" 
+                class="dark-input-modal" 
+                name="stock" 
+                [(ngModel)]="productoEnEdicion.stock" 
+                min="0" 
+                required 
+              />
+            </div>
+
+          </div>
+
+          <!-- Acciones del Modal -->
+          <div class="modal-actions-advanced">
+            <button type="button" class="btn-modal-cancel" (click)="cerrarModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-modal-submit" [disabled]="formEdicion.invalid">
+              💾 Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+  @if (productoAEliminar) {
+    <div class="modal-overlay">
+      <div class="modal-card-advanced" style="max-width: 420px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+        <div class="modal-header-advanced">
+          <h3>¿Estás seguro?</h3>
+          <p>Vas a eliminar permanentemente el producto <strong>"{{ productoAEliminar.nombre }}"</strong> del inventario.</p>
+        </div>
+        <div class="modal-actions-advanced" style="justify-content: center;">
+          <button type="button" class="btn-modal-cancel" (click)="cancelarEliminacion()">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-submit" style="background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);" (click)="ejecutarEliminacion()">
+            🗑️ Sí, Eliminar
           </button>
         </div>
-      </form>
+      </div>
     </div>
-  </div>
-}
+  }
 
-<!-- TOAST DE NOTIFICACIÓN FLOTANTE -->
-@if (mensajeNotificacion) {
-  <div class="toast-notification">
-    ✨ <span>{{ mensajeNotificacion }}</span>
-  </div>
-}
+  <!-- MODAL DE AVISO CENTRAL (Ej. Sin cambios detectados) -->
+  @if (mensajeAlertaModal) {
+    <div class="modal-overlay">
+      <div class="modal-card-advanced" style="max-width: 400px; text-align: center;">
+        <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">⚠️</div>
+        <div class="modal-header-advanced">
+          <h3>Aviso Importante</h3>
+          <p>{{ mensajeAlertaModal }}</p>
+        </div>
+        <div class="modal-actions-advanced" style="justify-content: center; margin-top: 1.5rem;">
+          <button type="button" class="btn-modal-submit" (click)="mensajeAlertaModal = null">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE ÉXITO CENTRAL -->
+  @if (mensajeNotificacion) {
+    <div class="modal-overlay">
+      <div class="modal-card-advanced" style="max-width: 400px; text-align: center;">
+        <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">✨</div>
+        <div class="modal-header-advanced">
+          <h3>¡Éxito!</h3>
+          <p>{{ mensajeNotificacion }}</p>
+        </div>
+        <div class="modal-actions-advanced" style="justify-content: center; margin-top: 1.5rem;">
+          <button type="button" class="btn-modal-submit" (click)="mensajeNotificacion = null">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
