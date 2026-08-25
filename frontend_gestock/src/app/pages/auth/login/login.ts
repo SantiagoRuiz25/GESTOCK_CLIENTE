@@ -1,7 +1,13 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../services/auth';
+
+// SDK global de Google (cargado en index.html)
+declare const google: any;
+
+const GOOGLE_CLIENT_ID = '863694515165-6dovpoe54dq2j63kkln7po1vuvciiqmh.apps.googleusercontent.com';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +16,10 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+
   credentials = {
     email: '',
     password: '',
@@ -23,7 +32,53 @@ export class LoginComponent {
   mouseX = 0;
   mouseY = 0;
 
-  constructor(private router: Router) {}
+  private tokenClient: any;
+
+  ngOnInit(): void {
+    this.inicializarGoogle();
+  }
+
+  // Espera a que el script de Google esté listo
+  private inicializarGoogle(): void {
+    if (typeof google === 'undefined' || !google.accounts) {
+      setTimeout(() => this.inicializarGoogle(), 200);
+      return;
+    }
+
+    this.tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: 'openid email profile',
+      callback: (respuesta: any) => {
+        if (respuesta.access_token) {
+          this.obtenerPerfilGoogle(respuesta.access_token);
+        }
+      }
+    });
+  }
+
+  // Trae los datos del usuario usando el token que entregó Google
+  private obtenerPerfilGoogle(accessToken: string): void {
+    this.isLoading = true;
+    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    })
+      .then(res => res.json())
+      .then(perfil => {
+        // Registrar o iniciar sesión en AuthService
+        this.authService.registrar({
+          nombre: perfil.name || 'Usuario Google',
+          email: perfil.email
+        });
+        
+        this.authService.login(perfil.email);
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
+      })
+      .catch(() => {
+        this.isLoading = false;
+        alert('Error al autenticar con Google');
+      });
+  }
 
   // Rastrea las coordenadas del mouse sobre la tarjeta
   onMouseMove(event: MouseEvent): void {
@@ -43,18 +98,30 @@ export class LoginComponent {
 
   onLogin(): void {
     if (!this.credentials.email || !this.credentials.password) {
+      alert('Por favor completa todos los campos.');
       return;
     }
 
     this.isLoading = true;
 
     setTimeout(() => {
+      const exito = this.authService.login(this.credentials.email, this.credentials.password);
       this.isLoading = false;
-      this.router.navigate(['/app']);
-    }, 1500);
+
+      if (exito) {
+        this.router.navigate(['/dashboard']);
+      } else {
+        alert('Credenciales incorrectas. Verifica tu correo y contraseña o regístrate primero.');
+      }
+    }, 1000);
   }
 
+  // Abre el selector de cuentas de Google
   loginWithGoogle(): void {
-    window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=1071967110190-6i7l9o5r6r5i5j5k5l5m5n5o5p5q5r5s5t5u5v5w5x5y5z&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fauth%2Flogin%2Fgoogle&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent';
+    if (!this.tokenClient) {
+      this.inicializarGoogle();
+      return;
+    }
+    this.tokenClient.requestAccessToken({ prompt: 'select_account' });
   }
 }

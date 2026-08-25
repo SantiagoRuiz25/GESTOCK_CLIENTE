@@ -1,38 +1,81 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { KpiResumen, CategoriaReporte } from '../models/reportes';
-import { ConfiguracionNotificaciones } from '../models/configuracion';
+
+export interface Usuario {
+  nombre?: string;
+  email: string;
+  password?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/v1'; // Ajusta con la URL de tu API en Go/Beego
+  private keyUsuarios = 'gestock_usuarios';
+  private keySesion = 'gestock_sesion_activa';
 
-  constructor(private http: HttpClient) {}
+  // Obtiene los usuarios guardados en localStorage
+  private obtenerUsuarios(): Usuario[] {
+    const data = localStorage.getItem(this.keyUsuarios);
+    
+    if (!data) {
+      // Credenciales por defecto si no hay usuarios guardados
+      const usuarioPrueba: Usuario[] = [
+        {
+          nombre: 'Usuario Demo',
+          email: 'admin@gestock.com',
+          password: '123'
+        }
+      ];
+      localStorage.setItem(this.keyUsuarios, JSON.stringify(usuarioPrueba));
+      return usuarioPrueba;
+    }
 
-  // --- MÉTODOS DE REPORTES ---
-  getKpis(): Observable<KpiResumen> {
-    return this.http.get<KpiResumen>(`${this.apiUrl}/reportes/kpis`);
+    return JSON.parse(data);
   }
 
-  getCategorias(): Observable<CategoriaReporte[]> {
-    return this.http.get<CategoriaReporte[]>(`${this.apiUrl}/reportes/categorias`);
+  // Registra un nuevo usuario
+  registrar(usuario: Usuario): boolean {
+    const usuarios = this.obtenerUsuarios();
+    const existe = usuarios.find(u => u.email === usuario.email);
+
+    if (existe) {
+      console.warn('⚠️ [AUTH] El correo ya está registrado:', usuario.email);
+      return false;
+    }
+
+    usuarios.push(usuario);
+    localStorage.setItem(this.keyUsuarios, JSON.stringify(usuarios));
+    console.log('✅ [AUTH] Usuario registrado exitosamente:', usuario.email);
+    return true;
   }
 
-  exportarInventario(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/reportes/exportar`, {
-      responseType: 'blob'
-    });
+  // Verifica credenciales para iniciar sesión
+  login(email: string, password?: string): boolean {
+    const usuarios = this.obtenerUsuarios();
+    
+    // Si viene de Google (sin contraseña), busca solo por email
+    const usuarioValido = password !== undefined
+      ? usuarios.find(u => u.email === email && u.password === password)
+      : usuarios.find(u => u.email === email);
+
+    if (usuarioValido) {
+      localStorage.setItem(this.keySesion, JSON.stringify({ email: usuarioValido.email }));
+      console.log('🚀 [AUTH] Inicio de sesión exitoso:', email);
+      return true;
+    }
+
+    console.error('❌ [AUTH] Credenciales incorrectas para:', email);
+    return false;
   }
 
-  // --- MÉTODOS DE CONFIGURACIÓN ---
-  getNotificaciones(): Observable<ConfiguracionNotificaciones> {
-    return this.http.get<ConfiguracionNotificaciones>(`${this.apiUrl}/configuracion/notificaciones`);
+  // Comprueba si hay una sesión activa
+  estaAutenticado(): boolean {
+    return localStorage.getItem(this.keySesion) !== null;
   }
 
-  guardarNotificaciones(config: ConfiguracionNotificaciones): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/configuracion/notificaciones`, config);
+  // Cierra la sesión activa borrando la clave de localStorage
+  logout(): void {
+    localStorage.removeItem(this.keySesion);
+    console.log('🚪 [AUTH] Sesión cerrada correctamente.');
   }
 }

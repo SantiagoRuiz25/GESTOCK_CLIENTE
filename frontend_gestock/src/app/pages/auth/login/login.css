@@ -213,54 +213,6 @@
 }
 
 /* ==========================================
-   DIVISOR
-   ========================================== */
-.divider {
-  display: flex;
-  align-items: center;
-  margin: 24px 0 18px 0;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.divider span {
-  padding: 0 12px;
-  color: #555861;
-  font-size: 0.8rem;
-}
-
-/* ==========================================
-   BOTÓN DE GOOGLE
-   ========================================== */
-.google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  box-sizing: border-box;
-}
-
-.google-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* ==========================================
    FOOTER
    ========================================== */
 .card-footer {
