@@ -82,7 +82,8 @@
             class="dark-input"
             required>
             <option value="" disabled selected>Selecciona una bodega activa</option>
-            @for (b of getBodegasActivasDisponibles(); track b) {
+            <!-- CORREGIDO: track b.id para evitar el error NG0956 -->
+            @for (b of getBodegasActivasDisponibles(); track b.id) {
               <option [value]="b.nombre">{{ b.nombre }}</option>
             }
           </select>
