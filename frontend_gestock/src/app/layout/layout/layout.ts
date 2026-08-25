@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 // Importa los componentes hijos del layout
 import { HeaderComponent } from '../header/header';
@@ -20,4 +21,12 @@ import { FooterComponent } from '../footer/footer';
   templateUrl: './layout.html',
   styleUrl: './layout.css'
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
+}
