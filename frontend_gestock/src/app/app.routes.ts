@@ -62,7 +62,7 @@ export const routes: Routes = [
       },
       {
         path: 'empresas',
-        loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresaComponent),
+        loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresasComponent),
         title: 'GESTOCK - Empresas'
       },
 
@@ -133,9 +133,8 @@ export const routes: Routes = [
         title: 'Programación - Gestock'
       },
       {
-        path: 'incidencias',
-        loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.RegistroIncidenciasComponent),
-        title: 'Registro de Incidencias - Gestock'
+      path: 'incidencias', // (o la ruta que tengas configurada)
+      loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.IncidenciasComponent)
       },
       
       // Captura cualquier ruta interna errónea dentro de /app

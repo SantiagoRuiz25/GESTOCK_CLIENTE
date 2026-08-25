@@ -1,60 +1,103 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
+
   credentials = {
     email: '',
     password: '',
     rememberMe: false
   };
 
-  isLoading = false;
   activeField: string | null = null;
-
-  mouseX = 0;
-  mouseY = 0;
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  mouseX: number = 0;
+  mouseY: number = 0;
 
   constructor(private router: Router) {}
 
-  // Rastrea las coordenadas del mouse sobre la tarjeta
-  onMouseMove(event: MouseEvent): void {
-    const card = event.currentTarget as HTMLElement;
-    const rect = card.getBoundingClientRect();
+  onMouseMove(event: MouseEvent) {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     this.mouseX = event.clientX - rect.left;
     this.mouseY = event.clientY - rect.top;
   }
 
-  setFocus(field: string): void {
+  setFocus(field: string) {
     this.activeField = field;
   }
 
-  clearFocus(): void {
+  clearFocus() {
     this.activeField = null;
   }
 
-  onLogin(): void {
-    if (!this.credentials.email || !this.credentials.password) {
+  async hashPassword(password: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  validarEmail(email: string): boolean {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  }
+
+  async onLogin() {
+    this.errorMessage = ''; // Limpiar errores previos
+
+    // 1. Validar campos vacíos
+    if (!this.credentials.email || !this.credentials.email.trim() || 
+        !this.credentials.password || !this.credentials.password.trim()) {
+      this.errorMessage = '⚠️ Todos los campos son obligatorios.';
       return;
     }
 
+    // 2. Validar que sea un correo real (ej: si escribe solo un nombre como "maicol" falla)
+    if (!this.validarEmail(this.credentials.email)) {
+      this.errorMessage = '⚠️ Error: Debe ingresar un correo electrónico válido (ej: usuario@gestock.com).';
+      return;
+    }
+
+    // 3. Validar longitud mínima de contraseña (8 caracteres)
+    if (this.credentials.password.length < 8) {
+      this.errorMessage = '⚠️ Error: La contraseña debe tener al menos 8 caracteres.';
+      return;
+    }
+
+    // Si pasa todas las validaciones con éxito:
     this.isLoading = true;
+
+    const hashedPassword = await this.hashPassword(this.credentials.password);
+
+    const loginPayload = {
+      email: this.credentials.email,
+      passwordHash: hashedPassword,
+      rememberMe: this.credentials.rememberMe,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log('%c[GESTOCK] Inicio de Sesión Exitoso (Hasheado JSON):', 'color: #38bdf8; font-weight: bold;');
+    console.log(JSON.stringify(loginPayload, null, 2));
 
     setTimeout(() => {
       this.isLoading = false;
-      this.router.navigate(['/app']);
-    }, 1500);
+      localStorage.setItem('gestock_session', JSON.stringify(loginPayload));
+      this.router.navigate(['/app/panel']);
+    }, 600);
   }
 
-  loginWithGoogle(): void {
-    window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=1071967110190-6i7l9o5r6r5i5j5k5l5m5n5o5p5q5r5s5t5u5v5w5x5y5z&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fauth%2Flogin%2Fgoogle&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent';
+  loginWithGoogle() {
+    console.log('%c[GESTOCK] Iniciando sesión con Google...', 'color: #34d399; font-weight: bold;');
   }
 }
