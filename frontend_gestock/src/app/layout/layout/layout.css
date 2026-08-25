@@ -32,8 +32,11 @@
 .content-container {
   grid-area: content;
   overflow-y: auto;
+  overflow-x: hidden; /* Evita que un elemento ancho genere scroll horizontal y tape el footer */
   padding: 32px;
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0; /* Permite que el contenido se achique en vez de forzar el ancho del grid */
 }
 
 /* 4. Footer fijo abajo */
