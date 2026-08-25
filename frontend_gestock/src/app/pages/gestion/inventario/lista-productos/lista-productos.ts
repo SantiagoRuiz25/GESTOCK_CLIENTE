@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,9 +9,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './lista-productos.html',
   styleUrls: ['./lista-productos.css']
 })
-export class ListaProductosComponent {
+export class ListaProductosComponent implements OnInit {
 
-  // Lista inicial por defecto en caso de que el localStorage esté vacío
   private productosIniciales: any[] = [
     { codigo: 'PROD-001', nombre: 'Laptop HP ProBook', categoria: 'Tecnología', bodega: 'Bodega Central', precio: 2500000, stock: 12 },
     { codigo: 'PROD-002', nombre: 'Mouse Inalámbrico Logitech', categoria: 'Accesorios', bodega: 'Bodega Norte', precio: 65000, stock: 45 },
@@ -47,93 +46,182 @@ export class ListaProductosComponent {
     { codigo: 'PROD-032', nombre: 'Jabón Líquido Manos Galón', categoria: 'Insumos', bodega: 'Bodega Central', precio: 42000, stock: 25 },
     { codigo: 'PROD-033', nombre: 'Papel Higiénico Institucional Pack x 12', categoria: 'Insumos', bodega: 'Bodega Norte', precio: 62000, stock: 50 },
     { codigo: 'PROD-034', nombre: 'Estantería Metálica 5 Bandejas', categoria: 'Mobiliario', bodega: 'Bodega Central', precio: 310000, stock: 10 },
-    { codigo: 'PROD-035', nombre: 'Mesa de Juntas 6 Puestos', categoria: 'Mobiliario', bodega: 'Bodega Norte', precio: 1400000, stock: 2 },
-    { codigo: 'PROD-036', nombre: 'Bloc de Notas Adhesivas Post-it', categoria: 'Papelería', bodega: 'Bodega de Tránsito', precio: 12000, stock: 75 },
-    { codigo: 'PROD-037', nombre: 'Grapadora de Oficina Metálica', categoria: 'Papelería', bodega: 'Bodega Central', precio: 24000, stock: 30 },
-    { codigo: 'PROD-038', nombre: 'Perforadora de Papel Tres Huecos', categoria: 'Papelería', bodega: 'Bodega Norte', precio: 36000, stock: 15 },
-    { codigo: 'PROD-039', nombre: 'Cinta Adhesiva Transparente Pack x 6', categoria: 'Papelería', bodega: 'Bodega de Tránsito', precio: 19000, stock: 40 },
-    { codigo: 'PROD-040', nombre: 'Tijeras de Oficina Inoxidables', categoria: 'Papelería', bodega: 'Bodega Central', precio: 8500, stock: 50 },
-    { codigo: 'PROD-041', nombre: 'Proyector Epson PowerLite', categoria: 'Tecnología', bodega: 'Bodega Central', precio: 2200000, stock: 4 },
-    { codigo: 'PROD-042', nombre: 'Pantalla de Proyección Tripie', categoria: 'Tecnología', bodega: 'Bodega Norte', precio: 480000, stock: 6 },
-    { codigo: 'PROD-043', nombre: 'Regleta Multitoma 6 Salidas', categoria: 'Accesorios', bodega: 'Bodega de Tránsito', precio: 45000, stock: 35 },
-    { codigo: 'PROD-044', nombre: 'Adaptador USB-C a HDMI', categoria: 'Accesorios', bodega: 'Bodega Central', precio: 65000, stock: 28 },
-    { codigo: 'PROD-045', nombre: 'Mousepad Ergonómico con Reposamuñecas', categoria: 'Accesorios', bodega: 'Bodega Norte', precio: 28000, stock: 42 },
-    { codigo: 'PROD-046', nombre: 'Lámpara LED de Escritorio', categoria: 'Mobiliario', bodega: 'Bodega de Tránsito', precio: 95000, stock: 17 },
-    { codigo: 'PROD-047', nombre: 'Papelera Metálica para Oficina', categoria: 'Mobiliario', bodega: 'Bodega Central', precio: 32000, stock: 25 },
-    { codigo: 'PROD-048', nombre: 'Borrador de Tablero Acrílico', categoria: 'Papelería', bodega: 'Bodega Norte', precio: 6000, stock: 60 },
-    { codigo: 'PROD-049', nombre: 'Calculadora Científica Casio', categoria: 'Tecnología', bodega: 'Bodega de Tránsito', precio: 85000, stock: 19 },
-    { codigo: 'PROD-050', nombre: 'Caja Menor de Seguridad Portátil', categoria: 'Mobiliario', bodega: 'Bodega Central', precio: 125000, stock: 8 }
+    { codigo: 'PROD-035', nombre: 'Mesa de Juntas 6 Puestos', categoria: 'Mobiliario', bodega: 'Bodega Norte', precio: 1400000, stock: 2 }
   ];
 
-  // Getter que obtiene los productos directo del localStorage (sincronizado)
-  get productosOriginales(): any[] {
-    const datos = localStorage.getItem('inventario_productos');
-    if (!datos) {
-      // Si no existe, inicializamos el almacenamiento con los 50 por defecto
-      localStorage.setItem('inventario_productos', JSON.stringify(this.productosIniciales));
-      return this.productosIniciales;
-    }
-    return JSON.parse(datos);
-  }
-
+  productosOriginales: any[] = [];
   filtroBusqueda: string = '';
   menuActivoIndex: number | null = null;
   productoEnEdicion: any = null;
+  private productoOriginalSnapshot: any = null;
+  
   mensajeNotificacion: string | null = null;
+  mensajeAlertaModal: string | null = null;
+  productoAEliminar: any = null;
+
+  ngOnInit() {
+    this.cargarProductos();
+  }
+
+  cargarProductos() {
+    const datos = localStorage.getItem('inventario_productos');
+    if (!datos) {
+      localStorage.setItem('inventario_productos', JSON.stringify(this.productosIniciales));
+      this.productosOriginales = [...this.productosIniciales];
+    } else {
+      try {
+        this.productosOriginales = JSON.parse(datos);
+      } catch (e) {
+        this.productosOriginales = [...this.productosIniciales];
+      }
+    }
+  }
+
+  get categoriasDisponibles(): string[] {
+    const categorias = this.productosOriginales.map(p => p.categoria);
+    return Array.from(new Set(categorias)).sort();
+  }
+
+  get bodegasDisponibles(): string[] {
+    const bodegas = this.productosOriginales.map(p => p.bodega);
+    return Array.from(new Set(bodegas)).sort();
+  }
 
   get productosFiltrados(): any[] {
-    const lista = this.productosOriginales;
-    if (!this.filtroBusqueda.trim()) {
+    const lista = this.productosOriginales || [];
+    if (!this.filtroBusqueda || !this.filtroBusqueda.trim()) {
       return lista;
     }
     const texto = this.filtroBusqueda.toLowerCase().trim();
     return lista.filter(p => 
-      p.nombre.toLowerCase().includes(texto) ||
-      p.codigo.toLowerCase().includes(texto) ||
-      p.categoria.toLowerCase().includes(texto) ||
-      p.bodega.toLowerCase().includes(texto)
+      (p.nombre && p.nombre.toLowerCase().includes(texto)) ||
+      (p.codigo && p.codigo.toLowerCase().includes(texto)) ||
+      (p.categoria && p.categoria.toLowerCase().includes(texto)) ||
+      (p.bodega && p.bodega.toLowerCase().includes(texto))
     );
-  }
-
-  toggleMenu(index: number) {
-    this.menuActivoIndex = this.menuActivoIndex === index ? null : index;
   }
 
   abrirModalEditar(prod: any) {
     this.productoEnEdicion = { ...prod };
+    this.productoOriginalSnapshot = { ...prod };
+    this.mensajeAlertaModal = null;
     this.menuActivoIndex = null;
   }
 
   cerrarModal() {
     this.productoEnEdicion = null;
+    this.productoOriginalSnapshot = null;
+    this.mensajeAlertaModal = null;
+  }
+
+  registrarAuditoria(accion: 'CREAR' | 'ACTUALIZAR' | 'ELIMINAR', producto: any, usuario: string = 'Administrador') {
+    const nuevoRegistro = {
+      id: `#${Date.now().toString().slice(-3)}`,
+      usuario: usuario,
+      accion: accion,
+      entidad: `Producto: ${producto.nombre}`,
+      detalles: `Bodega: ${producto.bodega} | Cantidad: ${producto.stock} un.`,
+      fechaHora: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+      estado: 'Completado'
+    };
+
+    const llaves = ['sistema_auditorias', 'auditorias'];
+    llaves.forEach(key => {
+      const actual = JSON.parse(localStorage.getItem(key) || '[]');
+      actual.unshift(nuevoRegistro);
+      localStorage.setItem(key, JSON.stringify(actual));
+    });
   }
 
   guardarEdicion(form: any) {
-    if (form.valid) {
-      let lista = this.productosOriginales;
-      const index = lista.findIndex(p => p.codigo === this.productoEnEdicion.codigo);
-      if (index !== -1) {
-        lista[index] = { ...this.productoEnEdicion };
-        localStorage.setItem('inventario_productos', JSON.stringify(lista));
+    if (form.valid && this.productoEnEdicion) {
+      const productoLimpio = {
+        ...this.productoEnEdicion,
+        precio: Number(this.productoEnEdicion.precio),
+        stock: Number(this.productoEnEdicion.stock)
+      };
+
+      const indexReal = this.productosOriginales.findIndex(p => p.codigo === productoLimpio.codigo);
+      
+      if (indexReal !== -1 && this.productoOriginalSnapshot) {
+        const sinCambios = pLinoCambio(productoLimpio, this.productoOriginalSnapshot);
+
+        if (sinCambios) {
+          this.cerrarModal();
+          this.mensajeAlertaModal = 'No se realizaron modificaciones en el producto.';
+          return; 
+        }
       }
-      this.mostrarNotificacion('¡Producto actualizado correctamente!');
+
+      if (indexReal !== -1) {
+        this.productosOriginales[indexReal] = productoLimpio;
+        this.registrarAuditoria('ACTUALIZAR', productoLimpio);
+      } else {
+        this.productosOriginales.unshift(productoLimpio);
+        this.registrarAuditoria('CREAR', productoLimpio);
+      }
+
+      localStorage.setItem('inventario_productos', JSON.stringify(this.productosOriginales));
+      console.log('✏️ [JSON Producto Modificado]:', JSON.stringify(productoLimpio, null, 2));
+      
+      this.productosOriginales = [...this.productosOriginales];
       this.cerrarModal();
+
+      setTimeout(() => {
+        this.mostrarNotificacion('¡Producto actualizado correctamente!');
+      }, 100);
     }
   }
 
-  eliminarProducto(prod: any) {
-    let lista = this.productosOriginales;
-    lista = lista.filter(p => p.codigo !== prod.codigo);
-    localStorage.setItem('inventario_productos', JSON.stringify(lista));
-    
+  confirmarEliminacion(prod: any) {
+    this.productoAEliminar = prod;
     this.menuActivoIndex = null;
-    this.mostrarNotificacion('¡Producto eliminado del inventario con éxito!');
+  }
+
+  cancelarEliminacion() {
+    this.productoAEliminar = null;
+  }
+
+  ejecutarEliminacion() {
+    if (!this.productoAEliminar) return;
+
+    const prod = this.productoAEliminar;
+    console.log('🗑️ [JSON Producto Eliminado]:', JSON.stringify(prod, null, 2));
+
+    this.productosOriginales = this.productosOriginales.filter(p => p.codigo !== prod.codigo);
+    
+    localStorage.setItem('inventario_productos', JSON.stringify(this.productosOriginales));
+    this.productosOriginales = [...this.productosOriginales];
+    
+    this.registrarAuditoria('ELIMINAR', prod);
+
+    this.productoAEliminar = null;
+
+    setTimeout(() => {
+      this.mostrarNotificacion('¡Producto eliminado del inventario con éxito!');
+    }, 100);
   }
 
   mostrarNotificacion(mensaje: string) {
-    this.mensajeNotificacion = mensaje;
+    this.mensajeNotificacion = null;
     setTimeout(() => {
-      this.mensajeNotificacion = null;
+      this.mensajeNotificacion = mensaje;
+    }, 50);
+
+    setTimeout(() => {
+      if (this.mensajeNotificacion === mensaje) {
+        this.mensajeNotificacion = null;
+      }
     }, 3500);
   }
+}
+
+function pLinoCambio(p1: any, p2: any): boolean {
+  return (
+    p1.nombre === p2.nombre &&
+    p1.categoria === p2.categoria &&
+    p1.bodega === p2.bodega &&
+    p1.precio === p2.precio &&
+    p1.stock === p2.stock
+  );
 }

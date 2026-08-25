@@ -10,16 +10,10 @@
 
     <!-- Botón de acciones con menú desplegable -->
     <div class="panel-actions-container">
-      <button class="btn-action-trigger" (click)="toggleMenuInventario($event)">
-        <span>+</span> Nueva acción
-      </button>
+      
 
       <div class="inventory-dropdown" *ngIf="mostrarMenuInventario" (click)="$event.stopPropagation()">
-        <ul>
-          <li><span class="dropdown-icon">📥</span> Registrar Entrada</li>
-          <li><span class="dropdown-icon">📤</span> Registrar Salida</li>
-          <li><span class="dropdown-icon">📈</span> Ver Reportes</li>
-        </ul>
+        
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@ export const routes: Routes = [
       import('./pagina/pagina').then((m) => m.PaginaComponent),
   },
 
-  // Módulo de Autenticación (Pantallas independientes sin Header/Sidebar)
+  // Módulo de Autenticación (Pantallas independientes)
   {
     path: 'auth',
     children: [
@@ -42,12 +42,19 @@ export const routes: Routes = [
     ]
   },
 
-  // Ruta del sistema interno con Sidebar/Layout que agrupa todas las secciones
+  // Alias para mantener compatibilidad si navegas a /dashboard
+  {
+    path: 'dashboard',
+    redirectTo: 'app/panel',
+    pathMatch: 'full'
+  },
+
+  // Ruta del sistema interno con Layout
   {
     path: 'app',
     component: LayoutComponent,
     children: [
-      {  path: '', redirectTo: 'gestion/inventario', pathMatch: 'full' },
+      { path: '', redirectTo: 'panel', pathMatch: 'full' },
 
       // Dashboard
       {
@@ -62,13 +69,11 @@ export const routes: Routes = [
       },
       {
         path: 'empresas',
-        loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresaComponent),
+        loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresasComponent),
         title: 'GESTOCK - Empresas'
       },
 
-      // Módulo de Inventario con sus subrutas },
-      
-      // Módulo de Inventario con sus subrutas
+      // Módulo de Inventario
       {
         path: 'gestion/inventario',
         loadComponent: () => import('./pages/gestion/inventario/inventario').then(m => m.InventarioComponent),
@@ -80,7 +85,7 @@ export const routes: Routes = [
         ]
       },
       
-      // Nuevos Módulos de Recepción y Logística
+      // Recepción y Logística
       {
         path: 'recepcion/recepcion-mercancias',
         title: 'GESTOCK - Recepción de Mercancías',
@@ -92,13 +97,13 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/recepcion/historial-logistico/historial-logistico').then(m => m.HistorialLogisticoComponent)
       },
 
-      // Módulo de Auditoría
+      // Auditoría
       {
         path: 'gestion/auditorias',
         loadComponent: () => import('./pages/gestion/auditorias/auditorias').then(m => m.AuditoriasComponent)
       },
       
-      // Módulo de Roles y Usuarios
+      // Roles y Usuarios
       {
         path: 'gestion/roles-yusuarios',
         loadComponent: () => import('./pages/gestion/roles-yusuarios/roles-yusuarios').then(m => m.RolesUsuariosComponent)
@@ -108,22 +113,17 @@ export const routes: Routes = [
       {
         path: 'reportes',
         title: 'GESTOCK - Reportes y Estadísticas',
-        loadComponent: () =>
-          import('./pages/reportes/reportes').then((m) => m.ReportesComponent),
+        loadComponent: () => import('./pages/reportes/reportes').then((m) => m.ReportesComponent)
       },
       {
         path: 'envios',
         title: 'GESTOCK - Gestión de Envíos',
-        loadComponent: () =>
-          import('./pages/envio/envio').then((m) => m.EnviosComponent),
+        loadComponent: () => import('./pages/envio/envio').then((m) => m.EnviosComponent)
       },
       {
         path: 'configuracion',
         title: 'GESTOCK - Configuración del Sistema',
-        loadComponent: () =>
-          import('./pages/configuracion/configuracion').then(
-            (m) => m.ConfiguracionComponent
-          ),
+        loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.ConfiguracionComponent)
       },
       
       // Mantenimiento
@@ -133,20 +133,18 @@ export const routes: Routes = [
         title: 'Programación - Gestock'
       },
       {
-        path: 'incidencias',
-        loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.RegistroIncidenciasComponent),
-        title: 'Registro de Incidencias - Gestock'
+      path: 'incidencias', // (o la ruta que tengas configurada)
+      loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.IncidenciasComponent)
       },
       
-      // Captura cualquier ruta interna errónea dentro de /app
       {
         path: '**',
-        redirectTo: 'gestion/inventario',
+        redirectTo: 'panel',
       },
     ],
   },
 
-  // Redirige URLs externas inexistentes a la landing page principal
+  // Fallback global
   {
     path: '**',
     redirectTo: '',

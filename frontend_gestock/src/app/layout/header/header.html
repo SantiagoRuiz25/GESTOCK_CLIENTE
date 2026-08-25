@@ -1,29 +1,51 @@
-<header class="app-header">
+<header class="header-container">
+  <!-- Si tienes un logo o título a la izquierda, va aquí -->
+  <div class="header-left">
+    <!-- (Opcional) Título o espacio izquierdo -->
+  </div>
+
+  <!-- Sección derecha: Campanita + Perfil -->
   <div class="header-right">
-    <!-- Indicador de estado -->
-    <div class="header-status">
-      <span class="status-dot"></span>
-      Sistema activo
+    
+    <!-- Campanita de notificaciones -->
+    <div class="notification-icon-container" style="position: relative; cursor: pointer;">
+      <span class="notification-bell">🔔</span>
+      <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; width: 8px; height: 8px; border-radius: 50%;"></span>
     </div>
 
-    <!-- Icono de Notificaciones -->
-    <button 
-      type="button" 
-      class="icon-btn" 
-      aria-label="Notificaciones"
-      [routerLink]="['/app/configuracion']" 
-      [queryParams]="{ tab: 'notificaciones' }">
-      <span class="bell-icon">🔔</span>
-      <span class="notification-badge"></span>
-    </button>
-
-    <!-- Perfil del Usuario -->
-    <div class="user-profile">
-      <div class="user-avatar">M</div>
-      <div class="user-info">
-        <span class="user-name">Maicol Nore</span>
-        <span class="user-role">Operador &#9662;</span>
+    <!-- Contenedor del Perfil -->
+    <div class="user-profile-container">
+      
+      <!-- Botón del Perfil -->
+      <div class="user-profile-btn" (click)="toggleMenuPerfil()">
+        <div class="avatar-circle">M</div>
+        <div class="user-info">
+          <span class="user-name">Maicol Nore</span>
+          <span class="user-role">Operador ▾</span>
+        </div>
       </div>
+
+      <!-- Menú Desplegable Flotante -->
+      <div *ngIf="mostrarMenuPerfil" class="profile-dropdown-card">
+        
+        <div class="profile-dropdown-header">
+          <p class="profile-name">Maicol Nore</p>
+          <p class="profile-email">maicol.nore@gestock.com</p>
+          <span class="profile-role-badge">Rol: Operador ADSO</span>
+        </div>
+
+        <div class="profile-dropdown-actions">
+          <button routerLink="/configuracion" (click)="mostrarMenuPerfil = false" class="profile-action-btn">
+            ⚙️ Configuración
+          </button>
+          <button (click)="cerrarSesion()" class="profile-action-btn danger">
+            🚪 Cerrar Sesión
+          </button>
+        </div>
+
+      </div>
+
     </div>
+
   </div>
 </header>

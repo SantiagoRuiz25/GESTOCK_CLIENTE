@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { AuthService } from '../services/auth';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,14 +23,16 @@ interface TarjetaInfo {
 })
 export class PaginaComponent implements AfterViewInit, OnDestroy {
   private router = inject(Router);
+  private authService = inject(AuthService);
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
 
-  // Escena Three.js
+  // Escena Three.js & Animación
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private resizeListener!: () => void;
+  private animationFrameId!: number;
 
   // Piezas de la Caja Articulada
   private boxGroup!: THREE.Group;
@@ -142,7 +145,7 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
 
     this.boxGroup = new THREE.Group();
 
-    // Material Cartón Amarillo
+    // Material Cartón
     const yellowMaterial = new THREE.MeshStandardMaterial({
       color: 0xeab308,
       roughness: 0.5,
@@ -187,7 +190,7 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
     wallRight.position.set(size / 2, 0, 0);
     this.boxGroup.add(wallRight);
 
-    // --- TAPAS MÓVILES (Inicialmente CERRADAS) ---
+    // Tapas Móviles
     const flapWidth = size;
     const flapDepth = size / 2;
     const flapGeo = new THREE.BoxGeometry(flapWidth, thickness, flapDepth);
@@ -199,7 +202,6 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
     mFlapLeft.rotation.y = Math.PI / 2;
     mFlapLeft.position.set(flapDepth / 2, 0, 0);
     this.flapLeft.add(mFlapLeft);
-    // Posición inicial cerrada (plana hacia adentro)
     this.flapLeft.rotation.z = -Math.PI / 2;
     this.boxGroup.add(this.flapLeft);
 
@@ -231,7 +233,7 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
     this.flapFront.rotation.x = -Math.PI / 2;
     this.boxGroup.add(this.flapFront);
 
-    // Esfera / Núcleo Holográfico en el interior
+    // Núcleo Holográfico
     const itemGeo = new THREE.IcosahedronGeometry(0.55, 2);
     const itemMat = new THREE.MeshStandardMaterial({
       color: 0x38bdf8,
@@ -240,7 +242,7 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
       emissiveIntensity: 0.8
     });
     this.innerItem = new THREE.Mesh(itemGeo, itemMat);
-    this.innerItem.position.set(0, -0.2, 0); // Oculta dentro de la caja al inicio
+    this.innerItem.position.set(0, -0.2, 0);
     this.boxGroup.add(this.innerItem);
 
     // Partículas
@@ -266,13 +268,14 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
     this.particlesGroup.add(particles);
     this.boxGroup.add(this.particlesGroup);
 
-    // Inclinación inicial de la caja cerrada
+    // Inclinación inicial
     this.boxGroup.rotation.x = 0.35;
     this.boxGroup.rotation.y = -0.55;
     this.scene.add(this.boxGroup);
 
+    // Bucle de Animación
     const animate = () => {
-      requestAnimationFrame(animate);
+      this.animationFrameId = requestAnimationFrame(animate);
       if (this.innerItem) {
         this.innerItem.rotation.y += 0.01;
         this.innerItem.rotation.x += 0.005;
@@ -300,12 +303,12 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
       }
     });
 
-    // 1. Muestra la tarjeta 1 con la caja TOTALMENTE CERRADA
+    // 1. Muestra tarjeta 1 con caja cerrada
     tl.to(this.boxGroup.rotation, { y: 0.1, x: 0.35, duration: 2 }, 0)
       .to(cards[0], { opacity: 1, y: 0, duration: 1 }, 0.5)
       .to(cards[0], { opacity: 0, duration: 0.5 }, 2);
 
-    // 2. APERTURA DE TAPAS COMO CAJA REAL & Salida de la esfera holográfica
+    // 2. Apertura de tapas & Núcleo sale
     tl.to(this.flapLeft.rotation, { z: Math.PI * 0.4, duration: 2 }, 2)
       .to(this.flapRight.rotation, { z: -Math.PI * 0.4, duration: 2 }, 2)
       .to(this.flapFront.rotation, { x: Math.PI * 0.4, duration: 2 }, 2)
@@ -316,7 +319,7 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
       .to(cards[1], { opacity: 1, y: 0, duration: 1 }, 2.8)
       .to(cards[1], { opacity: 0, duration: 0.5 }, 4.2);
 
-    // 3. Apertura total hacia los lados y elevación destacada del núcleo
+    // 3. Apertura total y elevación
     tl.to(this.flapLeft.rotation, { z: Math.PI * 0.65, duration: 1.5 }, 4.5)
       .to(this.flapRight.rotation, { z: -Math.PI * 0.65, duration: 1.5 }, 4.5)
       .to(this.flapFront.rotation, { x: Math.PI * 0.65, duration: 1.5 }, 4.5)
@@ -343,7 +346,17 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
   }
 
   irAlSistema(): void {
-    this.router.navigate(['/app']);
+    if (this.authService.estaAutenticado()) {
+      console.log('🔗 [NAVEGACIÓN] Usuario autenticado. Redirigiendo a /app...');
+      this.router.navigate(['/app']);
+    } else {
+      console.warn('🔒 [ACCESO DENEGADO] Debe registrarse o iniciar sesión.');
+      this.irALogin();
+    }
+  }
+
+  irALogin(): void {
+    this.router.navigate(['/auth']);
   }
 
   abrirWhatsApp(): void {
@@ -355,9 +368,19 @@ export class PaginaComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (!this.isBrowser) return;
 
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+
     if (this.resizeListener) {
       window.removeEventListener('resize', this.resizeListener);
     }
+
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.renderer.domElement.remove();
+    }
   }
 }

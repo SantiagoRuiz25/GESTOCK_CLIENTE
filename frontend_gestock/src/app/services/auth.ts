@@ -1,38 +1,89 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { KpiResumen, CategoriaReporte } from '../models/reportes';
-import { ConfiguracionNotificaciones } from '../models/configuracion';
+
+// 1. Define los roles permitidos
+export type RolUsuario = 'Administrador' | 'Supervisor' | 'Operario' | 'Auditor';
+
+// 2. Agrega la propiedad rol a la interfaz
+export interface Usuario {
+  nombre?: string;
+  email: string;
+  password?: string;
+  rol?: RolUsuario; // 👈 Aquí agregas el atributo opcional
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/v1'; // Ajusta con la URL de tu API en Go/Beego
+  private keyUsuarios = 'gestock_usuarios';
+  private keySesion = 'gestock_sesion_activa';
 
-  constructor(private http: HttpClient) {}
+  private obtenerUsuarios(): Usuario[] {
+    const data = localStorage.getItem(this.keyUsuarios);
+    
+    if (!data) {
+      const usuariosIniciales: Usuario[] = [
+        { nombre: 'Admin System', email: 'admin@gestock.com', password: '123', rol: 'Administrador' },
+        { nombre: 'Supervisor Logística', email: 'supervisor@gestock.com', password: '123', rol: 'Supervisor' },
+        { nombre: 'Operario Bodega', email: 'operario@gestock.com', password: '123', rol: 'Operario' },
+        { nombre: 'Auditor General', email: 'auditor@gestock.com', password: '123', rol: 'Auditor' }
+      ];
+      localStorage.setItem(this.keyUsuarios, JSON.stringify(usuariosIniciales));
+      return usuariosIniciales;
+    }
 
-  // --- MÉTODOS DE REPORTES ---
-  getKpis(): Observable<KpiResumen> {
-    return this.http.get<KpiResumen>(`${this.apiUrl}/reportes/kpis`);
+    return JSON.parse(data);
   }
 
-  getCategorias(): Observable<CategoriaReporte[]> {
-    return this.http.get<CategoriaReporte[]>(`${this.apiUrl}/reportes/categorias`);
+  registrar(usuario: Usuario): boolean {
+    const usuarios = this.obtenerUsuarios();
+    const existe = usuarios.find(u => u.email === usuario.email);
+
+    if (existe) {
+      return false;
+    }
+
+    // Asigna 'Operario' por defecto si no especifica rol
+    if (!usuario.rol) {
+      usuario.rol = 'Operario';
+    }
+
+    usuarios.push(usuario);
+    localStorage.setItem(this.keyUsuarios, JSON.stringify(usuarios));
+    return true;
   }
 
-  exportarInventario(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/reportes/exportar`, {
-      responseType: 'blob'
-    });
+  login(email: string, password?: string): boolean {
+    const usuarios = this.obtenerUsuarios();
+    
+    // Soporta autenticación con contraseña o mediante Google (solo email)
+    const usuarioValido = password !== undefined
+      ? usuarios.find(u => u.email === email && u.password === password)
+      : usuarios.find(u => u.email === email);
+
+    if (usuarioValido) {
+      localStorage.setItem(this.keySesion, JSON.stringify(usuarioValido));
+      return true;
+    }
+
+    return false;
   }
 
-  // --- MÉTODOS DE CONFIGURACIÓN ---
-  getNotificaciones(): Observable<ConfiguracionNotificaciones> {
-    return this.http.get<ConfiguracionNotificaciones>(`${this.apiUrl}/configuracion/notificaciones`);
+  obtenerUsuarioActual(): Usuario | null {
+    const sesion = localStorage.getItem(this.keySesion);
+    return sesion ? JSON.parse(sesion) : null;
   }
 
-  guardarNotificaciones(config: ConfiguracionNotificaciones): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/configuracion/notificaciones`, config);
+  obtenerRol(): RolUsuario | null {
+    const usuario = this.obtenerUsuarioActual();
+    return usuario?.rol || null;
+  }
+
+  estaAutenticado(): boolean {
+    return localStorage.getItem(this.keySesion) !== null;
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.keySesion);
   }
 }
