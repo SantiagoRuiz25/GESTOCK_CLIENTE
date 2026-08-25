@@ -22,6 +22,11 @@
         (click)="cambiarTab('backup')">
         💾 Backup
       </button>
+      <button 
+        [class.active]="tabActiva === 'sesiones'" 
+        (click)="cambiarTab('sesiones')">
+        💻 Sesiones
+      </button>
     </div>
   </div>
 
@@ -231,6 +236,47 @@
         <button class="btn-action-outline" (click)="exportarConfiguracion()">
           ✉️ Exportar configuración
         </button>
+      </div>
+    </div>
+  }
+
+  <!-- TAB: SESIONES ACTIVAS -->
+  @if (tabActiva === 'sesiones') {
+    <div class="card-panel history-panel">
+      <div class="history-header">
+        <div class="setting-info">
+          <h4>💻 Sesiones Activas</h4>
+          <p>Dispositivos que mantienen actualmente abierta una sesión en tu cuenta de Gestock.</p>
+        </div>
+        <span class="history-badge">{{ activeSessions.length }} Activas</span>
+      </div>
+
+      <div class="notifications-feed">
+        @for (session of activeSessions; track session.id) {
+          <div class="notification-card" [style.border-left]="session.current ? '4px solid #10b981' : '4px solid #3a86ff'">
+            <div class="notif-icon">🖥️</div>
+            <div class="notif-details">
+              <div class="notif-head">
+                <span class="notif-title">
+                  {{ session.device }} 
+                  @if (session.current) {
+                    <span style="background: #10b98120; color: #10b981; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Actual</span>
+                  }
+                </span>
+                <span class="notif-time">{{ session.timestamp }}</span>
+              </div>
+              <p class="notif-body" style="margin-top: 4px;">
+                {{ session.browser }} &bull; IP: {{ session.ip }}<br>
+                📍 {{ session.location }}
+              </p>
+            </div>
+            <div>
+              <button class="btn-action-outline" style="padding: 6px 12px; font-size: 12px;" (click)="revocarSesion(session.id)">
+                {{ session.current ? 'Cerrar' : 'Revocar' }}
+              </button>
+            </div>
+          </div>
+        }
       </div>
     </div>
   }
