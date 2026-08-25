@@ -4,7 +4,7 @@
   <div class="bodegas-header">
     <div>
       <h2>Listado y Control de Bodegas</h2>
-      <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación</p>
+      <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación. Haz clic en cualquier bodega para ver su inventario exacto.</p>
     </div>
     <div style="display: flex; gap: 1rem; align-items: center;">
       <span class="bodegas-count">{{ bodegas().length }} Registradas</span>
@@ -17,7 +17,7 @@
   <!-- Cuadrícula de Tarjetas de Bodegas -->
   <div class="bodegas-grid">
     @for (bodega of bodegas(); track bodega.id) {
-      <div class="bodega-card" [ngClass]="{ 'inactiva': !bodega.activa }">
+      <div class="bodega-card" [ngClass]="{ 'inactiva': !bodega.activa }" (click)="verDetalleBodega(bodega, $event)">
         
         <!-- Header de la tarjeta -->
         <div class="card-header">
@@ -130,5 +130,59 @@
         <button type="submit" class="btn-crear">Guardar Bodega</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ================================================= -->
+<!-- MODAL DE DETALLE DE PRODUCTOS (CARGA AL CLIC)    -->
+<!-- ================================================= -->
+<div class="modal-overlay animate-fade" *ngIf="mostrarModalDetalle() && bodegaSeleccionada()">
+  <div class="modal-content modal-detalle-ancho">
+    
+    <div class="modal-header-detalle">
+      <div>
+        <h3>📦 {{ bodegaSeleccionada()?.nombre }}</h3>
+        <p class="text-subtitle-sm">Código: <code>{{ bodegaSeleccionada()?.codigo }}</code> | Responsable: {{ bodegaSeleccionada()?.responsable }}</p>
+      </div>
+      <button class="btn-cerrar-x" (click)="cerrarModalDetalle()">✕</button>
+    </div>
+
+    <!-- Contenedor con espacio y scroll fluido para la tabla -->
+    <div class="table-container-wrapper">
+      <table class="productos-table">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th style="text-align: right;">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (bodegaSeleccionada()?.productos && bodegaSeleccionada()?.productos!.length > 0) {
+            @for (prod of bodegaSeleccionada()?.productos; track prod.id) {
+              <tr>
+                <td><code>{{ prod.sku }}</code></td>
+                <td style="font-weight: 500; color: #fff;">{{ prod.nombre }}</td>
+                <td><span class="badge-categoria">{{ prod.categoria }}</span></td>
+                <td style="text-align: right; font-weight: 600; color: #34d399;">{{ prod.cantidad | number }} un.</td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td colspan="4" class="empty-state-row">
+                <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: #64748b;"></i>
+                No hay productos registrados en esta bodega actualmente.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-actions" style="margin-top: 1.5rem;">
+      <button type="button" class="btn-cancelar w-100" (click)="cerrarModalDetalle()">Cerrar Ventana</button>
+    </div>
+
   </div>
 </div>

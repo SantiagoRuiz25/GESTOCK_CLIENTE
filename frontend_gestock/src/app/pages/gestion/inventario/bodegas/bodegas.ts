@@ -2,6 +2,29 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 
+interface ProductoBodega {
+  id: string;
+  nombre: string;
+  sku: string;
+  categoria: string;
+  cantidad: number;
+}
+
+interface Bodega {
+  id: number;
+  nombre: string;
+  codigo: string;
+  ciudad: string;
+  direccion: string;
+  responsable: string;
+  telefono: string;
+  capacidad: number;
+  ocupado: number;
+  activa: boolean;
+  icono: string;
+  productos?: ProductoBodega[];
+}
+
 @Component({
   selector: 'app-bodegas',
   standalone: true,
@@ -10,88 +33,329 @@ import { FormsModule, NgForm } from '@angular/forms';
   styleUrls: ['./bodegas.css']
 })
 export class BodegasComponent {
-  // Control de visibilidad del modal con Signal
-  mostrarModal = signal<boolean>(false);
+  mostrarModal = signal(false);
+  mostrarModalDetalle = signal(false);
+  bodegaSeleccionada = signal<Bodega | null>(null);
 
-  // Carga las 15 bodegas desde el localStorage, o las inicializa desactivadas por defecto
-  private obtenerBodegasIniciales(): any[] {
-    const guardadas = localStorage.getItem('inventario_bodegas');
-    if (guardadas) {
-      return JSON.parse(guardadas);
-    }
-
-    const listaInicial = [
-      { id: 1, nombre: 'Bodega Principal Yopal', codigo: 'BOD-001', direccion: 'Calle 24 # 15-40', ciudad: 'Yopal', icono: '🏢', responsable: 'Carlos Pérez', telefono: '3101234567', ocupado: 8500, capacidad: 10000, activa: false },
-      { id: 2, nombre: 'Centro Logístico Medellín', codigo: 'BOD-002', direccion: 'Cra. 50 # 12-30', ciudad: 'Medellín', icono: '🏭', responsable: 'Ana Gómez', telefono: '3209876543', ocupado: 3200, capacidad: 8000, activa: false },
-      { id: 3, nombre: 'Bodega de Tránsito Cali', codigo: 'BOD-003', direccion: 'Calle 15 # 32-10', ciudad: 'Cali', icono: '📦', responsable: 'Luis Rodríguez', telefono: '3154567890', ocupado: 4500, capacidad: 5000, activa: false },
-      { id: 4, nombre: 'Depósito Bogotá Norte', codigo: 'BOD-004', direccion: 'Autopista Norte # 180-20', ciudad: 'Bogotá', icono: '🏗️', responsable: 'Andrea Gómez', telefono: '3201112233', ocupado: 24000, capacidad: 30000, activa: false },
-      { id: 5, nombre: 'Bodega Costa Caribe', codigo: 'BOD-005', direccion: 'Vía 40 # 73-100', ciudad: 'Barranquilla', icono: '⚓', responsable: 'Jorge Díaz', telefono: '3014433221', ocupado: 23000, capacidad: 25000, activa: false },
-      { id: 6, nombre: 'Punto Villavicencio', codigo: 'BOD-006', direccion: 'Anillo Vial # 4-50', ciudad: 'Villavicencio', icono: '🚚', responsable: 'Lucía Benítez', telefono: '3125566778', ocupado: 4500, capacidad: 12000, activa: false },
-      { id: 7, nombre: 'Bodega Eje Cafetero', codigo: 'BOD-007', direccion: 'Km 3 Vía Armenia', ciudad: 'Pereira', icono: '☕', responsable: 'Esteban Osorio', telefono: '3149988776', ocupado: 8200, capacidad: 10000, activa: false },
-      { id: 8, nombre: 'Centro Acopio Bucaramanga', codigo: 'BOD-008', direccion: 'Cra. 27 # 52-14', ciudad: 'Bucaramanga', icono: '📦', responsable: 'Tatiana Rueda', telefono: '3112233445', ocupado: 11000, capacidad: 14000, activa: false },
-      { id: 9, nombre: 'Bodega Nororiente Cúcuta', codigo: 'BOD-009', direccion: 'Av. Libertadores # 8-30', ciudad: 'Cúcuta', icono: '🏢', responsable: 'Ricardo Quintero', telefono: '3186655443', ocupado: 15200, capacidad: 16000, activa: false },
-      { id: 10, nombre: 'Terminal Logística Cartagena', codigo: 'BOD-010', direccion: 'Zona Industrial Mamonal Km 7', ciudad: 'Cartagena', icono: '🚢', responsable: 'Héctor Pájaro', telefono: '3167788991', ocupado: 18000, capacidad: 35000, activa: false },
-      { id: 11, nombre: 'Bodega Sur Neiva', codigo: 'BOD-011', direccion: 'Calle 8 # 25-12', ciudad: 'Neiva', icono: '📦', responsable: 'Claudia Perdomo', telefono: '3190011223', ocupado: 3200, capacidad: 9000, activa: false },
-      { id: 12, nombre: 'Almacén Manizales Centro', codigo: 'BOD-012', direccion: 'Cra. 23 # 20-45', ciudad: 'Manizales', icono: '🏭', responsable: 'Julián Giraldo', telefono: '3134455667', ocupado: 9500, capacidad: 11000, activa: false },
-      { id: 13, nombre: 'Bodega Llanos Paz de Ariporo', codigo: 'BOD-013', direccion: 'Calle Principal # 5-20', ciudad: 'Paz de Ariporo', icono: '🌾', responsable: 'Diana Silva', telefono: '3213344556', ocupado: 2100, capacidad: 8000, activa: false },
-      { id: 14, nombre: 'Centro Operativo Santa Marta', codigo: 'BOD-014', direccion: 'Av. del Ferrocarril # 22-10', ciudad: 'Santa Marta', icono: '🏖️', responsable: 'Alberto Vives', telefono: '3109988772', ocupado: 12100, capacidad: 13000, activa: false },
-      { id: 15, nombre: 'Depósito Pasto Andina', codigo: 'BOD-015', direccion: 'Panamericana # 18-05', ciudad: 'Pasto', icono: '⛰️', responsable: 'Sandra Jojoa', telefono: '3151122334', ocupado: 4000, capacidad: 10000, activa: false }
-    ];
-
-    localStorage.setItem('inventario_bodegas', JSON.stringify(listaInicial));
-    return listaInicial;
-  }
-
-  bodegas = signal<any[]>(this.obtenerBodegasIniciales());
-
+  // Objeto vinculado al formulario de nueva bodega
   nuevaBodega = {
     nombre: '',
     codigo: '',
-    direccion: '',
     ciudad: '',
-    telefono: '',
+    direccion: '',
     responsable: '',
-    capacidad: null
+    telefono: '',
+    capacidad: 0
   };
 
+  // Las 15 bodegas completas
+  bodegas = signal<Bodega[]>([
+    {
+      id: 1,
+      nombre: 'Bodega Principal Yopal',
+      codigo: 'BOD-001',
+      ciudad: 'Yopal',
+      direccion: 'Calle 24 # 15-40',
+      responsable: 'Carlos Pérez',
+      telefono: '3101234567',
+      capacidad: 10000,
+      ocupado: 8500,
+      activa: true,
+      icono: '🏢',
+      productos: [
+        { id: 'p1', nombre: 'Laptop Lenovo ThinkPad', sku: 'LAP-001', categoria: 'Tecnología', cantidad: 3500 },
+        { id: 'p2', nombre: 'Silla Ergonómica Ejecutiva', sku: 'MUE-042', categoria: 'Mobiliario', cantidad: 3000 },
+        { id: 'p3', nombre: 'Kit de Redes UTP Cat6', sku: 'RED-109', categoria: 'Accesorios', cantidad: 2000 }
+      ]
+    },
+    {
+      id: 2,
+      nombre: 'Centro Logístico Medellín',
+      codigo: 'BOD-002',
+      ciudad: 'Medellín',
+      direccion: 'Cra. 50 # 12-30',
+      responsable: 'Ana Gómez',
+      telefono: '3209876543',
+      capacidad: 8000,
+      ocupado: 3200,
+      activa: true,
+      icono: '🏭',
+      productos: [
+        { id: 'p4', nombre: 'Estantería Metálica Industrial', sku: 'EST-012', categoria: 'Almacenamiento', cantidad: 3200 }
+      ]
+    },
+    {
+      id: 3,
+      nombre: 'Bodega Bogotá Norte',
+      codigo: 'BOD-003',
+      ciudad: 'Bogotá',
+      direccion: 'Autopista Norte # 180-20',
+      responsable: 'Luis Torres',
+      telefono: '3114567890',
+      capacidad: 15000,
+      ocupado: 12000,
+      activa: true,
+      icono: '📦',
+      productos: [
+        { id: 'p5', nombre: 'Pallets de Madera Tratada', sku: 'PAL-005', categoria: 'Logística', cantidad: 12000 }
+      ]
+    },
+    {
+      id: 4,
+      nombre: 'Depósito Cali Sur',
+      codigo: 'BOD-004',
+      ciudad: 'Cali',
+      direccion: 'Calle 5 # 70-12',
+      responsable: 'María Rodríguez',
+      telefono: '3157891234',
+      capacidad: 9000,
+      ocupado: 4500,
+      activa: true,
+      icono: '🏬',
+      productos: [
+        { id: 'p6', nombre: 'Cajas de Cartón Corrugado', sku: 'CAJ-010', categoria: 'Empaque', cantidad: 4500 }
+      ]
+    },
+    {
+      id: 5,
+      nombre: 'Bodega Barranquilla Portuaria',
+      codigo: 'BOD-005',
+      ciudad: 'Barranquilla',
+      direccion: 'Vía 40 # 73-100',
+      responsable: 'Jorge Eliécer Gaitán',
+      telefono: '3009871122',
+      capacidad: 20000,
+      ocupado: 18500,
+      activa: true,
+      icono: '⚓',
+      productos: [
+        { id: 'p7', nombre: 'Contenedores Plásticos Industriales', sku: 'CONT-99', categoria: 'Almacenamiento', cantidad: 18500 }
+      ]
+    },
+    {
+      id: 6,
+      nombre: 'Almacén Bucaramanga',
+      codigo: 'BOD-006',
+      ciudad: 'Bucaramanga',
+      direccion: 'Carrera 27 # 45-12',
+      responsable: 'Sandra Milena',
+      telefono: '3182233445',
+      capacidad: 6000,
+      ocupado: 2100,
+      activa: true,
+      icono: '🏢',
+      productos: [
+        { id: 'p8', nombre: 'Cinta de Embalaje Industrial', sku: 'CIN-01', categoria: 'Empaque', cantidad: 2100 }
+      ]
+    },
+    {
+      id: 7,
+      nombre: 'Bodega Villavicencio',
+      codigo: 'BOD-007',
+      ciudad: 'Villavicencio',
+      direccion: 'Anillo Vial # 12-50',
+      responsable: 'Camilo Rincón',
+      telefono: '3216549870',
+      capacidad: 7500,
+      ocupado: 5000,
+      activa: true,
+      icono: '🚜',
+      productos: [
+        { id: 'p9', nombre: 'Lubricantes y Aceites para Maquinaria', sku: 'LUB-40', categoria: 'Químicos', cantidad: 5000 }
+      ]
+    },
+    {
+      id: 8,
+      nombre: 'Depósito Pereira',
+      codigo: 'BOD-008',
+      ciudad: 'Pereira',
+      direccion: 'Zona Industrial La Julita',
+      responsable: 'Diana Patricia',
+      telefono: '3134455667',
+      capacidad: 8500,
+      ocupado: 1000,
+      activa: false,
+      icono: '🏭',
+      productos: []
+    },
+    {
+      id: 9,
+      nombre: 'Bodega Manizales',
+      codigo: 'BOD-009',
+      ciudad: 'Manizales',
+      direccion: 'Km 3 vía Magdalena',
+      responsable: 'Esteban Ospina',
+      telefono: '3109988776',
+      capacidad: 5000,
+      ocupado: 4800,
+      activa: true,
+      icono: '📦',
+      productos: [
+        { id: 'p10', nombre: 'Epp y Guantes de Cabritilla', sku: 'EPP-02', categoria: 'Seguridad', cantidad: 4800 }
+      ]
+    },
+    {
+      id: 10,
+      nombre: 'Centro Logístico Cartagena',
+      codigo: 'BOD-010',
+      ciudad: 'Cartagena',
+      direccion: 'Barrio Manga Calle 28',
+      responsable: 'Ramiro Suárez',
+      telefono: '3011122334',
+      capacidad: 12000,
+      ocupado: 11000,
+      activa: true,
+      icono: '🚢',
+      productos: [
+        { id: 'p11', nombre: 'Eslingas de Carga Pesada', sku: 'ESL-05', categoria: 'Logística', cantidad: 11000 }
+      ]
+    },
+    {
+      id: 11,
+      nombre: 'Bodega Cúcuta',
+      codigo: 'BOD-011',
+      ciudad: 'Cúcuta',
+      direccion: 'Zona Franca Local 4',
+      responsable: 'Yolanda Bermúdez',
+      telefono: '3123344556',
+      capacidad: 10000,
+      ocupado: 3000,
+      activa: true,
+      icono: '🏢',
+      productos: [
+        { id: 'p12', nombre: 'Lámparas LED de Bodega', sku: 'LAM-10', categoria: 'Iluminación', cantidad: 3000 }
+      ]
+    },
+    {
+      id: 12,
+      nombre: 'Depósito Ibagué',
+      codigo: 'BOD-012',
+      ciudad: 'Ibagué',
+      direccion: 'Cra 5 # 60-19',
+      responsable: 'Héctor Rojas',
+      telefono: '3167788990',
+      capacidad: 6500,
+      ocupado: 6200,
+      activa: true,
+      icono: '🏬',
+      productos: [
+        { id: 'p13', nombre: 'Baterías Recargables UPS', sku: 'BAT-03', categoria: 'Tecnología', cantidad: 6200 }
+      ]
+    },
+    {
+      id: 13,
+      nombre: 'Bodega Neiva',
+      codigo: 'BOD-013',
+      ciudad: 'Neiva',
+      direccion: 'Calle 8 # 35-10',
+      responsable: 'Clara Inés',
+      telefono: '3174455661',
+      capacidad: 5500,
+      ocupado: 1200,
+      activa: false,
+      icono: '📦',
+      productos: []
+    },
+    {
+      id: 14,
+      nombre: 'Centro Logístico Pasto',
+      codigo: 'BOD-014',
+      ciudad: 'Pasto',
+      direccion: 'Salida Panamericana # 2-10',
+      responsable: 'Gerardo Benavides',
+      telefono: '3195566778',
+      capacidad: 7000,
+      ocupado: 4000,
+      activa: true,
+      icono: '🏭',
+      productos: [
+        { id: 'p14', nombre: 'Estibas Plásticas Reforzadas', sku: 'EST-PL', categoria: 'Almacenamiento', cantidad: 4000 }
+      ]
+    },
+    {
+      id: 15,
+      nombre: 'Bodega Montería',
+      codigo: 'BOD-015',
+      ciudad: 'Montería',
+      direccion: 'Calle 41 # 9-50',
+      responsable: 'Fabián Negrete',
+      telefono: '3028899001',
+      capacidad: 8000,
+      ocupado: 3500,
+      activa: true,
+      icono: '🏢',
+      productos: [
+        { id: 'p15', nombre: 'Tubería PVC de 4 Pulgadas', sku: 'TUB-PVC', categoria: 'Construcción', cantidad: 3500 }
+      ]
+    }
+  ]);
+
+  // Método para crear una nueva bodega desde el formulario con salida JSON en consola
+  crearBodega(form: NgForm) {
+    if (form.valid) {
+      const nueva: Bodega = {
+        id: Date.now(),
+        nombre: this.nuevaBodega.nombre,
+        codigo: this.nuevaBodega.codigo,
+        ciudad: this.nuevaBodega.ciudad,
+        direccion: this.nuevaBodega.direccion,
+        responsable: this.nuevaBodega.responsable,
+        telefono: this.nuevaBodega.telefono,
+        capacidad: Number(this.nuevaBodega.capacidad),
+        ocupado: 0,
+        activa: true,
+        icono: '📦',
+        productos: []
+      };
+
+      // Muestra en formato JSON limpio la bodega recién creada en la consola
+      console.log("=== JSON NUEVA BODEGA CREADA ===");
+      console.log(JSON.stringify(nueva, null, 2));
+
+      this.bodegas.update(lista => [nueva, ...lista]);
+
+      this.mostrarModal.set(false);
+      form.resetForm();
+      this.nuevaBodega = {
+        nombre: '',
+        codigo: '',
+        ciudad: '',
+        direccion: '',
+        responsable: '',
+        telefono: '',
+        capacidad: 0
+      };
+    }
+  }
+
+  // Método al hacer clic en una tarjeta con salida JSON en consola
+  verDetalleBodega(bodega: Bodega, event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.closest('.switch-container') || target.closest('input')) {
+      return;
+    }
+    
+    // Muestra en formato JSON limpio la bodega seleccionada y sus productos en la consola
+    console.log("=== JSON BODEGA SELECCIONADA Y SUS PRODUCTOS ===");
+    console.log(JSON.stringify(bodega, null, 2));
+
+    this.bodegaSeleccionada.set(bodega);
+    this.mostrarModalDetalle.set(true);
+  }
+
+  cerrarModalDetalle() {
+    this.mostrarModalDetalle.set(false);
+    this.bodegaSeleccionada.set(null);
+  }
+
   getPorcentaje(ocupado: number, capacidad: number): number {
-    if (!capacidad || capacidad <= 0) return 0;
+    if (!capacidad || capacidad === 0) return 0;
     return Math.round((ocupado / capacidad) * 100);
   }
 
-  toggleEstado(id: number): void {
-    this.bodegas.update(lista => {
-      const nuevaLista = lista.map(b => b.id === id ? { ...b, activa: !b.activa } : b);
-      localStorage.setItem('inventario_bodegas', JSON.stringify(nuevaLista));
-      return nuevaLista;
-    });
-  }
-
-  // Método para registrar la nueva bodega de manera funcional
-  crearBodega(form: NgForm): void {
-    if (form.invalid) return;
-
-    const nueva = {
-      id: Date.now(),
-      nombre: this.nuevaBodega.nombre,
-      codigo: this.nuevaBodega.codigo || `BOD-${Math.floor(100 + Math.random() * 900)}`,
-      direccion: this.nuevaBodega.direccion,
-      ciudad: this.nuevaBodega.ciudad,
-      icono: '📦',
-      responsable: this.nuevaBodega.responsable,
-      telefono: this.nuevaBodega.telefono,
-      ocupado: 0,
-      capacidad: Number(this.nuevaBodega.capacidad),
-      activa: false // Se mantiene desactivada hasta que el usuario decida activarla
-    };
-
-    this.bodegas.update(lista => {
-      const listaActualizada = [...lista, nueva];
-      localStorage.setItem('inventario_bodegas', JSON.stringify(listaActualizada));
-      return listaActualizada;
-    });
-
-    form.resetForm();
-    this.mostrarModal.set(false);
+  toggleEstado(id: number) {
+    this.bodegas.update(lista => 
+      lista.map(b => b.id === id ? { ...b, activa: !b.activa } : b)
+    );
   }
 }
