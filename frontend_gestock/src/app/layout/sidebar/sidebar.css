@@ -1,63 +1,68 @@
 .app-sidebar {
-  width: 240px;
+  width: 260px;
   height: 100vh;
-  background-color: #131b2e;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #0d121d;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 1.25rem 1rem;
   box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow: hidden; /* Evita que el contenedor principal genere scroll global */
 }
 
-/* Header / Brand */
+/* Marca / Logo superior */
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 12px;
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .brand-icon {
-  font-size: 1.5rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 1.1rem;
 }
 
-.brand-text {
-  color: #ffffff;
-  font-size: 1.25rem;
+.brand-title {
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
 }
 
-/* Menú de Navegación */
+/* Menú con desplazamiento interno */
 .sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-top: 1.5rem;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
+/* Categorías (PANEL, GESTIÓN, MANTENIMIENTO, SISTEMA) */
 .nav-section-title {
-  color: #64748b;
   font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.08em;
+  margin: 18px 0 8px 10px;
   text-transform: uppercase;
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-  padding-left: 0.75rem;
-  display: block;
-  visibility: visible;
 }
 
+/* Elementos del menú */
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: 12px;
+  padding: 10px 14px;
   color: #94a3b8;
   text-decoration: none;
   font-size: 0.88rem;
@@ -67,40 +72,42 @@
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: #f8fafc;
 }
 
 .nav-item.active {
-  background-color: #2563eb;
+  background-color: #3b82f6; /* Color azul sólido idéntico al de tu captura */
   color: #ffffff;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .nav-icon {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
-/* Footer Sidebar / Logout */
+/* Pie del Sidebar (Cerrar Sesión) */
 .sidebar-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 1rem;
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background-color: #0d121d;
 }
 
 .btn-logout {
-  width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: 12px;
+  width: 100%;
   background: transparent;
   border: none;
   color: #f87171;
+  padding: 10px 14px;
   font-size: 0.88rem;
   font-weight: 500;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
 }
 
 .btn-logout:hover {
@@ -114,7 +121,7 @@
     padding: 1.25rem 0.5rem;
   }
 
-  .brand-text,
+  .brand-title,
   .nav-section-title,
   .nav-text {
     display: none !important;

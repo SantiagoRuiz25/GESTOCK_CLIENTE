@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 // Importa los componentes hijos del layout
 import { HeaderComponent } from '../header/header';
@@ -13,8 +13,6 @@ import { FooterComponent } from '../footer/footer';
   imports: [
     CommonModule,
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     HeaderComponent,
     SidebarComponent,
     FooterComponent
