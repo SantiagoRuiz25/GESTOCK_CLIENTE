@@ -1,85 +1,137 @@
-<div class="audit-container">
-  <!-- Encabezado de la Sección -->
+<div class="auditoria-container">
+  <!-- Cabecera Principal -->
   <div class="header-section">
     <div>
       <h2>Auditoría del Sistema</h2>
       <p class="text-subtitle">Registro y monitoreo de actividades, acciones y accesos de los usuarios</p>
     </div>
-    <button class="btn-action" (click)="exportarLogs()">
-      <i class="fas fa-download"></i> Exportar Reporte
-    </button>
-  </div>
-
-  <!-- Tarjetas de Estadísticas / Métricas -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon bg-blue"><i class="fas fa-shield-alt"></i></div>
-      <div>
-        <h4>{{ totalLogs() }}</h4>
-        <span>Total Registros</span>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon bg-green"><i class="fas fa-check-circle"></i></div>
-      <div>
-        <h4>{{ accionesExitosas() }}</h4>
-        <span>Acciones Exitosas</span>
-      </div>
+    <div>
+      <button class="btn-exportar" (click)="exportarReporte()">
+        <i class="fas fa-file-download"></i> Exportar Reporte
+      </button>
     </div>
   </div>
 
-  <!-- Barra de Búsqueda y Filtros -->
-  <div class="filter-card">
-    <div class="search-box">
-      <i class="fas fa-search"></i>
-      <input type="text" [(ngModel)]="filtroTexto" placeholder="Buscar por usuario o entidad..." (input)="filtrarLogs()">
+  <!-- Tarjetas de Métricas Superiores -->
+  <div class="metricas-grid">
+    <div class="card-metrica">
+      <div class="icono-caja icono-azul">
+        <i class="fas fa-database"></i>
+      </div>
+      <div class="metrica-info">
+        <span class="numero-grande">{{ listaAuditorias.length }}</span>
+        <span class="etiqueta-metrica">Total Registros</span>
+      </div>
     </div>
-    <div class="filter-options">
-      <select [(ngModel)]="filtroAccion" (change)="filtrarLogs()" class="dark-input">
-        <option value="">Todas las acciones</option>
-        <option value="CREAR">Crear</option>
-        <option value="ACTUALIZAR">Actualizar</option>
-        <option value="ELIMINAR">Eliminar</option>
+    <div class="card-metrica">
+      <div class="icono-caja icono-verde">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="metrica-info">
+        <span class="numero-grande">{{ contarExitosas() }}</span>
+        <span class="etiqueta-metrica">Acciones Exitosas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Búsqueda y Filtros desplegable -->
+  <div class="filtros-barra">
+    <div class="input-grupo-busqueda">
+      <input type="text" [(ngModel)]="filtroBusqueda" class="input-estilizado" placeholder="Buscar por usuario o entidad...">
+    </div>
+
+    <div class="filtros-derecha">
+      <select [(ngModel)]="filtroAccion" class="select-estilizado">
+        <option value="TODOS">Todas las acciones</option>
+        <option value="CREAR">CREAR</option>
+        <option value="ACTUALIZAR">ACTUALIZAR</option>
+        <option value="ELIMINAR">ELIMINAR</option>
       </select>
-      <button class="btn-reset" (click)="limpiarFiltros()">Limpiar</button>
+      <button class="btn-limpiar" (click)="limpiarFiltros()">Limpiar</button>
     </div>
   </div>
 
-  <!-- Tabla de Auditoría Profesional -->
-  <div class="table-card">
-    <table class="dark-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Usuario</th>
-          <th>Acción Realizada</th>
-          <th>Módulo / Entidad</th>
-          <th>Fecha y Hora</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let log of logsFiltrados()" class="table-row">
-          <td>#{{ log.id }}</td>
-          <td>
-            <div class="user-info">
-              <span class="avatar-dot"></span>
-              <strong>{{ log.usuario }}</strong>
-            </div>
-          </td>
-          <td>
-            <span class="badge-accion" [ngClass]="log.tipo">{{ log.accion }}</span>
-          </td>
-          <td>{{ log.entidad }}</td>
-          <td>{{ log.fecha | date:'medium' }}</td>
-          <td>
-            <span class="status-badge success">Completado</span>
-          </td>
-        </tr>
-        <tr *ngIf="logsFiltrados().length === 0">
-          <td colspan="6" class="text-center py-4 text-muted">No se encontraron registros de auditoría.</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Tabla Principal de Registros -->
+  <div class="tabla-card">
+    <div class="tabla-responsive">
+      <table class="dark-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>USUARIO</th>
+            <th>ACCIÓN REALIZADA</th>
+            <th>MÓDULO / ENTIDAD</th>
+            <th>FECHA Y HORA</th>
+            <th>ESTADO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of auditoriasFiltradas" class="fila-tabla-clic" (click)="verDetalleAuditoria(item)" title="Haz clic para ver detalles completos">
+            <td><span class="insignia-id">{{ item.id }}</span></td>
+            <td>
+              <div class="celda-usuario">
+                <span class="punto-verde"></span>
+                <strong>{{ item.usuario }}</strong>
+              </div>
+            </td>
+            <td>
+              <span class="badge-accion" [ngClass]="obtenerClaseAccion(item.accion)">
+                {{ item.accion }}
+              </span>
+            </td>
+            <td><span class="texto-entidad">{{ item.entidad }}</span></td>
+            <td><span class="texto-fecha">{{ item.fechaHora }}</span></td>
+            <td>
+              <span class="badge-estado">
+                <span class="punto-estado"></span> {{ item.estado }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="auditoriasFiltradas.length === 0">
+            <td colspan="6" class="vacio-tabla">No se encontraron registros de auditoría.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Detallado al Hacer Clic -->
+  <div class="superposicion-modal" *ngIf="auditoriaSeleccionada" (click)="cerrarModalDetalle()">
+    <div class="tarjeta-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Detalle de Registro {{ auditoriaSeleccionada.id }}</h3>
+        <span class="badge-accion" [ngClass]="obtenerClaseAccion(auditoriaSeleccionada.accion)">
+          {{ auditoriaSeleccionada.accion }}
+        </span>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-fila-info">
+          <span class="info-label">Usuario Responsable:</span>
+          <span class="info-valor">{{ auditoriaSeleccionada.usuario }}</span>
+        </div>
+        <div class="modal-fila-info">
+          <span class="info-label">Entidad / Módulo:</span>
+          <span class="info-valor">{{ auditoriaSeleccionada.entidad }}</span>
+        </div>
+        <div class="modal-fila-info">
+          <span class="info-label">Descripción Operación:</span>
+          <span class="info-valor">{{ auditoriaSeleccionada.detalles }}</span>
+        </div>
+        <div class="modal-fila-info">
+          <span class="info-label">Fecha y Hora:</span>
+          <span class="info-valor">{{ auditoriaSeleccionada.fechaHora }}</span>
+        </div>
+
+        <div class="json-box-container" *ngIf="auditoriaSeleccionada.jsonDetalle">
+          <label class="json-label">Datos Específicos del Producto / Cambio (JSON):</label>
+          <pre class="json-content">{{ auditoriaSeleccionada.jsonDetalle | json }}</pre>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cerrar-modal" (click)="cerrarModalDetalle()">Cerrar</button>
+      </div>
+    </div>
   </div>
 </div>

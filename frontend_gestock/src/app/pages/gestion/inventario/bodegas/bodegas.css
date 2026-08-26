@@ -1,14 +1,17 @@
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ==========================================================
+   --- 1. ANIMACIONES Y CONFIGURACIÓN GENERAL ---
+   ========================================================== */
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: scale(0.96) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .animate-fade {
-  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .bodegas-container {
-  padding: 2rem;
+  padding: 2.5rem;
   background-color: #0b0f19;
   color: #f1f5f9;
   min-height: 100vh;
@@ -16,149 +19,210 @@
   box-sizing: border-box;
 }
 
+/* ==========================================================
+   --- 2. CABECERA DE LA SECCIÓN ---
+   ========================================================== */
 .bodegas-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .bodegas-header h2 {
-  font-size: 1.75rem;
+  font-size: 2rem;
+  font-weight: 700;
   color: #ffffff;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
 }
 
 .text-subtitle {
   color: #94a3b8;
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  margin: 0;
+  max-width: 650px;
 }
 
 .text-subtitle-sm {
-  color: #64748b;
-  font-size: 0.8rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 .bodegas-count {
-  background: #1e293b;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
   border: 1px solid #334155;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: #60a5fa;
+  padding: 0.6rem 1.25rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  color: #38bdf8;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
 }
 
 .btn-nueva {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border: none;
   padding: 0.75rem 1.25rem;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
   transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  white-space: nowrap;
 }
 
 .btn-nueva:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
 }
 
-/* --- CUADRÍCULA DE TARJETAS --- */
+/* ==========================================================
+   --- 3. CUADRÍCULA DE TARJETAS (BODEGAS GRID) ---
+   ========================================================== */
 .bodegas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.75rem;
 }
 
 .bodega-card {
-  background: #1e293b;
+  background: linear-gradient(145deg, #1e293b, #131a28);
   border: 1px solid #334155;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 1.75rem;
+  cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  cursor: pointer;
 }
 
 .bodega-card:hover {
+  border-color: #3b82f6;
   transform: translateY(-4px);
-  border-color: #475569;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
 .bodega-card.inactiva {
-  background: #131a28;
-  border-color: #2a374a;
-  opacity: 0.65;
+  opacity: 0.6;
+  border-style: dashed;
+  filter: grayscale(0.3);
 }
 
+/* Header de la tarjeta individual */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 1rem;
 }
 
 .bodega-info-main {
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 1rem;
 }
 
 .bodega-icon {
-  font-size: 1.75rem;
-  background: rgba(59, 130, 246, 0.15);
-  padding: 0.75rem;
-  border-radius: 12px;
+  font-size: 2.2rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  width: 55px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 14px;
+  flex-shrink: 0;
 }
 
 .bodega-card h3 {
-  margin: 0;
-  font-size: 1.15rem;
   color: #ffffff;
+  font-size: 1.15rem;
+  margin: 0 0 4px 0;
+  font-weight: 600;
 }
 
 .bodega-ciudad {
+  color: #94a3b8;
   font-size: 0.85rem;
+}
+
+/* Divisor estético */
+.card-divider {
+  border: none;
+  border-top: 1px solid #334155;
+  margin: 1.25rem 0;
+}
+
+/* Cuerpo de detalles de la bodega */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  gap: 1rem;
+}
+
+.detail-row .label {
   color: #94a3b8;
 }
 
-/* --- SWITCH MODERNO --- */
+.detail-row .value {
+  color: #e2e8f0;
+  font-weight: 500;
+  text-align: right;
+  word-break: break-word;
+}
+
+.text-muted {
+  color: #64748b;
+}
+
+/* ==========================================================
+   --- 4. INTERRUPTOR (SWITCH) Y BARRAS DE CAPACIDAD ---
+   ========================================================== */
 .switch-container {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.4rem;
+  gap: 6px;
 }
 
 .badge-status {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.2rem 0.6rem;
-  border-radius: 12px;
+  border-radius: 20px;
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.3);
+  text-transform: uppercase;
 }
 
 .badge-status.active {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
-  border-color: rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+/* Switch CSS personalizado estilo slider */
 .switch {
   position: relative;
   display: inline-block;
@@ -166,7 +230,7 @@
   height: 22px;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -177,7 +241,7 @@
   cursor: pointer;
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: #334155;
-  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: 0.3s;
   border-radius: 22px;
 }
 
@@ -189,126 +253,130 @@
   left: 3px;
   bottom: 3px;
   background-color: white;
-  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: 0.3s;
   border-radius: 50%;
 }
 
 input:checked + .slider {
-  background-color: #10b981;
+  background-color: #2563eb;
 }
 
 input:checked + .slider:before {
   transform: translateX(22px);
 }
 
-.card-divider {
-  border: none;
-  border-top: 1px solid #334155;
-  margin: 1rem 0;
-}
-
-/* --- DETALLES --- */
-.card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-}
-
-.detail-row .label {
-  color: #94a3b8;
-}
-
-.detail-row .value {
-  color: #e2e8f0;
-  font-weight: 500;
-}
-
-/* --- CAPACIDAD --- */
+/* Barra de progreso de ocupación */
 .capacidad-container {
   background: #0f172a;
-  padding: 0.85rem;
-  border-radius: 10px;
+  padding: 1rem;
+  border-radius: 12px;
   border: 1px solid #334155;
 }
 
 .capacidad-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #94a3b8;
-  margin-bottom: 0.4rem;
+  margin-bottom: 8px;
   font-weight: 600;
 }
 
 .progress-bar-bg {
-  background: #1e293b;
+  width: 100%;
   height: 8px;
+  background: #1e293b;
   border-radius: 4px;
   overflow: hidden;
 }
 
 .progress-bar-fill {
-  background: linear-gradient(90deg, #3b82f6, #10b981);
   height: 100%;
+  background: #38bdf8;
   border-radius: 4px;
-  transition: width 0.5s ease;
+  transition: width 0.6s ease;
 }
 
 .progress-bar-fill.high-capacity {
-  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  background: #ef4444;
 }
 
-/* --- MODAL OSCURO CENTRADO REAL --- */
+/* ==========================================================
+   --- 5. MODALES GENERALES Y DE DETALLE ---
+   ========================================================== */
 .modal-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(11, 15, 25, 0.85) !important;
-  backdrop-filter: blur(6px) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 99999 !important;
-  overflow: hidden !important;
-  margin: 0 !important;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(7, 10, 18, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .modal-content {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
-  padding: 2rem !important;
-  border-radius: 16px !important;
-  width: 90% !important;
-  max-width: 500px !important;
-  max-height: 90vh !important;
-  overflow-y: auto !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
-  box-sizing: border-box !important;
-  position: relative !important;
+  background: linear-gradient(145deg, #1e293b, #131a28);
+  border: 1px solid #334155;
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
 }
 
-.modal-header {
-  margin-bottom: 1.5rem;
+.modal-detalle-ancho {
+  max-width: 750px;
 }
 
-.modal-header h3 {
-  margin: 0;
+.modal-header h3, .modal-header-detalle h3 {
   color: #ffffff;
   font-size: 1.4rem;
+  margin: 0 0 6px 0;
 }
 
+.modal-header-detalle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 1rem;
+}
+
+.btn-cerrar-x {
+  background: #334155;
+  border: none;
+  color: #f1f5f9;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-cerrar-x:hover {
+  background: #ef4444;
+}
+
+/* Formularios dentro del modal */
 .modal-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
 }
 
 .input-group {
@@ -324,28 +392,26 @@ input:checked + .slider:before {
 .form-label {
   color: #cbd5e1;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .dark-input {
   background: #0f172a;
   border: 1px solid #334155;
   color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
   outline: none;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
   transition: all 0.25s ease;
 }
 
 .dark-input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.w-100 {
-  width: 100%;
-  box-sizing: border-box;
+  background: #131a28;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
 .modal-actions {
@@ -358,10 +424,10 @@ input:checked + .slider:before {
 
 .btn-cancelar {
   background: #334155;
-  color: #cbd5e1;
+  color: #f1f5f9;
   border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
+  padding: 0.75rem 1.4rem;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s;
@@ -372,72 +438,35 @@ input:checked + .slider:before {
 }
 
 .btn-crear {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  cursor: pointer;
+  padding: 0.75rem 1.6rem;
+  border-radius: 12px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
   transition: all 0.25s ease;
 }
 
 .btn-crear:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
 }
 
-/* --- MODAL DE DETALLE DE PRODUCTOS (AMPLIO Y DESPEJADO) --- */
-.modal-detalle-ancho {
-  max-width: 750px !important;
-  width: 95% !important;
-  padding: 2.25rem !important;
+.w-100 {
+  width: 100%;
 }
 
-.modal-header-detalle {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.75rem;
-  border-bottom: 1px solid #334155;
-  padding-bottom: 1rem;
-}
-
-.modal-header-detalle h3 {
-  margin: 0 0 0.25rem 0;
-  color: #ffffff;
-  font-size: 1.35rem;
-}
-
-.btn-cerrar-x {
-  background: #334155;
-  border: none;
-  color: #cbd5e1;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-cerrar-x:hover {
-  background: #ef4444;
-  color: #ffffff;
-}
-
-/* --- TABLA DE PRODUCTOS ORDENADA Y ESPACIADA --- */
+/* ==========================================================
+   --- 6. TABLA DE DETALLES DENTRO DEL MODAL ---
+   ========================================================== */
 .table-container-wrapper {
-  max-height: 380px;
+  max-height: 350px;
   overflow-y: auto;
-  border-radius: 10px;
   border: 1px solid #334155;
+  border-radius: 14px;
   background: #0f172a;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .productos-table {
@@ -448,10 +477,13 @@ input:checked + .slider:before {
 }
 
 .productos-table th {
-  background: #1e293b;
+  background: #131a28;
   color: #94a3b8;
-  padding: 1rem 1.25rem;
+  padding: 1rem;
   font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -459,31 +491,107 @@ input:checked + .slider:before {
 }
 
 .productos-table td {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #1e293b;
+  padding: 1rem;
+  border-bottom: 1px solid #334155;
   color: #cbd5e1;
 }
 
-.productos-table tbody tr:last-child td {
-  border-bottom: none;
+.productos-table tbody tr:hover {
+  background: rgba(51, 65, 85, 0.3);
 }
 
-.productos-table tbody tr:hover {
-  background: rgba(59, 130, 246, 0.08);
+.badge-categoria {
+  background: #1e293b;
+  color: #38bdf8;
+  border: 1px solid #334155;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
 }
 
 .empty-state-row {
   text-align: center;
-  color: #94a3b8;
   padding: 3rem !important;
+  color: #64748b !important;
 }
 
-.badge-categoria {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  padding: 0.3rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: inline-block;
+
+/* ==========================================================
+   --- 7. DISEÑO RESPONSIVE PARA DISPOSITIVOS MÓVILES (< 768px) ---
+   ========================================================== */
+@media (max-width: 768px) {
+  .bodegas-container {
+    padding: 1rem;
+  }
+
+  .bodegas-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .bodegas-grid {
+    grid-template-columns: 1fr; /* Una tarjeta por fila en celulares */
+  }
+
+  /* Ajustes de modales para pantallas pequeñas */
+  .modal-content {
+    padding: 1.5rem;
+    max-width: 95vw;
+  }
+
+  .modal-form {
+    grid-template-columns: 1fr;
+  }
+
+  .input-group.full-width {
+    grid-column: span 1;
+  }
+
+  .modal-actions {
+    grid-column: span 1;
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancelar, .btn-crear {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Transformar la tabla del modal de detalle en formato Tarjeta (Card) */
+  .productos-table thead {
+    display: none;
+  }
+
+  .productos-table tr {
+    display: block;
+    background: #131a28;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+    padding: 0.75rem;
+    border: 1px solid #334155;
+  }
+
+  .productos-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    text-align: right;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+  }
+
+  .productos-table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Inserta etiquetas automáticas en los elementos de la tabla móvil */
+  .productos-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #94a3b8;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
 }
