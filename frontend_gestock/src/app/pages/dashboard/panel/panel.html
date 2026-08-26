@@ -4,14 +4,15 @@
       <span class="panel-header-icon">📊</span>
       <div>
         <h1>Panel</h1>
-        <p class="panel-subtitle">Resumen general del sistema de inventario</p>
+        <!-- Subtítulo con el indicador dinámico de la empresa actual -->
+        <p class="panel-subtitle">
+          Resumen general del sistema de inventario — <span class="empresa-badge">🏢 {{ empresaActual?.nombre }}</span>
+        </p>
       </div>
     </div>
 
     <!-- Botón de acciones con menú desplegable -->
     <div class="panel-actions-container">
-      
-
       <div class="inventory-dropdown" *ngIf="mostrarMenuInventario" (click)="$event.stopPropagation()">
         
       </div>
@@ -23,28 +24,28 @@
     <div class="stat-card accent-blue">
       <div class="stat-icon">🏷️</div>
       <h3>Total precios</h3>
-      <p>19</p>
-      <span class="subtext positive">19 activos</span>
+      <p>{{ empresaActual?.totalPrecios }}</p>
+      <span class="subtext positive">{{ empresaActual?.totalPrecios }} activos</span>
     </div>
 
     <div class="stat-card accent-green">
       <div class="stat-icon">💰</div>
       <h3>Valor de inventario</h3>
-      <p>$29.997</p>
+      <p>${{ empresaActual?.valorInventario | number }}</p>
       <span class="subtext positive">▲ 12% vs mes anterior</span>
     </div>
 
     <div class="stat-card accent-amber">
       <div class="stat-icon">⚠️</div>
       <h3>Alertas de stock</h3>
-      <p>4</p>
+      <p>{{ empresaActual?.alertasStock }}</p>
       <span class="subtext warning">2 bajo · 2 agotado</span>
     </div>
 
     <div class="stat-card accent-purple">
       <div class="stat-icon">🏬</div>
       <h3>Bodegas activas</h3>
-      <p>3</p>
+      <p>{{ empresaActual?.bodegasActivas }}</p>
     </div>
 
     <div class="stat-card accent-cyan">
