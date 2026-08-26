@@ -1,73 +1,102 @@
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* ==========================================================
+   --- 1. CONFIGURACIÓN GENERAL DEL LAYOUT ---
+   ========================================================== */
 .inventario-layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  padding: 2.5rem;
   background-color: #0b0f19;
   color: #f1f5f9;
+  min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
+/* ==========================================================
+   --- 2. SUBMENÚ DE NAVEGACIÓN (TABS) ---
+   ========================================================== */
 .inventario-nav {
   display: flex;
-  gap: 0.6rem;
-  padding: 1rem 2rem;
-  background-color: transparent;
-  align-items: center;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  gap: 1rem;
+  background: linear-gradient(145deg, #1e293b, #131a28);
+  padding: 0.75rem;
+  border-radius: 20px;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: fit-content;
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .nav-tab {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 10px;
   padding: 0.75rem 1.25rem;
+  border-radius: 12px;
   color: #94a3b8;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 0.9rem;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid transparent;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
-  flex-shrink: 0;
+}
+
+.nav-tab i {
+  font-size: 1.1rem;
+  transition: transform 0.25s ease;
 }
 
 .nav-tab:hover {
-  background-color: rgba(30, 41, 59, 0.5);
   color: #ffffff;
+  background: rgba(51, 65, 85, 0.4);
 }
 
+.nav-tab:hover i {
+  transform: translateY(-2px);
+}
+
+/* Clase activa que aplica Angular Router (`routerLinkActive="active"`) */
 .nav-tab.active {
-  background-color: #3b82f6; /* Mismo color azul exacto que usas en el sistema */
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
 }
 
+.nav-tab.active i {
+  color: #ffffff;
+}
+
+/* ==========================================================
+   --- 3. CONTENEDOR DE VISTAS (ROUTER OUTLET) ---
+   ========================================================== */
 .inventario-content {
-  flex: 1;
-  background-color: #0b0f19;
-  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Responsivo: menos padding lateral y pestañas más compactas en móvil */
-@media (max-width: 560px) {
+/* ==========================================================
+   --- 4. DISEÑO RESPONSIVE PARA DISPOSITIVOS MÓVILES (< 768px) ---
+   ========================================================== */
+@media (max-width: 768px) {
+  .inventario-layout {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
   .inventario-nav {
-    padding: 0.75rem 1rem;
-    gap: 0.4rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    width: 100%;
+    padding: 0.5rem;
   }
 
   .nav-tab {
-    padding: 0.6rem 0.85rem;
-    font-size: 0.8rem;
+    justify-content: center;
+    padding: 0.85rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 }

@@ -21,22 +21,24 @@
   overflow: hidden;
 }
 
-/* 2. Header fijo arriba */
+/* 2. Header fijo arriba (CORREGIDO: Desbloquea elementos flotantes y menús) */
 .header-container {
   grid-area: header;
   height: 100%;
-  overflow: hidden;
+  overflow: visible !important; /* Permite que el desplegable del perfil sobresalga */
+  position: relative;
+  z-index: 1000; /* Hace que el menú quede por encima de las tarjetas y la tabla */
 }
 
 /* 3. Única zona con scroll (Aquí es donde se mueven las tarjetas y tablas) */
 .content-container {
   grid-area: content;
   overflow-y: auto;
-  overflow-x: hidden; /* Evita que un elemento ancho genere scroll horizontal y tape el footer */
+  overflow-x: hidden; /* Evita que un elemento ancho genere scroll horizontal */
   padding: 32px;
   box-sizing: border-box;
   width: 100%;
-  min-width: 0; /* Permite que el contenido se achique en vez de forzar el ancho del grid */
+  min-width: 0; /* Permite que el contenido se reduzca en vez de forzar el ancho del grid */
 }
 
 /* 4. Footer fijo abajo */
@@ -48,7 +50,7 @@
   justify-content: center;
 }
 
-/* Responsivo: el sidebar se colapsa a modo ícono (ver sidebar.css, 65px) */
+/* Responsivo: el sidebar se colapsa a modo ícono */
 @media (max-width: 768px) {
   .sofia-layout {
     grid-template-columns: 65px 1fr;

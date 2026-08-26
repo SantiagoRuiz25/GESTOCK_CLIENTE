@@ -6,7 +6,7 @@
       <h2>Listado y Control de Bodegas</h2>
       <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación. Haz clic en cualquier bodega para ver su inventario exacto.</p>
     </div>
-    <div style="display: flex; gap: 1rem; align-items: center;">
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
       <span class="bodegas-count">{{ bodegas().length }} Registradas</span>
       <button class="btn-nueva" (click)="mostrarModal.set(true)">
         <i class="fas fa-warehouse"></i> + Nueva Bodega
@@ -33,7 +33,7 @@
             <span class="badge-status" [ngClass]="{ 'active': bodega.activa }">
               {{ bodega.activa ? 'Activa' : 'Inactiva' }}
             </span>
-            <label class="switch" title="Activar / Desactivar Bodega">
+            <label class="switch" title="Activar / Desactivar Bodega" (click)="$event.stopPropagation()">
               <input type="checkbox" [checked]="bodega.activa" (change)="toggleEstado(bodega.id)">
               <span class="slider round"></span>
             </label>
@@ -162,10 +162,10 @@
           @if (bodegaSeleccionada()?.productos && bodegaSeleccionada()?.productos!.length > 0) {
             @for (prod of bodegaSeleccionada()?.productos; track prod.id) {
               <tr>
-                <td><code>{{ prod.sku }}</code></td>
-                <td style="font-weight: 500; color: #fff;">{{ prod.nombre }}</td>
-                <td><span class="badge-categoria">{{ prod.categoria }}</span></td>
-                <td style="text-align: right; font-weight: 600; color: #34d399;">{{ prod.cantidad | number }} un.</td>
+                <td data-label="SKU"><code>{{ prod.sku }}</code></td>
+                <td data-label="Producto" style="font-weight: 500; color: #fff;">{{ prod.nombre }}</td>
+                <td data-label="Categoría"><span class="badge-categoria">{{ prod.categoria }}</span></td>
+                <td data-label="Cantidad" style="text-align: right; font-weight: 600; color: #34d399;">{{ prod.cantidad | number }} un.</td>
               </tr>
             }
           } @else {

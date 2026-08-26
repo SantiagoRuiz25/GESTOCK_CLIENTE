@@ -12,7 +12,6 @@ import { FormsModule, NgForm } from '@angular/forms';
 export class RegistrarProductosComponent {
   categorias = ['Tecnología', 'Accesorios', 'Mobiliario', 'Herramientas', 'Seguridad'];
 
-  // Lista inicial de las 15 bodegas
   private bodegasIniciales: any[] = [
     { id: 1, nombre: 'Bodega Principal Yopal', codigo: 'BOD-001', activa: false },
     { id: 2, nombre: 'Centro Logístico Medellín', codigo: 'BOD-002', activa: false },
@@ -31,7 +30,6 @@ export class RegistrarProductosComponent {
     { id: 15, nombre: 'Depósito Pasto Andina', codigo: 'BOD-015', activa: false }
   ];
 
-  // Getter que obtiene las bodegas sincronizadas desde el localStorage
   get bodegasActivas(): any[] {
     const data = localStorage.getItem('inventario_bodegas');
     if (!data) {
@@ -52,25 +50,31 @@ export class RegistrarProductosComponent {
 
   mensajeExito: string | null = null;
 
-  // Filtra y devuelve ÚNICAMENTE las bodegas que tienen 'activa: true'
   getBodegasActivasDisponibles(): any[] {
     return this.bodegasActivas.filter(b => b.activa);
   }
 
-  // 🔹 FUNCIÓN ACTUALIZADA PARA REGISTRAR EN LA AUDITORÍA (CUBRE AMBAS LLAVES)
   registrarAuditoria(accion: 'CREAR' | 'ACTUALIZAR' | 'ELIMINAR', producto: any, usuario: string = 'Administrador') {
     const nuevoRegistro = {
       id: `#${Date.now().toString().slice(-3)}`,
       usuario: usuario,
       accion: accion,
-      entidad: 'Inventario / Producto',
-      detalles: `Bodega: ${producto.bodega} | Cantidad: ${producto.stock} un.`,
+      entidad: `Producto: ${producto.nombre}`,
+      detalles: `Se registró el producto en ${producto.bodega} con stock inicial de ${producto.stock} un.`,
       fechaHora: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
-      estado: 'Completado'
+      estado: 'Completado',
+      jsonDetalle: {
+        codigo: producto.codigo,
+        nombre: producto.nombre,
+        categoria: producto.categoria,
+        precio: producto.precio,
+        stock: producto.stock,
+        bodega: producto.bodega,
+        responsable: usuario
+      }
     };
 
     const llaves = ['sistema_auditorias', 'auditorias'];
-    
     llaves.forEach(key => {
       const actual = JSON.parse(localStorage.getItem(key) || '[]');
       actual.unshift(nuevoRegistro);
@@ -87,17 +91,17 @@ export class RegistrarProductosComponent {
         fechaRegistro: new Date().toISOString()
       };
 
-      // 🖨️ IMPRIME EL JSON LIMPIO EN LA CONSOLA DEL NAVEGADOR
-      console.log("=== JSON NUEVO PRODUCTO REGISTRADO ===");
-      console.log(JSON.stringify(nuevoProductoData, null, 2));
-
       const productosGuardados = JSON.parse(localStorage.getItem('inventario_productos') || '[]');
-      
       productosGuardados.unshift(nuevoProductoData);
       localStorage.setItem('inventario_productos', JSON.stringify(productosGuardados));
 
-      // 🔹 REGISTRAR EN AUDITORÍA LA CREACIÓN DEL PRODUCTO CON SU BODEGA Y STOCK
       this.registrarAuditoria('CREAR', prodValues);
+
+      // 🖨️ CONSOLA: Muestra el JSON detallado cuando se CREA un producto nuevo
+      console.group(`✨ NUEVO PRODUCTO REGISTRADO [ ACCIÓN: CREAR ]`);
+      console.log('Se ha dado de alta el siguiente producto en el sistema:');
+      console.log(JSON.stringify(nuevoProductoData, null, 2));
+      console.groupEnd();
 
       this.mostrarNotificacion('¡Producto registrado con éxito y visible en lista!');
       

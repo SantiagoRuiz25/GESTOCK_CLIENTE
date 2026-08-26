@@ -1,24 +1,28 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout/layout';
+import { roleGuard } from './guards/role-guard/role-guard';
+
+const todosLosRoles = [
+  'Administrador', 
+  'Supervisor', 
+  'Operario', 
+  'Operador', 
+  'Técnico de Mantenimiento', 
+  'Técnico Mantenimiento', 
+  'Auditor'
+];
 
 export const routes: Routes = [
-  // Ruta raíz: landing page informativa
   {
     path: '',
     title: 'GESTOCK - Inicio',
     loadComponent: () =>
       import('./pagina/pagina').then((m) => m.PaginaComponent),
   },
-
-  // Módulo de Autenticación (Pantallas independientes)
   {
     path: 'auth',
     children: [
-      { 
-        path: '', 
-        redirectTo: 'login', 
-        pathMatch: 'full' 
-      },
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
       { 
         path: 'login', 
         loadComponent: () => import('./pages/auth/login/login').then(m => m.LoginComponent),
@@ -41,42 +45,45 @@ export const routes: Routes = [
       }
     ]
   },
-
-  // Alias para mantener compatibilidad si navegas a /dashboard
-  {
-    path: 'dashboard',
-    redirectTo: 'app/panel',
-    pathMatch: 'full'
-  },
-
-  // Ruta del sistema interno con Layout
+  { path: 'dashboard', redirectTo: 'app/panel', pathMatch: 'full' },
   {
     path: 'app',
     component: LayoutComponent,
     children: [
       { path: '', redirectTo: 'panel', pathMatch: 'full' },
-
-      // Dashboard
       {
         path: 'panel',
         loadComponent: () => import('./pages/dashboard/panel/panel').then(m => m.PanelComponent),
-        title: 'GESTOCK - Panel'
+        title: 'GESTOCK - Panel',
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Auditor'] }
       },
       {
         path: 'panel/:id',
         loadComponent: () => import('./pages/dashboard/panel/panel').then(m => m.PanelComponent),
-        title: 'GESTOCK - Panel'
+        title: 'GESTOCK - Panel',
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Auditor'] }
       },
       {
         path: 'empresas',
         loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresasComponent),
-        title: 'GESTOCK - Empresas'
+        title: 'GESTOCK - Empresas',
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador'] }
+      },
+      {
+        path: 'registrar-empresa',
+        loadComponent: () => import('./pages/dashboard/registrar-empresa/registrar-empresa').then(m => m.RegistrarEmpresaComponent),
+        title: 'Registrar Empresa - Gestock'
       },
 
       // Módulo de Inventario
       {
         path: 'gestion/inventario',
         loadComponent: () => import('./pages/gestion/inventario/inventario').then(m => m.InventarioComponent),
+        canActivate: [roleGuard],
+        data: { roles: todosLosRoles },
         children: [
           { path: '', redirectTo: 'lista-productos', pathMatch: 'full' },
           { path: 'lista-productos', loadComponent: () => import('./pages/gestion/inventario/lista-productos/lista-productos').then(m => m.ListaProductosComponent) },
@@ -84,69 +91,63 @@ export const routes: Routes = [
           { path: 'bodegas', loadComponent: () => import('./pages/gestion/inventario/bodegas/bodegas').then(m => m.BodegasComponent) }
         ]
       },
-      
-      // Recepción y Logística
       {
         path: 'recepcion/recepcion-mercancias',
         title: 'GESTOCK - Recepción de Mercancías',
-        loadComponent: () => import('./pages/recepcion/recepcion-mercancias/recepcion-mercancias').then(m => m.RecepcionMercanciasComponent)
+        loadComponent: () => import('./pages/recepcion/recepcion-mercancias/recepcion-mercancias').then(m => m.RecepcionMercanciasComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Operario', 'Operador'] }
       },
       {
         path: 'recepcion/historial-logistico',
         title: 'GESTOCK - Historial Logístico',
-        loadComponent: () => import('./pages/recepcion/historial-logistico/historial-logistico').then(m => m.HistorialLogisticoComponent)
+        loadComponent: () => import('./pages/recepcion/historial-logistico/historial-logistico').then(m => m.HistorialLogisticoComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Técnico de Mantenimiento', 'Técnico Mantenimiento', 'Auditor'] }
       },
-
-      // Auditoría
       {
         path: 'gestion/auditorias',
-        loadComponent: () => import('./pages/gestion/auditorias/auditorias').then(m => m.AuditoriasComponent)
+        loadComponent: () => import('./pages/gestion/auditorias/auditorias').then(m => m.AuditoriasComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Auditor'] }
       },
-      
-      // Roles y Usuarios
       {
         path: 'gestion/roles-yusuarios',
-        loadComponent: () => import('./pages/gestion/roles-yusuarios/roles-yusuarios').then(m => m.RolesUsuariosComponent)
+        loadComponent: () => import('./pages/gestion/roles-yusuarios/roles-yusuarios').then(m => m.RolesUsuariosComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador'] }
       },
-
-      // Módulos adicionales
+      // (Ruta de envíos eliminada por completo)
       {
         path: 'reportes',
         title: 'GESTOCK - Reportes y Estadísticas',
-        loadComponent: () => import('./pages/reportes/reportes').then((m) => m.ReportesComponent)
-      },
-      {
-        path: 'envios',
-        title: 'GESTOCK - Gestión de Envíos',
-        loadComponent: () => import('./pages/envio/envio').then((m) => m.EnviosComponent)
+        loadComponent: () => import('./pages/reportes/reportes').then((m) => m.ReportesComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Auditor'] }
       },
       {
         path: 'configuracion',
         title: 'GESTOCK - Configuración del Sistema',
-        loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.ConfiguracionComponent)
+        loadComponent: () => import('./pages/configuracion/configuracion').then((m) => m.ConfiguracionComponent),
+        canActivate: [roleGuard],
+        data: { roles: todosLosRoles }
       },
-      
-      // Mantenimiento
       {
         path: 'programacion',
         loadComponent: () => import('./pages/mantenimiento/programacion-mantenimiento/programacion-mantenimiento.component').then(m => m.ProgramacionMantenimientoComponent),
-        title: 'Programación - Gestock'
+        title: 'Programación - Gestock',
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Técnico de Mantenimiento', 'Técnico Mantenimiento'] }
       },
       {
-      path: 'incidencias', // (o la ruta que tengas configurada)
-      loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.IncidenciasComponent)
+        path: 'incidencias',
+        loadComponent: () => import('./pages/mantenimiento/registro-incidencias/registro-incidencias.component').then(m => m.IncidenciasComponent),
+        title: 'Incidencias - Gestock',
+        canActivate: [roleGuard],
+        data: { roles: ['Administrador', 'Supervisor', 'Operario', 'Operador', 'Técnico de Mantenimiento', 'Técnico Mantenimiento'] }
       },
-      
-      {
-        path: '**',
-        redirectTo: 'panel',
-      },
+      { path: '**', redirectTo: 'panel' }
     ],
   },
-
-  // Fallback global
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  { path: '**', redirectTo: '' }
 ];

@@ -5,7 +5,12 @@
     [style.--mouse-x.px]="mouseX"
     [style.--mouse-y.px]="mouseY">
     
-    <!-- Header -->
+    <div class="back-home-container" style="margin-bottom: 8px;">
+      <a routerLink="/" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#94a3b8'">
+        &larr; Volver al inicio
+      </a>
+    </div>
+
     <div class="card-header">
       <div class="brand-badge">
         <span class="icon">📦</span>
@@ -15,10 +20,8 @@
       <p class="subtitle">Ingresa tus datos para acceder al sistema de gestión.</p>
     </div>
 
-    <!-- Contenedor del Formulario -->
     <div class="login-form">
       
-      <!-- Correo -->
       <div class="form-group" [class.is-focused]="activeField === 'email'">
         <label for="email">Correo Electrónico</label>
         <div class="input-wrapper">
@@ -34,7 +37,6 @@
         </div>
       </div>
 
-      <!-- Contraseña -->
       <div class="form-group" [class.is-focused]="activeField === 'password'">
         <label for="password">Contraseña</label>
         <div class="input-wrapper">
@@ -53,7 +55,6 @@
         </div>
       </div>
 
-      <!-- Recordar -->
       <div class="form-actions">
         <label class="remember-me">
           <input 
@@ -64,22 +65,15 @@
         </label>
       </div>
 
-      <!-- Alerta de Errores Comunes -->
       <div *ngIf="errorMessage" class="error-banner" style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 4px; text-align: center; font-weight: 500;">
         {{ errorMessage }}
       </div>
 
-      <!-- Botón Principal -->
       <button type="button" class="btn-primary" [disabled]="isLoading" (click)="onLogin()">
         <span *ngIf="!isLoading">Acceder a la Plataforma &rarr;</span>
         <span *ngIf="isLoading" class="spinner"></span>
       </button>
 
-    </div>
-
-    <!-- Footer -->
-    <div class="card-footer">
-      <p>¿No tienes una cuenta aún? <a routerLink="/auth/crear-usuario" class="register-link">Crear cuenta</a></p>
     </div>
 
   </div>
