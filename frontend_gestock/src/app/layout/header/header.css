@@ -1,177 +1,188 @@
-/* Contenedor principal de la barra superior */
 .header-container {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: space-between; /* Separa la izquierda de la derecha */
-  width: 100%;
-  padding: 0 24px;
-  height: 70px;
-  background-color: #0f172a; /* Ajusta según el tono oscuro de tu app */
-  box-sizing: border-box;
+  padding: 0.75rem 1.5rem;
+  background: #0d1527;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 }
 
-/* Agrupa la campanita y el perfil a la derecha */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-left: auto; /* Empuja todo el bloque hacia la derecha */
+  gap: 1.25rem;
 }
 
-/* Estilo de la campanita */
-.notification-icon-container {
-  font-size: 18px;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.notification-icon-container:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-/* Contenedor principal del perfil en la cabecera */
-.user-profile-container {
+.popover-wrapper {
   position: relative;
-  display: inline-block;
 }
 
-/* Botón interactivo del perfil */
+/* Botón interactivo de usuario */
 .user-profile-btn {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   cursor: pointer;
-  gap: 10px;
-  padding: 4px 8px;
+  padding: 0.4rem 0.75rem;
   border-radius: 8px;
-  transition: background-color 0.2s ease;
+  background: rgba(255, 255, 255, 0.04);
+  user-select: none;
+  transition: background 0.2s ease;
 }
 
 .user-profile-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.12);
 }
 
-/* Avatar circular con la inicial */
 .avatar-circle {
-  background: #2563eb;
-  color: #ffffff;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
+  background: #2563eb;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 0.9rem;
 }
 
-/* Información del usuario en el header */
 .user-info {
-  text-align: left;
-  line-height: 1.2;
-}
-
-.user-info .user-name {
-  display: block;
-  font-weight: 600;
-  color: #f8fafc;
-  font-size: 14px;
-}
-
-.user-info .user-role {
-  display: block;
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-/* Tarjeta del menú desplegable flotante (alineada a la derecha) */
-.profile-dropdown-card {
-  position: absolute;
-  right: 0;
-  top: 52px;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-  width: 260px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  padding: 16px;
-  color: #f8fafc;
-  animation: fadeInDropdown 0.15s ease-out;
-}
-
-/* Cabecera interna del menú flotante */
-.profile-dropdown-header {
-  border-bottom: 1px solid #334155;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
-}
-
-.profile-dropdown-header .profile-name {
-  margin: 0;
-  font-weight: 700;
-  font-size: 15px;
-  color: #ffffff;
-}
-
-.profile-dropdown-header .profile-email {
-  margin: 4px 0 0 0;
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-.profile-role-badge {
-  display: inline-block;
-  margin-top: 8px;
-  background: #059669;
-  color: #ffffff;
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-/* Opciones / Botones del menú */
-.profile-dropdown-actions {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.profile-action-btn {
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Panel Emergente Estilo Chrome */
+.chrome-profile-card {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 290px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
+  z-index: 999;
+  padding: 1.25rem 0 0.5rem 0;
+}
+
+.chrome-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem 1rem 1rem;
+  text-align: center;
+}
+
+.chrome-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.chrome-user-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #f8fafc;
+}
+
+.chrome-user-email {
+  margin: 2px 0 8px 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.chrome-role-tag {
+  background: rgba(37, 99, 235, 0.25);
+  color: #60a5fa;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.chrome-menu-section {
+  display: flex;
+  flex-direction: column;
+  padding: 0.4rem 0.5rem;
+}
+
+.chrome-menu-section.border-top {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chrome-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   background: transparent;
   border: none;
   color: #cbd5e1;
-  text-align: left;
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.875rem;
   width: 100%;
-  transition: background-color 0.2s, color 0.2s;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.profile-action-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+.chrome-menu-item .item-icon {
+  font-size: 1.1rem;
+}
+
+.chrome-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
-.profile-action-btn.danger {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-.profile-action-btn.danger:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+.chrome-menu-item.danger {
   color: #f87171;
 }
 
-/* Animación sutil de aparición */
-@keyframes fadeInDropdown {
+.chrome-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+/* Panel Notificaciones Rediseñado */
+.notifications-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  width: 320px;
+  background-color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -180,4 +191,107 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Cabecera del Panel */
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.dropdown-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+/* Botón "Marcar leídas" */
+.link-btn {
+  background: transparent;
+  border: none;
+  color: #60a5fa;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.link-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+}
+
+/* Lista de Notificaciones */
+.notifications-list {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+/* Ítem individual de notificación */
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.notification-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notification-item.unread {
+  background: rgba(59, 130, 246, 0.08);
+  border-left: 3px solid #3b82f6;
+}
+
+/* Icono indicador lateral */
+.notif-icon-wrapper {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.notif-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.notif-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.notif-msg {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.notif-time {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 4px;
 }

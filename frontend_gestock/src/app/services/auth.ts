@@ -1,68 +1,86 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
-// 1. Define los roles permitidos
-export type RolUsuario = 'Administrador' | 'Supervisor' | 'Operario' | 'Auditor';
+export type RolUsuario = 
+  | 'Administrador' 
+  | 'Supervisor' 
+  | 'Técnico de Mantenimiento' 
+  | 'Técnico Mantenimiento' 
+  | 'Auditor' 
+  | 'Operario' 
+  | 'Operador';
 
-// 2. Agrega la propiedad rol a la interfaz
 export interface Usuario {
-  nombre?: string;
+  id?: number;
+  nombre: string;
   email: string;
+  correo?: string;
   password?: string;
-  rol?: RolUsuario; // 👈 Aquí agregas el atributo opcional
+  rol: RolUsuario | string;
+  empresaId?: number;
+  estado?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private router = inject(Router);
   private keyUsuarios = 'gestock_usuarios';
-  private keySesion = 'gestock_sesion_activa';
+  private keySesion = 'gestock_usuario_sesion';
 
-  private obtenerUsuarios(): Usuario[] {
-    const data = localStorage.getItem(this.keyUsuarios);
-    
-    if (!data) {
-      const usuariosIniciales: Usuario[] = [
-        { nombre: 'Admin System', email: 'admin@gestock.com', password: '123', rol: 'Administrador' },
-        { nombre: 'Supervisor Logística', email: 'supervisor@gestock.com', password: '123', rol: 'Supervisor' },
-        { nombre: 'Operario Bodega', email: 'operario@gestock.com', password: '123', rol: 'Operario' },
-        { nombre: 'Auditor General', email: 'auditor@gestock.com', password: '123', rol: 'Auditor' }
-      ];
-      localStorage.setItem(this.keyUsuarios, JSON.stringify(usuariosIniciales));
-      return usuariosIniciales;
-    }
-
-    return JSON.parse(data);
+  constructor() {
+    this.inicializarUsuarios();
   }
 
-  registrar(usuario: Usuario): boolean {
-    const usuarios = this.obtenerUsuarios();
-    const existe = usuarios.find(u => u.email === usuario.email);
+  private inicializarUsuarios(): Usuario[] {
+    const data = localStorage.getItem(this.keyUsuarios);
+    if (data) {
+      return JSON.parse(data);
+    }
 
+    const usuariosIniciales: Usuario[] = [
+      { nombre: 'Admin System', email: 'admin@gestock.com', correo: 'admin@gestock.com', password: '123', rol: 'Administrador' },
+      { nombre: 'Supervisor Logística', email: 'supervisor@gestock.com', correo: 'supervisor@gestock.com', password: '123', rol: 'Supervisor' },
+      { nombre: 'Técnico Mantenimiento', email: 'tecnico@gestock.com', correo: 'tecnico@gestock.com', password: '123', rol: 'Técnico de Mantenimiento' },
+      { nombre: 'Auditor General', email: 'auditor@gestock.com', correo: 'auditor@gestock.com', password: '123', rol: 'Auditor' },
+      { nombre: 'Operario Almacén', email: 'operario@gestock.com', correo: 'operario@gestock.com', password: '123', rol: 'Operario' }
+    ];
+
+    localStorage.setItem(this.keyUsuarios, JSON.stringify(usuariosIniciales));
+    return usuariosIniciales;
+  }
+
+  obtenerUsuarios(): Usuario[] {
+    const data = localStorage.getItem(this.keyUsuarios);
+    return data ? JSON.parse(data) : this.inicializarUsuarios();
+  }
+
+  registrar(nuevoUsuario: Usuario): boolean {
+    const usuarios = this.obtenerUsuarios();
+    const existe = usuarios.some(u => (u.email || u.correo) === (nuevoUsuario.email || nuevoUsuario.correo));
     if (existe) {
       return false;
     }
-
-    // Asigna 'Operario' por defecto si no especifica rol
-    if (!usuario.rol) {
-      usuario.rol = 'Operario';
-    }
-
-    usuarios.push(usuario);
+    usuarios.push(nuevoUsuario);
     localStorage.setItem(this.keyUsuarios, JSON.stringify(usuarios));
     return true;
   }
 
-  login(email: string, password?: string): boolean {
+  login(emailOrCorreo: string, password?: string): boolean {
     const usuarios = this.obtenerUsuarios();
-    
-    // Soporta autenticación con contraseña o mediante Google (solo email)
-    const usuarioValido = password !== undefined
-      ? usuarios.find(u => u.email === email && u.password === password)
-      : usuarios.find(u => u.email === email);
+    const usuarioValido = usuarios.find(u => 
+      (u.email === emailOrCorreo || u.correo === emailOrCorreo) && 
+      (!password || u.password === password)
+    );
 
     if (usuarioValido) {
-      localStorage.setItem(this.keySesion, JSON.stringify(usuarioValido));
+      const sesionData: Usuario = {
+        ...usuarioValido,
+        email: usuarioValido.email || usuarioValido.correo || '',
+        correo: usuarioValido.correo || usuarioValido.email || ''
+      };
+      localStorage.setItem(this.keySesion, JSON.stringify(sesionData));
       return true;
     }
 
@@ -70,20 +88,33 @@ export class AuthService {
   }
 
   obtenerUsuarioActual(): Usuario | null {
-    const sesion = localStorage.getItem(this.keySesion);
-    return sesion ? JSON.parse(sesion) : null;
-  }
-
-  obtenerRol(): RolUsuario | null {
-    const usuario = this.obtenerUsuarioActual();
-    return usuario?.rol || null;
+    const data = localStorage.getItem(this.keySesion);
+    return data ? JSON.parse(data) : null;
   }
 
   estaAutenticado(): boolean {
-    return localStorage.getItem(this.keySesion) !== null;
+    return this.obtenerUsuarioActual() !== null;
   }
 
   logout(): void {
     localStorage.removeItem(this.keySesion);
+    this.router.navigate(['/auth/login']);
+  }
+
+  obtenerRutaInicialPorRol(): string {
+    const usuario = this.obtenerUsuarioActual();
+    const rol = usuario?.rol || '';
+
+    if (rol === 'Administrador' || rol === 'Supervisor' || rol === 'Auditor') {
+      return '/app/panel';
+    }
+    if (rol === 'Operario' || rol === 'Operador') {
+      return '/app/recepcion/recepcion-mercancias';
+    }
+    if (rol === 'Técnico de Mantenimiento' || rol === 'Técnico Mantenimiento') {
+      return '/app/programacion';
+    }
+
+    return '/app/gestion/inventario';
   }
 }

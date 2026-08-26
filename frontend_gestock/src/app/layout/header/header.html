@@ -1,50 +1,85 @@
 <header class="header-container">
-  <!-- Si tienes un logo o título a la izquierda, va aquí -->
   <div class="header-left">
-    <!-- (Opcional) Título o espacio izquierdo -->
+    <div class="brand-badge">
+      <span class="brand-logo">📦</span>
+      <span class="brand-title">Gestock</span>
+    </div>
   </div>
 
-  <!-- Sección derecha: Campanita + Perfil -->
   <div class="header-right">
     
-    <!-- Campanita de notificaciones -->
-    <div class="notification-icon-container" style="position: relative; cursor: pointer;">
-      <span class="notification-bell">🔔</span>
-      <span class="notification-badge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; width: 8px; height: 8px; border-radius: 50%;"></span>
+    <div class="popover-wrapper">
+      <button class="icon-btn" type="button" (click)="toggleNotificaciones($event)">
+        <span class="bell-icon">🔔</span>
+        <span *ngIf="obtenerSinLeerCount() > 0" class="notification-badge">
+          {{ obtenerSinLeerCount() }}
+        </span>
+      </button>
+
+      <div *ngIf="mostrarNotificaciones" class="dropdown-panel notifications-panel" (click)="$event.stopPropagation()">
+        <div class="dropdown-header">
+          <h3>Notificaciones</h3>
+          <button (click)="marcarTodasComoLeidas()" class="link-btn">Marcar leídas</button>
+        </div>
+        <div class="notifications-list">
+          <div *ngFor="let notif of notificaciones" class="notification-item" [class.unread]="!notif.leida">
+            <div class="notif-content">
+              <p class="notif-title">{{ notif.titulo }}</p>
+              <p class="notif-msg">{{ notif.mensaje }}</p>
+              <span class="notif-time">{{ notif.tiempo }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Contenedor del Perfil -->
-    <div class="user-profile-container">
-      
-      <!-- Botón del Perfil -->
-      <div class="user-profile-btn" (click)="toggleMenuPerfil()">
-        <div class="avatar-circle">M</div>
+    <div class="popover-wrapper">
+      <div class="user-profile-btn" (click)="toggleMenuPerfil($event)">
+        <div class="avatar-circle">
+          {{ obtenerIniciales() }}
+        </div>
         <div class="user-info">
-          <span class="user-name">Maicol Nore</span>
-          <span class="user-role">Operador ▾</span>
+          <span class="user-name">{{ usuarioActual?.nombre || 'Auditor General' }}</span>
+          <span class="user-role">{{ usuarioActual?.rol || 'Auditor' }} ▾</span>
         </div>
       </div>
 
-      <!-- Menú Desplegable Flotante -->
-      <div *ngIf="mostrarMenuPerfil" class="profile-dropdown-card">
+      <div *ngIf="mostrarMenuPerfil" class="dropdown-panel chrome-profile-card" (click)="$event.stopPropagation()">
         
-        <div class="profile-dropdown-header">
-          <p class="profile-name">Maicol Nore</p>
-          <p class="profile-email">maicol.nore@gestock.com</p>
-          <span class="profile-role-badge">Rol: Operador ADSO</span>
+        <div class="chrome-card-header">
+          <div class="chrome-avatar">
+            {{ obtenerIniciales() }}
+          </div>
+          <p class="chrome-user-name">{{ usuarioActual?.nombre || 'Auditor General' }}</p>
+          <p class="chrome-user-email">{{ usuarioActual?.email || 'auditor@gestock.com' }}</p>
+          <span class="chrome-role-tag">Rol: {{ usuarioActual?.rol || 'Auditor' }}</span>
         </div>
 
-        <div class="profile-dropdown-actions">
-          <button routerLink="/configuracion" (click)="mostrarMenuPerfil = false" class="profile-action-btn">
-            ⚙️ Configuración
+        <div class="chrome-menu-section">
+          <button routerLink="/app/configuracion" (click)="cerrarMenus()" class="chrome-menu-item">
+            <span class="item-icon">✏️</span> Personalizar perfil
           </button>
-          <button (click)="cerrarSesion()" class="profile-action-btn danger">
-            🚪 Cerrar Sesión
+          <button routerLink="/app/configuracion" (click)="cerrarMenus()" class="chrome-menu-item">
+            <span class="item-icon">⚙️</span> Configuración de la cuenta
+          </button>
+        </div>
+
+        <div class="chrome-menu-section border-top">
+          <button routerLink="/auth/creacion-usuarios" (click)="cerrarMenus()" class="chrome-menu-item">
+            <span class="item-icon">👤➕</span> Añadir nuevo perfil
+          </button>
+          <button routerLink="/app/configuracion" (click)="cerrarMenus()" class="chrome-menu-item">
+            <span class="item-icon">👥</span> Gestionar usuarios de Gestock
+          </button>
+        </div>
+
+        <div class="chrome-menu-section border-top">
+          <button (click)="cerrarSesion()" class="chrome-menu-item danger">
+            <span class="item-icon">🚪</span> Cerrar sesión
           </button>
         </div>
 
       </div>
-
     </div>
 
   </div>
