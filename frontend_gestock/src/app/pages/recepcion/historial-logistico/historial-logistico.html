@@ -1,17 +1,102 @@
-<!-- Sección de Filtros -->
-  <div class="config-card filter-card">
-    <div class="input-row">
-      <div class="input-group">
-        <label>Filtrar por Fecha (HU042)</label>
-        <input type="date" [(ngModel)]="filtroFecha" />
-      </div>
-      <div class="input-group">
-        <label>Filtrar por Responsable</label>
-        <select [(ngModel)]="filtroResponsable">
-          <option value="">Todos los usuarios</option>
-          <option value="Maicol Nore">Maicol Nore [Gerente]</option>
-          <option value="Erick Ruiz">Erick Ruiz [Operador]</option>
-        </select>
-      </div>
+<div class="historial-container">
+  <!-- Encabezado de Sección -->
+  <div class="section-header">
+    <div>
+      <h2>Historial Logístico</h2>
+      <p>Monitoreo, trazabilidad y control de movimientos en almacén (HU041 - HU043)</p>
+    </div>
+    
+    <!-- Botón Único de Exportación (HU043) -->
+    <div class="report-actions">
+      <button class="btn-export" (click)="exportarReporte()">
+        📊 Exportar
+      </button>
     </div>
   </div>
+
+  <!-- Barra de Filtros Avanzada (HU042) -->
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Fecha Desde (HU042)</label>
+      <input type="date" [(ngModel)]="filtroFechaDesde" class="form-control" />
+    </div>
+
+    <div class="filter-group">
+      <label>Fecha Hasta (HU042)</label>
+      <input type="date" [(ngModel)]="filtroFechaHasta" class="form-control" />
+    </div>
+
+    <div class="filter-group">
+      <label>Tipo de Movimiento</label>
+      <select [(ngModel)]="filtroTipo" class="form-control">
+        <option value="Todos">Todos</option>
+        <option value="Entrada">Entrada</option>
+        <option value="Salida">Salida</option>
+        <option value="Transferencia">Transferencia</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Producto</label>
+      <input type="text" [(ngModel)]="filtroProducto" placeholder="Buscar producto..." class="form-control" />
+    </div>
+
+    <div class="filter-group">
+      <label>Responsable</label>
+      <select [(ngModel)]="filtroResponsable" class="form-control">
+        <option value="Todos los usuarios">Todos los usuarios</option>
+        <option value="Maicol Nore">Maicol Nore</option>
+        <option value="Carlos Pérez">Carlos Pérez</option>
+        <option value="Ana Gómez">Ana Gómez</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- Tabla de Visualización (HU041) -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="gestock-table">
+        <thead>
+          <tr>
+            <th>ID Movimiento</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Responsable</th>
+            <th>Origen / Destino</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of movimientosFiltrados">
+            <td><span class="badge-id">{{ item.id }}</span></td>
+            <td>{{ item.fecha }}</td>
+            <td>
+              <span class="badge-tipo" [ngClass]="{
+                'entrada': item.tipoMovimiento === 'Entrada',
+                'salida': item.tipoMovimiento === 'Salida',
+                'transferencia': item.tipoMovimiento === 'Transferencia'
+              }">
+                {{ item.tipoMovimiento }}
+              </span>
+            </td>
+            <td class="font-weight-bold">{{ item.producto }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>{{ item.responsable }}</td>
+            <td>{{ item.destinoOrigen }}</td>
+          </tr>
+          <tr *ngIf="movimientosFiltrados.length === 0">
+            <td colspan="7" class="text-center empty-state">
+              No se encontraron registros logísticos en el rango de fechas o filtros seleccionados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
