@@ -64,7 +64,6 @@ export class LoginComponent implements OnInit {
     })
       .then(res => res.json())
       .then(perfil => {
-        // Registrar e iniciar sesión con la cuenta de Google (rol Operario por defecto si es nuevo)
         this.authService.registrar({
           nombre: perfil.name || 'Usuario Google',
           email: perfil.email,
@@ -73,7 +72,9 @@ export class LoginComponent implements OnInit {
 
         this.authService.login(perfil.email);
         this.isLoading = false;
-        this.router.navigate(['/app/panel']);
+        
+        // Verificación obligatoria de empresa tras login con Google
+        this.verificarEmpresaYRedirigir();
       })
       .catch(() => {
         this.isLoading = false;
@@ -120,6 +121,24 @@ export class LoginComponent implements OnInit {
     this.activeField = null;
   }
 
+  /**
+   * Valida si el usuario ya tiene una empresa registrada.
+   * Si no la tiene, lo redirige obligatoriamente al formulario de nueva empresa.
+   * Si ya la tiene, le permite el acceso al sistema de inventarios (/app/panel).
+   */
+  private verificarEmpresaYRedirigir(): void {
+    const empresaRegistrada = localStorage.getItem('gestock_empresa_activa');
+
+    if (!empresaRegistrada) {
+      console.log('%c[GESTOCK] Sin empresa registrada. Redirigiendo obligatoriamente al formulario de nueva empresa...', 'color: #f59e0b; font-weight: bold;');
+      // Redirección directa al componente del formulario de nueva empresa
+      this.router.navigate(['/app/regsistrar-empresa']);
+    } else {
+      console.log('%c[GESTOCK] Empresa detectada. Acceso concedido al panel de inventarios.', 'color: #10b981; font-weight: bold;');
+      this.router.navigate(['/app/registrar-empresa']);
+    }
+  }
+
   // Procesa el inicio de sesión manual
   async onLogin(): Promise<void> {
     this.errorMessage = '';
@@ -156,7 +175,8 @@ export class LoginComponent implements OnInit {
       this.isLoading = false;
 
       if (exito) {
-        this.router.navigate(['/app/panel']);
+        // Redirección obligatoria evaluando la existencia de la empresa
+        this.verificarEmpresaYRedirigir();
       } else {
         this.errorMessage = '⚠️ Credenciales incorrectas. Verifica tu correo y contraseña o regístrate primero.';
       }

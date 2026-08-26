@@ -72,6 +72,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/dashboard/empresa/empresa').then(m => m.EmpresasComponent),
         title: 'GESTOCK - Empresas'
       },
+      {
+        path: 'regsistrar-empresa',
+        loadComponent: () => import('./pages/dashboard/registrar-empresa/registrar-empresa').then(m => m.RegistrarEmpresaComponent),
+        title: 'Registrar Empresa'
+      },
 
       // Módulo de Inventario
       {
