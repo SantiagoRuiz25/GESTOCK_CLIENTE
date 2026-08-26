@@ -1,77 +1,49 @@
 <aside class="app-sidebar">
-  <!-- Logo de la App -->
   <div class="sidebar-brand">
-    <div class="brand-icon">📦</div>
+    <span class="brand-icon">📦</span>
     <span class="brand-title">Gestock</span>
   </div>
 
   <nav class="sidebar-nav">
-    <!-- DASHBOARD -->
-    <div class="nav-section-title">PANEL</div>
-    <a routerLink="/app/panel" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📊</span>
-      <span class="nav-text">Panel</span>
-    </a>
-    <a routerLink="/app/empresas" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">🏢</span>
-      <span class="nav-text">Empresas</span>
-    </a>
+    
+    <ng-container *ngIf="tieneItemsVisibles('PANEL')">
+      <div class="nav-section-title">PANEL</div>
+      <ng-container *ngFor="let item of menuItems">
+        <a *ngIf="item.section === 'PANEL' && esPermitido(item.rolesPermitidos)" 
+           [routerLink]="item.route" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+      </ng-container>
+    </ng-container>
 
-    <!-- GESTIÓN -->
-    <div class="nav-section-title">GESTIÓN</div>
-    <a routerLink="/app/gestion/inventario/lista-productos" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📦</span>
-      <span class="nav-text">Inventario</span>
-    </a>
-    <a routerLink="/app/recepcion/recepcion-mercancias" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📥</span>
-      <span class="nav-text">Recepción</span>
-    </a>
-    <a routerLink="/app/recepcion/historial-logistico" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📋</span>
-      <span class="nav-text">Historial Logístico</span>
-    </a>
-    <a routerLink="/app/gestion/auditorias" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📋</span>
-      <span class="nav-text">Auditorías</span>
-    </a>
-    <a routerLink="/app/gestion/roles-yusuarios" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-text">Roles y Usuarios</span>
-    </a>
-    <a routerLink="/app/envios" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">🚚</span>
-      <span class="nav-text">Envíos</span>
-    </a>
+    <ng-container *ngIf="tieneItemsVisibles('GESTIÓN')">
+      <div class="nav-section-title">GESTIÓN</div>
+      <ng-container *ngFor="let item of menuItems">
+        <a *ngIf="item.section === 'GESTIÓN' && esPermitido(item.rolesPermitidos)" 
+           [routerLink]="item.route" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+      </ng-container>
+    </ng-container>
 
-    <!-- MANTENIMIENTO -->
-    <div class="nav-section-title">MANTENIMIENTO</div>
-    <a routerLink="/app/programacion" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">🛠️</span>
-      <span class="nav-text">Programación</span>
-    </a>
-    <a routerLink="/app/incidencias" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">⚠️</span>
-      <span class="nav-text">Incidencias</span>
-    </a>
+    <ng-container *ngIf="tieneItemsVisibles('MANTENIMIENTO')">
+      <div class="nav-section-title">MANTENIMIENTO</div>
+      <ng-container *ngFor="let item of menuItems">
+        <a *ngIf="item.section === 'MANTENIMIENTO' && esPermitido(item.rolesPermitidos)" 
+           [routerLink]="item.route" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+      </ng-container>
+    </ng-container>
 
-    <!-- SISTEMA -->
-    <div class="nav-section-title">SISTEMA</div>
-    <a routerLink="/app/reportes" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📈</span>
-      <span class="nav-text">Reportes</span>
-    </a>
-    <a routerLink="/app/configuracion" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-text">Configuración</span>
-    </a>
   </nav>
-
-  <!-- Botón Cerrar Sesión Abajo -->
-  <div class="sidebar-footer">
-    <button type="button" class="btn-logout" (click)="logout()">
-      <span class="nav-icon">🚪</span>
-      <span class="nav-text">Cerrar Sesión</span>
-    </button>
-  </div>
 </aside>

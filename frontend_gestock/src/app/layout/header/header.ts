@@ -1,42 +1,106 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService, Usuario } from '../../services/auth';
+
+interface Notificacion {
+  id: number;
+  titulo: string;
+  mensaje: string;
+  tiempo: string;
+  leida: boolean;
+}
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    CommonModule,
-    
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })
-export class HeaderComponent {
-  // Estado para mostrar u ocultar el menú desplegable del perfil
+export class HeaderComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
+  private cdr = inject(ChangeDetectorRef);
+
+  usuarioActual: Usuario | null = null;
   mostrarMenuPerfil: boolean = false;
+  mostrarNotificaciones: boolean = false;
 
-  constructor(private router: Router) {}
+  notificaciones: Notificacion[] = [
+    {
+      id: 1,
+      titulo: 'Stock Bajo',
+      mensaje: 'El producto Sensor LDR tiene 3 unidades.',
+      tiempo: 'Hace 5 min',
+      leida: false
+    }
+  ];
 
-  // Método para alternar el menú al hacer clic en el perfil
-  toggleMenuPerfil(): void {
-    this.mostrarMenuPerfil = !this.mostrarMenuPerfil;
+  ngOnInit(): void {
+    this.cargarUsuario();
   }
 
-  // Cierra el menú automáticamente si se hace clic fuera de él
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.user-profile-container')) {
+  cargarUsuario(): void {
+    this.usuarioActual = this.authService.obtenerUsuarioActual();
+  }
+
+  obtenerIniciales(): string {
+    if (!this.usuarioActual || !this.usuarioActual.nombre) {
+      return 'AG';
+    }
+    const partes = this.usuarioActual.nombre.trim().split(' ');
+    if (partes.length >= 2) {
+      return (partes[0][0] + partes[1][0]).toUpperCase();
+    }
+    return partes[0].slice(0, 2).toUpperCase();
+  }
+
+  toggleMenuPerfil(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.mostrarMenuPerfil = !this.mostrarMenuPerfil;
+    if (this.mostrarMenuPerfil) {
+      this.mostrarNotificaciones = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  toggleNotificaciones(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.mostrarNotificaciones = !this.mostrarNotificaciones;
+    if (this.mostrarNotificaciones) {
       this.mostrarMenuPerfil = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  cerrarMenus(): void {
+    this.mostrarMenuPerfil = false;
+    this.mostrarNotificaciones = false;
+    this.cdr.detectChanges();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.cerrarMenus();
     }
   }
 
-  // Acción para cerrar sesión
+  marcarTodasComoLeidas(): void {
+    this.notificaciones.forEach(n => n.leida = true);
+  }
+
+  obtenerSinLeerCount(): number {
+    return this.notificaciones.filter(n => !n.leida).length;
+  }
+
   cerrarSesion(): void {
-    this.mostrarMenuPerfil = false;
-    localStorage.removeItem('gestock_session');
-    console.log('%c[GESTOCK] Sesión cerrada.', 'color: #f59e0b; font-weight: bold;');
+    this.cerrarMenus();
+    this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
 }
