@@ -254,3 +254,24 @@
   font-size: 0.82rem;
   color: #94a3b8;
 }
+
+/* Botón Volver al Inicio */
+.back-home-container {
+  margin-bottom: 20px;
+}
+
+.back-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.back-home-link:hover {
+  color: #38bdf8;
+  transform: translateX(-3px);
+}
