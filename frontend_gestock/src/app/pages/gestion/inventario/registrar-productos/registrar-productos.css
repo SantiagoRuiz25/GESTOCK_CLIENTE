@@ -1,61 +1,92 @@
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ==========================================================
+   --- 1. ANIMACIONES Y CONFIGURACIÓN GENERAL ---
+   ========================================================== */
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: scale(0.96) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .animate-fade {
-  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .registro-container {
-  padding: 2rem;
+  padding: 2.5rem;
   background-color: #0b0f19;
   color: #f1f5f9;
   min-height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* ==========================================================
+   --- 2. CABECERA DE LA SECCIÓN ---
+   ========================================================== */
 .registro-header {
   width: 100%;
   max-width: 900px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .registro-header h2 {
-  font-size: 1.75rem;
+  font-size: 2rem;
+  font-weight: 700;
   color: #ffffff;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px;
+}
+
+.registro-header h2 i {
+  color: #3b82f6;
 }
 
 .text-subtitle {
   color: #94a3b8;
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  margin: 0;
 }
 
-/* Tarjeta de formulario con toque moderno y profundidad */
+/* ==========================================================
+   --- 3. MENSAJE TOAST / ÉXITO MODERNO ---
+   ========================================================== */
+.toast-success-modern {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+/* ==========================================================
+   --- 4. TARJETA CONTENEDORA Y FORMULARIO ---
+   ========================================================== */
 .form-card {
-  background: linear-gradient(145deg, #121826 0%, #1e293b 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  background: linear-gradient(145deg, #1e293b, #131a28);
+  border: 1px solid #334155;
+  border-radius: 24px;
   padding: 2.5rem;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
   width: 100%;
   max-width: 900px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
   box-sizing: border-box;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
 }
 
@@ -67,113 +98,132 @@
 
 .form-label {
   color: #cbd5e1;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  letter-spacing: 0.02em;
 }
 
-/* Campos de entrada y selects oscuros mejorados */
+/* Inputs, Selects y Elementos Oscuros */
 .dark-input {
-  background: #080b12;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0f172a;
+  border: 1px solid #334155;
   color: #ffffff;
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
   outline: none;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
   width: 100%;
   box-sizing: border-box;
+  transition: all 0.25s ease;
+}
+
+.dark-input::placeholder {
+  color: #64748b;
 }
 
 .dark-input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-  background-color: #05080e;
+  background: #131a28;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* Estilo para los selects */
+/* Estilo personalizado para los selects */
 select.dark-input {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1rem;
+  padding-right: 2.5rem;
   cursor: pointer;
 }
 
+select.dark-input option {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+/* ==========================================================
+   --- 5. MENSAJES DE ERROR Y VALIDACIÓN ---
+   ========================================================== */
 .error-msg {
   color: #f87171;
   font-size: 0.78rem;
-  margin-top: 0.2rem;
   font-weight: 500;
+  margin-top: 2px;
 }
 
 .warning-msg {
   color: #fbbf24;
   font-size: 0.78rem;
-  margin-top: 0.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
   font-weight: 500;
+  margin-top: 2px;
 }
 
+/* ==========================================================
+   --- 6. ACCIONES Y BOTÓN DE ENVÍO ---
+   ========================================================== */
 .form-actions {
-  margin-top: 2.5rem;
+  grid-column: span 2;
+  margin-top: 2rem;
   display: flex;
   justify-content: flex-end;
 }
 
-/* Botón de envío con mejor animación y brillo */
 .btn-submit {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border: none;
-  padding: 0.85rem 2rem;
-  border-radius: 10px;
+  padding: 0.9rem 2rem;
+  border-radius: 14px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
-  transition: all 0.3s ease;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+  transition: all 0.25s ease;
+  width: 100%;
+  justify-content: center;
 }
 
 .btn-submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
-  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 6px 25px rgba(37, 99, 235, 0.6);
 }
 
 .btn-submit:disabled {
-  opacity: 0.5;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #64748b;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-/* Toast flotante de éxito por si lo implementas */
-.toast-success-modern {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid #10b981;
-  color: #34d399;
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
+/* ==========================================================
+   --- 7. DISEÑO RESPONSIVE PARA DISPOSITIVOS MÓVILES (< 768px) ---
+   ========================================================== */
 @media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
   .registro-container {
     padding: 1rem;
+  }
+
+  .form-card {
+    padding: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr; /* Una columna por fila en celulares */
+    gap: 1.2rem;
+  }
+
+  .form-actions {
+    grid-column: span 1;
+    margin-top: 1.5rem;
+  }
+
+  .btn-submit {
+    width: 100%;
   }
 }

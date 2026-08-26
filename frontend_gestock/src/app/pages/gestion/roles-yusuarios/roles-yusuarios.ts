@@ -1,61 +1,71 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 
 @Component({
-  selector: 'app-roles-yusuarios',
+  selector: 'app-roles',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './roles-yusuarios.html',
   styleUrls: ['./roles-yusuarios.css']
 })
-export class RolesUsuariosComponent {
-  rolForm: FormGroup;
-  nuevoUsuarioForm: FormGroup;
+export class RolesUsuariosComponent implements OnInit {
   
-  listaUsuarios = [
-    { id: 1, nombre: 'Carlos Pérez', email: 'carlos.perez@gestock.com', rol: 'Almacenista', activo: true, estadoTexto: 'Activo ahora', horasTrabajadas: 38 },
-    { id: 2, nombre: 'Ana Gómez', email: 'ana.gomez@gestock.com', rol: 'Administrador', activo: true, estadoTexto: 'Activo hace 5 min', horasTrabajadas: 45 },
-    { id: 3, nombre: 'Luis Torres', email: 'luis.torres@gestock.com', rol: 'Auditor', activo: false, estadoTexto: 'Inactivo hace 3 horas', horasTrabajadas: 24 }
+  // Lista de usuarios simulada
+  listaUsuarios: any[] = [
+    { id: 1, nombre: 'Carlos Pérez', email: 'carlos@gestock.com', rol: 'Administrador', activo: true, estadoTexto: 'En línea', horasTrabajadas: 42 },
+    { id: 2, nombre: 'Ana Gómez', email: 'ana@gestock.com', rol: 'Auditor', activo: true, estadoTexto: 'En línea', horasTrabajadas: 38 },
+    { id: 3, nombre: 'Luis Torres', email: 'luis@gestock.com', rol: 'Supervisor', activo: false, estadoTexto: 'Desconectado', horasTrabajadas: 40 },
+    { id: 4, nombre: 'Sofia Martínez', email: 'sofia@gestock.com', rol: 'Operario', activo: true, estadoTexto: 'En línea', horasTrabajadas: 45 }
+  ];
+
+  // Permisos basados exactamente en los módulos del menú lateral de Gestock
+  listaPermisosDisponibles: string[] = [
+    'Acceso al Panel',
+    'Gestión de Empresas',
+    'Control de Inventario',
+    'Gestión de Recepción',
+    'Ver Historial Logístico',
+    'Gestión de Auditorías',
+    'Administración de Roles y Usuarios',
+    'Control de Envíos',
+    'Módulo de Programación',
+    'Gestión de Incidencias',
+    'Generación de Reportes',
+    'Configuración del Sistema'
   ];
 
   usuarioSeleccionado: any = null;
   modoCrear: boolean = false;
+  
+  nuevoUsuarioForm!: FormGroup;
+  rolForm!: FormGroup;
 
-  mensajeAlerta: string | null = null;
-  tipoAlerta: 'success' | 'info' = 'success';
+  mensajeAlerta: string = '';
+  tipoAlerta: string = 'success';
 
-  listaPermisosDisponibles = [
-    'Visualización de permisos del sistema',
-    'Asignación de permisos a usuario',
-    'Revocación de accesos asignados',
-    'Registro y alta de nuevos productos',
-    'Control de existencias y stock en bodegas',
-    'Auditoría y revisión de bitácoras'
-  ];
+  constructor(private fb: FormBuilder) {}
 
-  permisosPorRol: { [key: string]: boolean[] } = {
-    'Administrador': [true, true, true, true, true, true],
-    'Almacenista': [true, false, false, true, true, false],
-    'Auditor': [true, false, false, false, false, true]
-  };
+  ngOnInit(): void {
+    this.inicializarFormularios();
+  }
 
-  constructor(private fb: FormBuilder) {
+  inicializarFormularios(): void {
+    this.nuevoUsuarioForm = this.fb.group({
+      nombre: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      rol: ['', Validators.required],
+      horasTrabajadas: [0, [Validators.required, Validators.min(1)]]
+    });
+
     this.rolForm = this.fb.group({
       nombreRol: ['', Validators.required],
       descripcion: [''],
       permisos: this.fb.array(this.listaPermisosDisponibles.map(() => false))
     });
-
-    this.nuevoUsuarioForm = this.fb.group({
-      nombre: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      rol: ['Almacenista', Validators.required],
-      horasTrabajadas: [40, [Validators.required, Validators.min(1)]]
-    });
   }
 
-  get permisosArray() {
+  get permisosArray(): FormArray {
     return this.rolForm.get('permisos') as FormArray;
   }
 
@@ -64,90 +74,82 @@ export class RolesUsuariosComponent {
   }
 
   totalHorasTrabajadas(): number {
-    return this.listaUsuarios.reduce((acc, curr) => acc + curr.horasTrabajadas, 0);
+    return this.listaUsuarios.reduce((acc, curr) => acc + (curr.horasTrabajadas || 0), 0);
   }
 
-  mostrarNotificacion(mensaje: string, tipo: 'success' | 'info' = 'success') {
-    this.mensajeAlerta = mensaje;
-    this.tipoAlerta = tipo;
-    setTimeout(() => {
-      this.mensajeAlerta = null;
-    }, 3500);
-  }
-
-  abrirModalCrear() {
+  abrirModalCrear(): void {
     this.modoCrear = true;
     this.usuarioSeleccionado = null;
-    this.nuevoUsuarioForm.reset({ rol: 'Almacenista', horasTrabajadas: 40 });
+    this.nuevoUsuarioForm.reset({ horasTrabajadas: 40 });
   }
 
-  seleccionarUsuario(user: any) {
+  volverALista(): void {
+    this.modoCrear = false;
+    this.usuarioSeleccionado = null;
+  }
+
+  seleccionarUsuario(user: any): void {
     this.usuarioSeleccionado = user;
     this.modoCrear = false;
     
-    const permisosDefecto = this.permisosPorRol[user.rol] || this.listaPermisosDisponibles.map(() => false);
-    
+    // Simular permisos precargados según el rol
+    const permisosSimulados = this.listaPermisosDisponibles.map(permiso => {
+      if (user.rol === 'Administrador') return true;
+      if (user.rol === 'Auditor' && permiso.includes('Auditorías')) return true;
+      if (user.rol === 'Supervisor' && (permiso.includes('Inventario') || permiso.includes('Panel'))) return true;
+      return false;
+    });
+
     this.rolForm.patchValue({
       nombreRol: user.rol,
-      descripcion: `Configuración activa para ${user.nombre}`
+      descripcion: `Configuración actual para ${user.nombre}`
     });
 
-    const formArray = this.permisosArray;
-    permisosDefecto.forEach((val, idx) => {
-      formArray.at(idx).setValue(val);
-    });
+    this.permisosArray.clear();
+    permisosSimulados.forEach(p => this.permisosArray.push(this.fb.control(p)));
   }
 
-  onRolSelectChange(event: any) {
+  onRolSelectChange(event: any): void {
     const rolSeleccionado = event.target.value;
-    const permisosDefecto = this.permisosPorRol[rolSeleccionado] || this.listaPermisosDisponibles.map(() => false);
-    
-    const formArray = this.permisosArray;
-    permisosDefecto.forEach((val, idx) => {
-      formArray.at(idx).setValue(val);
+    // Ajustar permisos por defecto según el rol elegido
+    const nuevosPermisos = this.listaPermisosDisponibles.map(permiso => {
+      if (rolSeleccionado === 'Administrador') return true;
+      if (rolSeleccionado === 'Auditor') return permiso.includes('Auditorías') || permiso.includes('Reportes');
+      if (rolSeleccionado === 'Supervisor') return permiso.includes('Inventario') || permiso.includes('Panel') || permiso.includes('Envíos');
+      return permiso.includes('Inventario') || permiso.includes('Recepción');
     });
+
+    this.permisosArray.clear();
+    nuevosPermisos.forEach(p => this.permisosArray.push(this.fb.control(p)));
   }
 
-  onRolNuevoChange(event: any) {}
-
-  volverALista() {
-    this.usuarioSeleccionado = null;
-    this.modoCrear = false;
-    this.rolForm.reset();
-  }
-
-  guardarNuevoUsuario() {
+  guardarNuevoUsuario(): void {
     if (this.nuevoUsuarioForm.valid) {
-      const val = this.nuevoUsuarioForm.value;
-      const nuevoUser = {
+      const nuevo = {
         id: this.listaUsuarios.length + 1,
-        nombre: val.nombre,
-        email: val.email,
-        rol: val.rol,
+        ...this.nuevoUsuarioForm.value,
         activo: true,
-        estadoTexto: 'Activo ahora',
-        horasTrabajadas: Number(val.horasTrabajadas)
+        estadoTexto: 'En línea'
       };
-
-      this.listaUsuarios.push(nuevoUser);
-
-      // 👉 AQUÍ SE IMPRIME EL JSON DEL NUEVO USUARIO CREADO
-      console.log('👤 [JSON Usuario Creado]:', JSON.stringify(nuevoUser, null, 2));
-
-      this.mostrarNotificacion(`¡Usuario ${nuevoUser.nombre} registrado con éxito!`, 'success');
+      this.listaUsuarios.push(nuevo);
+      this.mostrarAlerta('Usuario registrado exitosamente', 'success');
       this.volverALista();
     }
   }
 
-  guardarRol() {
-    if (this.rolForm.valid && this.usuarioSeleccionado) {
+  guardarRol(): void {
+    if (this.usuarioSeleccionado) {
       this.usuarioSeleccionado.rol = this.rolForm.value.nombreRol;
-
-      // 👉 AQUÍ SE IMPRIME EL JSON DEL USUARIO CON SU ROL/PERMISOS MODIFICADOS
-      console.log('✏️ [JSON Usuario Modificado (Rol/Permisos)]:', JSON.stringify(this.usuarioSeleccionado, null, 2));
-
-      this.mostrarNotificacion(`¡Permisos y rol actualizados para ${this.usuarioSeleccionado.nombre}!`, 'success');
+      this.mostrarAlerta(`Permisos y rol actualizados para ${this.usuarioSeleccionado.nombre}`, 'success');
       this.volverALista();
     }
+  }
+
+  mostrarAlerta(mensaje: string, tipo: string): void {
+    this.mensajeAlerta = mensaje;
+    this.tipoAlerta = tipo;
+    setTimeout(() => {
+      this.mensajeAlerta = '';
+    }, 3500);
   }
 }
