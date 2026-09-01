@@ -1,4 +1,3 @@
-<!-- Fondo oscuro semitransparente (Overlay) -->
 <div class="modal-overlay">
   <div class="modal-card">
     
@@ -8,39 +7,44 @@
 
     <p class="modal-subtitle">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
 
-    <div *ngIf="errorMessage" class="alert-error">
-      {{ errorMessage }}
+    <div *ngIf="errorMessage()" class="alert-error">
+      {{ errorMessage() }}
     </div>
 
-    <form (ngSubmit)="guardarEmpresa()" class="modal-form">
+    <form [formGroup]="empresaForm" (ngSubmit)="guardarEmpresa()" class="modal-form">
+      
       <div class="form-group">
         <label>Nombre de la Empresa</label>
         <input 
           type="text" 
-          [(ngModel)]="empresa.nombre" 
-          name="nombre" 
+          formControlName="nombre" 
           placeholder="Nombre comercial..." 
           class="form-control" 
-          required 
+          [ngClass]="{'is-invalid': empresaForm.get('nombre')?.invalid && empresaForm.get('nombre')?.touched}"
         />
+        <div *ngIf="empresaForm.get('nombre')?.invalid && empresaForm.get('nombre')?.touched" class="error-text">
+          El nombre es obligatorio (mínimo 2 caracteres).
+        </div>
       </div>
 
       <div class="form-group">
         <label>Email de contacto</label>
         <input 
           type="email" 
-          [(ngModel)]="empresa.email" 
-          name="email" 
+          formControlName="email" 
           placeholder="correo@empresa.com" 
           class="form-control" 
-          required 
+          [ngClass]="{'is-invalid': empresaForm.get('email')?.invalid && empresaForm.get('email')?.touched}"
         />
+        <div *ngIf="empresaForm.get('email')?.invalid && empresaForm.get('email')?.touched" class="error-text">
+          Ingrese un correo electrónico válido.
+        </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Moneda</label>
-          <select [(ngModel)]="empresa.moneda" name="moneda" class="form-control">
+          <select formControlName="moneda" class="form-control">
             <option value="USD - Dólar">USD - Dólar</option>
             <option value="COP - Peso Colombiano">COP - Peso Colombiano</option>
             <option value="EUR - Euro">EUR - Euro</option>
@@ -49,7 +53,7 @@
 
         <div class="form-group">
           <label>Formato de Fecha</label>
-          <select [(ngModel)]="empresa.formatoFecha" name="formatoFecha" class="form-control">
+          <select formControlName="formatoFecha" class="form-control">
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="YYYY-MM-DD">YYYY-MM-DD</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -58,11 +62,11 @@
       </div>
 
       <div class="modal-actions">
-        <!-- Se eliminó el botón de cancelar para que el flujo sea 100% obligatorio -->
-        <button type="submit" class="btn-crear" [disabled]="isLoading">
-          {{ isLoading ? 'Creando...' : 'Crear Empresa' }}
+        <button type="submit" class="btn-crear" [disabled]="isLoading()">
+          {{ isLoading() ? 'Creando...' : 'Crear Empresa' }}
         </button>
       </div>
+
     </form>
 
   </div>

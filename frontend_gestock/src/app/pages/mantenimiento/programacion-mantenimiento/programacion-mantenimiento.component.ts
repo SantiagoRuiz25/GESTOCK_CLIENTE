@@ -47,6 +47,11 @@ export class ProgramacionMantenimientoComponent {
 
     // Agregar a la tabla y reiniciar el formulario
     this.programaciones.unshift(nuevoItem);
+    
+    // [MODIFICACIÓN GESTOCK] - Registro detallado en consola con formato JSON
+    console.log('%c[GESTOCK] Nuevo Mantenimiento Registrado (JSON):', 'color: #38bdf8; font-weight: bold;');
+    console.log(JSON.stringify(nuevoItem, null, 2));
+
     this.nuevoMantenimiento = {
       equipo: '',
       tipo: 'Preventivo',
