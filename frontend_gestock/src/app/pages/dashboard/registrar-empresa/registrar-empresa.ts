@@ -1,63 +1,73 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EstadisticasService, Empresa } from '../../../services/estadisticas.service'; // Ajusta la ruta de tu servicio
+import { EstadisticasService, Empresa } from '../../../services/estadisticas.service';
 
 @Component({
   selector: 'app-registrar-empresa',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './registrar-empresa.html',
   styleUrls: ['./registrar-empresa.css']
 })
 export class RegistrarEmpresaComponent {
   private router = inject(Router);
+  private fb = inject(FormBuilder);
   private estadisticasService = inject(EstadisticasService);
 
-  empresa = {
-    nombre: '',
-    email: '',
-    moneda: 'COP - Peso Colombiano',
-    formatoFecha: 'DD/MM/YYYY'
-  };
+  // Uso de Signals para el estado del componente (Angular moderno)
+  isLoading = signal<boolean>(false);
+  errorMessage = signal<string>('');
 
-  errorMessage: string = '';
-  isLoading: boolean = false;
+  // Definición del formulario con validadores reactivos
+  empresaForm: FormGroup = this.fb.group({
+    nombre: ['', [Validators.required, Validators.minLength(2)]],
+    email: ['', [Validators.required, Validators.email]],
+    moneda: ['COP - Peso Colombiano', Validators.required],
+    formatoFecha: ['DD/MM/YYYY', Validators.required]
+  });
 
   guardarEmpresa(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
-    // Validar campos obligatorios
-    if (!this.empresa.nombre.trim() || !this.empresa.email.trim()) {
-      this.errorMessage = '⚠️ Por favor, complete todos los campos obligatorios.';
+    if (this.empresaForm.invalid) {
+      this.empresaForm.markAllAsTouched();
+      this.errorMessage.set('⚠️ Por favor, complete correctamente los campos obligatorios.');
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(false);
 
+    // Simulamos un breve respiro del hilo principal (macrotarea) para evitar bloqueos de renderizado
     setTimeout(() => {
-      // Construir el objeto de empresa completo con métricas iniciales
-      const nuevaEmpresa: Empresa = {
-        id: Date.now().toString(),
-        nombre: this.empresa.nombre.trim(),
-        email: this.empresa.email.trim(),
-        moneda: this.empresa.moneda,
-        formatoFecha: this.empresa.formatoFecha,
-        bodegasActivas: 1, // Inicia con 1 bodega activa por defecto
-        totalPrecios: 0,
-        valorInventario: 0,
-        alertasStock: 0
-      };
+      try {
+        const formValues = this.empresaForm.value;
+        
+        const nuevaEmpresa: Empresa = {
+          id: Date.now().toString(),
+          nombre: formValues.nombre.trim(),
+          email: formValues.email.trim(),
+          moneda: formValues.moneda,
+          formatoFecha: formValues.formatoFecha,
+          bodegasActivas: 1,
+          totalPrecios: 0,
+          valorInventario: 0,
+          alertasStock: 0
+        };
 
-      // Guardar y notificar al sistema mediante el servicio reactivo
-      this.estadisticasService.cambiarEmpresaActiva(nuevaEmpresa);
+        // Notificar al servicio
+        this.estadisticasService.cambiarEmpresaActiva(nuevaEmpresa);
 
-      this.isLoading = false;
-      console.log('%c[GESTOCK] Empresa obligatoria creada con éxito:', 'color: #10b981; font-weight: bold;', nuevaEmpresa);
-      
-      // Redirigir obligatoriamente al panel general de inventarios
-      this.router.navigate(['/app/panel']);
-    }, 800);
+        console.log('%c[GESTOCK] Empresa creada con éxito:', 'color: #10b981; font-weight: bold;', nuevaEmpresa);
+        
+        this.router.navigate(['/app/panel']);
+      } catch (error) {
+        console.error('[GESTOCK Error]:', error);
+        this.errorMessage.set('❌ Ocurrió un error al guardar la empresa.');
+        this.isLoading.set(false);
+      }
+    }, 300);
+    
   }
 }

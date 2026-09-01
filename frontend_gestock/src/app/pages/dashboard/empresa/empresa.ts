@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { EstadisticasService, Empresa } from '../../../services/estadisticas.service'; // Ajusta la ruta de tu servicio
 
 interface EmpresaItem {
   id: string;
@@ -19,12 +21,13 @@ interface EmpresaItem {
   styleUrls: ['./empresa.css']
 })
 export class EmpresasComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private estadisticasService = inject(EstadisticasService);
 
   empresasLista: EmpresaItem[] = [];
   mostrarModalCrear: boolean = false;
   nuevaEmpresaForm!: FormGroup;
-
-  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.inicializarFormulario();
@@ -105,13 +108,9 @@ export class EmpresasComponent implements OnInit {
       estado: 'Activa'
     };
 
-    // Agregar a la lista
     this.empresasLista.unshift(nuevaEmpresa);
-
-    // Guardar temporalmente en localStorage
     this.sincronizarStorage();
 
-    // Mostrar JSON exacto en la consola de desarrollo
     console.log('%c[GESTOCK] Nueva Empresa Creada (JSON):', 'color: #38bdf8; font-weight: bold;');
     console.log(JSON.stringify(nuevaEmpresa, null, 2));
 
@@ -123,6 +122,26 @@ export class EmpresasComponent implements OnInit {
     if (emp) {
       console.log('%c[GESTOCK] Empresa seleccionada:', 'color: #34d399; font-weight: bold;');
       console.log(JSON.stringify(emp, null, 2));
+
+      // Mapeamos al formato completo que espera tu EstadisticasService
+      const empresaParaServicio: Empresa = {
+        id: emp.id,
+        nombre: emp.nombre,
+        email: emp.email,
+        moneda: emp.moneda,
+        formatoFecha: emp.formatoFecha,
+        bodegasActivas: 1,
+        totalPrecios: 0,
+        valorInventario: 0,
+        alertasStock: 0
+      };
+
+      // Actualizamos el servicio reactivo y guardamos la sesión seleccionada
+      this.estadisticasService.cambiarEmpresaActiva(empresaParaServicio);
+      localStorage.setItem('empresaIdSeleccionada', id);
+
+      // Redirigimos a la ruta del panel de inventarios (/app/panel o la que utilices)
+      this.router.navigate(['/app/panel']);
     }
   }
 

@@ -20,11 +20,12 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
 
   credentials = {
-    email: '',
-    password: '',
+    email: 'maicolnore10@gmail.com',
+    password: '12345678',
     rememberMe: false
   };
 
+  
   activeField: string | null = null;
   isLoading: boolean = false;
   errorMessage: string = '';
@@ -131,7 +132,7 @@ export class LoginComponent implements OnInit {
       this.isLoading = false;
 
       if (exito) {
-        // Redirección dinámica según el rol del usuario
+        // Redirección dinámica según el rol del usuario hacia registrar empresa u otra ruta configurada
         const rutaDestino = this.authService.obtenerRutaInicialPorRol();
         this.router.navigate([rutaDestino]);
       } else {
