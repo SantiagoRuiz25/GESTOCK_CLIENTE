@@ -1,80 +1,72 @@
-<div class="auth-wrapper">
-  <div 
-    class="login-card" 
-    (mousemove)="onMouseMove($event)"
-    [style.--mouse-x.px]="mouseX"
-    [style.--mouse-y.px]="mouseY">
-    
-    <div class="back-home-container" style="margin-bottom: 8px;">
-      <a routerLink="/" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#94a3b8'">
-        &larr; Volver al inicio
-      </a>
+<div class="login-card" *ngIf="!mostrarModalRol">
+  <button class="btn-back">← Volver al inicio</button>
+  
+  <div class="brand-badge">
+    📦 Gestock
+  </div>
+
+  <h2>Iniciar Sesión</h2>
+  <p class="subtitle">Ingresa tus datos para acceder al sistema de gestión.</p>
+
+  <form [formGroup]="loginForm" (ngSubmit)="procesarLogin()">
+    <div class="form-group">
+      <label>Correo Electrónico</label>
+      <div class="input-wrapper">
+        <span class="icon">✉️</span>
+        <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+      </div>
     </div>
 
-    <div class="card-header">
-      <div class="brand-badge">
-        <span class="icon">📦</span>
-        <span>Gestock</span>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <div class="input-wrapper">
+        <span class="icon">🔒</span>
+        <input type="password" formControlName="password" placeholder="••••••••" />
       </div>
-      <h1>Iniciar Sesión</h1>
-      <p class="subtitle">Ingresa tus datos para acceder al sistema de gestión.</p>
     </div>
 
-    <div class="login-form">
-      
-      <div class="form-group" [class.is-focused]="activeField === 'email'">
-        <label for="email">Correo Electrónico</label>
-        <div class="input-wrapper">
-          <span class="input-icon">✉️</span>
-          <input 
-            type="text" 
-            id="email" 
-            [(ngModel)]="credentials.email" 
-            name="email"
-            placeholder="usuario@gestock.com"
-            (focus)="setFocus('email')"
-            (blur)="clearFocus()">
+    <div class="form-options">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="recordar" /> Recordar este dispositivo
+      </label>
+      <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <button type="submit" class="btn-submit" [disabled]="loginForm.invalid">
+      Acceder a la Plataforma →
+    </button>
+  </form>
+</div>
+
+<!-- Modal para Seleccionar Tipo de Acceso / Rol -->
+<div class="modal-backdrop" *ngIf="mostrarModalRol">
+  <div class="role-modal-card">
+    <div class="modal-badge">🔐 Configuración de Acceso</div>
+    <h3>¿Cómo deseas ingresar?</h3>
+    <p class="modal-subtitle">Detectamos que estás accediendo con un usuario secundario ({{ loginForm.value.email }}). Elige tu perfil de trabajo:</p>
+
+    <div class="role-options">
+      <!-- Opción 1: Modo Administrador de Empresa -->
+      <button class="role-card" (click)="confirmarAcceso('admin')">
+        <div class="role-icon">🛡️</div>
+        <div class="role-info">
+          <h4>Ingresar como Administrador</h4>
+          <p>Acceso total a configuraciones, reportes y gestión de la empresa.</p>
         </div>
-      </div>
-
-      <div class="form-group" [class.is-focused]="activeField === 'password'">
-        <label for="password">Contraseña</label>
-        <div class="input-wrapper">
-          <span class="input-icon">🔒</span>
-          <input 
-            type="password" 
-            id="password" 
-            [(ngModel)]="credentials.password" 
-            name="password"
-            placeholder="••••••••"
-            (focus)="setFocus('password')"
-            (blur)="clearFocus()">
-        </div>
-        <div class="forgot-password-container">
-          <a routerLink="/auth/recuperar-contrasena" class="forgot-link">¿Olvidaste tu contraseña?</a>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <label class="remember-me">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="credentials.rememberMe" 
-            name="rememberMe">
-          <span>Recordar este dispositivo</span>
-        </label>
-      </div>
-
-      <div *ngIf="errorMessage" class="error-banner" style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 4px; text-align: center; font-weight: 500;">
-        {{ errorMessage }}
-      </div>
-
-      <button type="button" class="btn-primary" [disabled]="isLoading" (click)="onLogin()">
-        <span *ngIf="!isLoading">Acceder a la Plataforma &rarr;</span>
-        <span *ngIf="isLoading" class="spinner"></span>
       </button>
 
+      <!-- Opción 2: Modo Usuario Estándar / Operador -->
+      <button class="role-card" (click)="confirmarAcceso('usuario')">
+        <div class="role-icon">👤</div>
+        <div class="role-info">
+          <h4>Ingresar como Usuario Nuevo / Estándar</h4>
+          <p>Acceso restringido a tareas operativas diarias e inventario básico.</p>
+        </div>
+      </button>
     </div>
 
+    <button class="btn-cancel-modal" (click)="cancelarSeleccionRol()">
+      ← Regresar al login
+    </button>
   </div>
 </div>

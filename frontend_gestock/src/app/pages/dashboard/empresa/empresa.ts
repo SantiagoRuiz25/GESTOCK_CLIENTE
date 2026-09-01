@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 interface EmpresaItem {
   id: string;
@@ -24,7 +25,10 @@ export class EmpresasComponent implements OnInit {
   mostrarModalCrear: boolean = false;
   nuevaEmpresaForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.inicializarFormulario();
@@ -105,13 +109,9 @@ export class EmpresasComponent implements OnInit {
       estado: 'Activa'
     };
 
-    // Agregar a la lista
     this.empresasLista.unshift(nuevaEmpresa);
-
-    // Guardar temporalmente en localStorage
     this.sincronizarStorage();
 
-    // Mostrar JSON exacto en la consola de desarrollo
     console.log('%c[GESTOCK] Nueva Empresa Creada (JSON):', 'color: #38bdf8; font-weight: bold;');
     console.log(JSON.stringify(nuevaEmpresa, null, 2));
 
@@ -121,8 +121,12 @@ export class EmpresasComponent implements OnInit {
   seleccionarEmpresa(id: string) {
     const emp = this.empresasLista.find(e => e.id === id);
     if (emp) {
-      console.log('%c[GESTOCK] Empresa seleccionada:', 'color: #34d399; font-weight: bold;');
-      console.log(JSON.stringify(emp, null, 2));
+      // Guardar la empresa activa seleccionada para usarla globalmente
+      localStorage.setItem('empresa_activa', JSON.stringify(emp));
+      console.log('%c[GESTOCK] Empresa seleccionada:', 'color: #34d399; font-weight: bold;', emp.nombre);
+      
+      // Redireccionar al panel
+      this.router.navigate(['/app/panel']);
     }
   }
 

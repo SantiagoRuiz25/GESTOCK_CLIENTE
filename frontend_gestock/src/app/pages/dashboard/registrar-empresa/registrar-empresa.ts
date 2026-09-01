@@ -1,63 +1,45 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EstadisticasService, Empresa } from '../../../services/estadisticas.service'; // Ajusta la ruta de tu servicio
 
 @Component({
   selector: 'app-registrar-empresa',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './registrar-empresa.html',
   styleUrls: ['./registrar-empresa.css']
 })
 export class RegistrarEmpresaComponent {
-  private router = inject(Router);
-  private estadisticasService = inject(EstadisticasService);
 
-  empresa = {
-    nombre: '',
-    email: '',
-    moneda: 'COP - Peso Colombiano',
-    formatoFecha: 'DD/MM/YYYY'
-  };
+  constructor(private router: Router) {}
 
-  errorMessage: string = '';
-  isLoading: boolean = false;
+  crearYSalir(nombre: string, email: string, moneda: string, formatoFecha: string) {
+    const nuevaEmpresa = {
+      id: `EMP-${Date.now().toString().slice(-3)}`,
+      nombre: nombre || 'Empresa Creada',
+      email: email || 'contacto@empresa.com',
+      moneda: moneda || 'USD - Dólar',
+      formatoFecha: formatoFecha || 'DD/MM/YYYY',
+      estado: 'Activa'
+    };
 
-  guardarEmpresa(): void {
-    this.errorMessage = '';
+    // 1. Guardar empresas y sesión activa en LocalStorage con claves unificadas
+    try {
+      const localData = localStorage.getItem('gestock_empresas');
+      const empresas = localData ? JSON.parse(localData) : [];
+      empresas.unshift(nuevaEmpresa);
 
-    // Validar campos obligatorios
-    if (!this.empresa.nombre.trim() || !this.empresa.email.trim()) {
-      this.errorMessage = '⚠️ Por favor, complete todos los campos obligatorios.';
-      return;
+      localStorage.setItem('gestock_empresas', JSON.stringify(empresas));
+      localStorage.setItem('empresa_activa', JSON.stringify(nuevaEmpresa));
+      localStorage.setItem('gestock_empresa_activa', JSON.stringify(nuevaEmpresa));
+      localStorage.setItem('isLoggedIn', 'true');
+    } catch (e) {
+      console.error('Error guardando datos:', e);
     }
 
-    this.isLoading = true;
-
-    setTimeout(() => {
-      // Construir el objeto de empresa completo con métricas iniciales
-      const nuevaEmpresa: Empresa = {
-        id: Date.now().toString(),
-        nombre: this.empresa.nombre.trim(),
-        email: this.empresa.email.trim(),
-        moneda: this.empresa.moneda,
-        formatoFecha: this.empresa.formatoFecha,
-        bodegasActivas: 1, // Inicia con 1 bodega activa por defecto
-        totalPrecios: 0,
-        valorInventario: 0,
-        alertasStock: 0
-      };
-
-      // Guardar y notificar al sistema mediante el servicio reactivo
-      this.estadisticasService.cambiarEmpresaActiva(nuevaEmpresa);
-
-      this.isLoading = false;
-      console.log('%c[GESTOCK] Empresa obligatoria creada con éxito:', 'color: #10b981; font-weight: bold;', nuevaEmpresa);
-      
-      // Redirigir obligatoriamente al panel general de inventarios
-      this.router.navigate(['/app/panel']);
-    }, 800);
+    // 2. Navegar al panel de forma segura
+    this.router.navigate(['/app/panel']).catch(() => {
+      window.location.hash = '/app/panel';
+    });
   }
 }

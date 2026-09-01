@@ -1,69 +1,48 @@
-<!-- Fondo oscuro semitransparente (Overlay) -->
-<div class="modal-overlay">
-  <div class="modal-card">
-    
-    <div class="modal-header">
-      <h3>Registrar Nueva Empresa</h3>
+<div class="registro-layout">
+  <div class="registro-card">
+    <div class="card-header">
+      <h2>Registrar Nueva Empresa</h2>
+      <p class="subtitle">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
     </div>
 
-    <p class="modal-subtitle">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
-
-    <div *ngIf="errorMessage" class="alert-error">
-      {{ errorMessage }}
-    </div>
-
-    <form (ngSubmit)="guardarEmpresa()" class="modal-form">
+    <!-- Se elimina (ngSubmit) para evitar bloqueos del formulario -->
+    <div>
       <div class="form-group">
-        <label>Nombre de la Empresa</label>
-        <input 
-          type="text" 
-          [(ngModel)]="empresa.nombre" 
-          name="nombre" 
-          placeholder="Nombre comercial..." 
-          class="form-control" 
-          required 
-        />
+        <label for="nombre">Nombre de la Empresa</label>
+        <input id="nombre" type="text" #nombreInput placeholder="Ej. Mi Empresa SAS" value="CATEGORIA PRODUCTO 1" />
       </div>
 
       <div class="form-group">
-        <label>Email de contacto</label>
-        <input 
-          type="email" 
-          [(ngModel)]="empresa.email" 
-          name="email" 
-          placeholder="correo@empresa.com" 
-          class="form-control" 
-          required 
-        />
+        <label for="email">Email de contacto</label>
+        <input id="email" type="email" #emailInput placeholder="contacto@empresa.com" value="ericksantiago7p@gmail.com" />
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>Moneda</label>
-          <select [(ngModel)]="empresa.moneda" name="moneda" class="form-control">
+          <label for="moneda">Moneda</label>
+          <select id="moneda" #monedaSelect>
             <option value="USD - Dólar">USD - Dólar</option>
             <option value="COP - Peso Colombiano">COP - Peso Colombiano</option>
-            <option value="EUR - Euro">EUR - Euro</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Formato de Fecha</label>
-          <select [(ngModel)]="empresa.formatoFecha" name="formatoFecha" class="form-control">
+          <label for="formatoFecha">Formato de Fecha</label>
+          <select id="formatoFecha" #fechaSelect>
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
           </select>
         </div>
       </div>
 
-      <div class="modal-actions">
-        <!-- Se eliminó el botón de cancelar para que el flujo sea 100% obligatorio -->
-        <button type="submit" class="btn-crear" [disabled]="isLoading">
-          {{ isLoading ? 'Creando...' : 'Crear Empresa' }}
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn-primary-action" 
+          (click)="crearYSalir(nombreInput.value, emailInput.value, monedaSelect.value, fechaSelect.value)"
+        >
+          Crear Empresa →
         </button>
       </div>
-    </form>
-
+    </div>
   </div>
 </div>
