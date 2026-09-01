@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { EstadisticasService, Empresa } from '../../../services/estadisticas.service';
 
 interface EmpresaItem {
   id: string;
@@ -20,15 +21,13 @@ interface EmpresaItem {
   styleUrls: ['./empresa.css']
 })
 export class EmpresasComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private estadisticasService = inject(EstadisticasService);
 
   empresasLista: EmpresaItem[] = [];
   mostrarModalCrear: boolean = false;
   nuevaEmpresaForm!: FormGroup;
-
-  constructor(
-    private fb: FormBuilder,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     this.inicializarFormulario();
@@ -121,12 +120,28 @@ export class EmpresasComponent implements OnInit {
   seleccionarEmpresa(id: string) {
     const emp = this.empresasLista.find(e => e.id === id);
     if (emp) {
-      // Guardar la empresa activa seleccionada para usarla globalmente
+      console.log('%c[GESTOCK] Empresa seleccionada:', 'color: #34d399; font-weight: bold;');
+      console.log(JSON.stringify(emp, null, 2));
+
+      const empresaParaServicio: Empresa = {
+        id: emp.id,
+        nombre: emp.nombre,
+        email: emp.email,
+        moneda: emp.moneda,
+        formatoFecha: emp.formatoFecha,
+        bodegasActivas: 1,
+        totalPrecios: 0,
+        valorInventario: 0,
+        alertasStock: 0
+      };
+
+      this.estadisticasService.cambiarEmpresaActiva(empresaParaServicio);
+      localStorage.setItem('empresaIdSeleccionada', id);
       localStorage.setItem('empresa_activa', JSON.stringify(emp));
-      console.log('%c[GESTOCK] Empresa seleccionada:', 'color: #34d399; font-weight: bold;', emp.nombre);
-      
-      // Redireccionar al panel
-      this.router.navigate(['/app/panel']);
+
+      this.router.navigate(['/app/panel']).catch(() => {
+        window.location.hash = '/app/panel';
+      });
     }
   }
 

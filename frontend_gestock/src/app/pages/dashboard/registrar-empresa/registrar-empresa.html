@@ -1,26 +1,42 @@
-<div class="registro-layout">
-  <div class="registro-card">
-    <div class="card-header">
-      <h2>Registrar Nueva Empresa</h2>
-      <p class="subtitle">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
-    </div>
-
-    <!-- Se elimina (ngSubmit) para evitar bloqueos del formulario -->
-    <div>
-      <div class="form-group">
-        <label for="nombre">Nombre de la Empresa</label>
-        <input id="nombre" type="text" #nombreInput placeholder="Ej. Mi Empresa SAS" value="CATEGORIA PRODUCTO 1" />
+  <div class="modal-backdrop" *ngIf="mostrarModalCrear">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Registrar Nueva Empresa</h3>
+        <button type="button" class="close-btn" (click)="cerrarModalCrear()">&times;</button>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email de contacto</label>
-        <input id="email" type="email" #emailInput placeholder="contacto@empresa.com" value="ericksantiago7p@gmail.com" />
-      </div>
+      <form [formGroup]="nuevaEmpresaForm" (ngSubmit)="crearNuevaEmpresa()">
+        <p class="empresas-subtitle" style="margin-bottom: 1.25rem;">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
 
-      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre">Nombre de la Empresa</label>
+          <input 
+            id="nombre" 
+            type="text" 
+            formControlName="nombre" 
+            placeholder="Ej. Mi Empresa SAS" 
+          />
+          <div *ngIf="nuevaEmpresaForm.get('nombre')?.invalid && nuevaEmpresaForm.get('nombre')?.touched" class="error-text" style="color: #f87171; font-size: 0.75rem; margin-top: 0.25rem;">
+            El nombre es obligatorio.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email de contacto</label>
+          <input 
+            id="email" 
+            type="email" 
+            formControlName="email" 
+            placeholder="contacto@empresa.com" 
+          />
+          <div *ngIf="nuevaEmpresaForm.get('email')?.invalid && nuevaEmpresaForm.get('email')?.touched" class="error-text" style="color: #f87171; font-size: 0.75rem; margin-top: 0.25rem;">
+            Ingrese un correo electrónico válido.
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="moneda">Moneda</label>
-          <select id="moneda" #monedaSelect>
+          <select id="moneda" formControlName="moneda">
             <option value="USD - Dólar">USD - Dólar</option>
             <option value="COP - Peso Colombiano">COP - Peso Colombiano</option>
           </select>
@@ -28,21 +44,17 @@
 
         <div class="form-group">
           <label for="formatoFecha">Formato de Fecha</label>
-          <select id="formatoFecha" #fechaSelect>
+          <select id="formatoFecha" formControlName="formatoFecha">
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
           </select>
         </div>
-      </div>
 
-      <div class="form-actions">
-        <button 
-          type="button" 
-          class="btn-primary-action" 
-          (click)="crearYSalir(nombreInput.value, emailInput.value, monedaSelect.value, fechaSelect.value)"
-        >
-          Crear Empresa →
-        </button>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModalCrear()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="nuevaEmpresaForm.invalid">Crear Empresa →</button>
+        </div>
+      </form>
     </div>
   </div>
-</div>

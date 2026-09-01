@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,15 +11,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.css']
 })
 export class LoginComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+
   loginForm!: FormGroup;
   mostrarModalRol: boolean = false;
+  errorMessage: string = '';
   
   private readonly ADMIN_SUPERIOR_EMAIL = 'admin@gestock.com';
-
-  constructor(
-    private fb: FormBuilder,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -30,8 +29,8 @@ export class LoginComponent implements OnInit {
   }
 
   procesarLogin() {
-    // Si el formulario es inválido, no hace nada (prevención extra)
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       console.warn('El formulario tiene errores de validación.');
       return;
     }
@@ -40,27 +39,33 @@ export class LoginComponent implements OnInit {
     console.log('Intentando iniciar sesión con:', emailIngresado);
 
     if (emailIngresado === this.ADMIN_SUPERIOR_EMAIL) {
-      // Guardamos la sesión
       localStorage.setItem('user_role', 'super_admin');
       localStorage.setItem('user_email', emailIngresado);
+      localStorage.setItem('gestock_usuario_sesion', JSON.stringify({ 
+        email: emailIngresado, 
+        rol: 'Administrador', 
+        nombre: 'Administrador Principal' 
+      }));
       
-      // Redirección obligatoria solicitada
       this.enrutarARegistroEmpresa();
     } else {
-      // Abre el modal si no es el admin principal
       this.mostrarModalRol = true;
     }
   }
 
   confirmarAcceso(tipoRol: 'admin' | 'usuario') {
     const email = this.loginForm.value.email.trim().toLowerCase();
+    const nombreRol = tipoRol === 'admin' ? 'Administrador' : 'Auditor General';
     
     localStorage.setItem('user_email', email);
     localStorage.setItem('user_role', tipoRol);
+    localStorage.setItem('gestock_usuario_sesion', JSON.stringify({ 
+      email: email, 
+      rol: nombreRol, 
+      nombre: 'Usuario' 
+    }));
 
     this.mostrarModalRol = false;
-
-    // Redirección obligatoria solicitada sin importar el rol
     this.enrutarARegistroEmpresa();
   }
 
@@ -68,14 +73,11 @@ export class LoginComponent implements OnInit {
     this.mostrarModalRol = false;
   }
 
-  // Función auxiliar para manejar posibles errores de ruteo
   private enrutarARegistroEmpresa() {
     console.log('Redirigiendo a registrar-empresa...');
     
-    // Intenta la ruta con prefijo /app/ primero
     this.router.navigate(['/app/registrar-empresa']).catch(err => {
       console.error('No se encontró /app/registrar-empresa, intentando ruta raíz...', err);
-      // Fallback a la ruta raíz si tus rutas no están anidadas en /app
       this.router.navigate(['/registrar-empresa']);
     });
   }
