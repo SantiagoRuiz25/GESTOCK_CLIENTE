@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EstadisticasService, Empresa } from '../../../services/estadisticas.service'; // Ajusta la ruta de tu servicio
+import { EstadisticasService, Empresa } from '../../../services/estadisticas.service';
 
 interface EmpresaItem {
   id: string;
@@ -123,7 +123,6 @@ export class EmpresasComponent implements OnInit {
       console.log('%c[GESTOCK] Empresa seleccionada:', 'color: #34d399; font-weight: bold;');
       console.log(JSON.stringify(emp, null, 2));
 
-      // Mapeamos al formato completo que espera tu EstadisticasService
       const empresaParaServicio: Empresa = {
         id: emp.id,
         nombre: emp.nombre,
@@ -136,12 +135,13 @@ export class EmpresasComponent implements OnInit {
         alertasStock: 0
       };
 
-      // Actualizamos el servicio reactivo y guardamos la sesión seleccionada
       this.estadisticasService.cambiarEmpresaActiva(empresaParaServicio);
       localStorage.setItem('empresaIdSeleccionada', id);
+      localStorage.setItem('empresa_activa', JSON.stringify(emp));
 
-      // Redirigimos a la ruta del panel de inventarios (/app/panel o la que utilices)
-      this.router.navigate(['/app/panel']);
+      this.router.navigate(['/app/panel']).catch(() => {
+        window.location.hash = '/app/panel';
+      });
     }
   }
 

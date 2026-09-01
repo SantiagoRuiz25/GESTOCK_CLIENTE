@@ -1,73 +1,60 @@
-<div class="modal-overlay">
-  <div class="modal-card">
-    
-    <div class="modal-header">
-      <h3>Registrar Nueva Empresa</h3>
-    </div>
-
-    <p class="modal-subtitle">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
-
-    <div *ngIf="errorMessage()" class="alert-error">
-      {{ errorMessage() }}
-    </div>
-
-    <form [formGroup]="empresaForm" (ngSubmit)="guardarEmpresa()" class="modal-form">
-      
-      <div class="form-group">
-        <label>Nombre de la Empresa</label>
-        <input 
-          type="text" 
-          formControlName="nombre" 
-          placeholder="Nombre comercial..." 
-          class="form-control" 
-          [ngClass]="{'is-invalid': empresaForm.get('nombre')?.invalid && empresaForm.get('nombre')?.touched}"
-        />
-        <div *ngIf="empresaForm.get('nombre')?.invalid && empresaForm.get('nombre')?.touched" class="error-text">
-          El nombre es obligatorio (mínimo 2 caracteres).
-        </div>
+  <div class="modal-backdrop" *ngIf="mostrarModalCrear">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Registrar Nueva Empresa</h3>
+        <button type="button" class="close-btn" (click)="cerrarModalCrear()">&times;</button>
       </div>
 
-      <div class="form-group">
-        <label>Email de contacto</label>
-        <input 
-          type="email" 
-          formControlName="email" 
-          placeholder="correo@empresa.com" 
-          class="form-control" 
-          [ngClass]="{'is-invalid': empresaForm.get('email')?.invalid && empresaForm.get('email')?.touched}"
-        />
-        <div *ngIf="empresaForm.get('email')?.invalid && empresaForm.get('email')?.touched" class="error-text">
-          Ingrese un correo electrónico válido.
-        </div>
-      </div>
+      <form [formGroup]="nuevaEmpresaForm" (ngSubmit)="crearNuevaEmpresa()">
+        <p class="empresas-subtitle" style="margin-bottom: 1.25rem;">Configure los datos iniciales de su organización para acceder al sistema Gestock.</p>
 
-      <div class="form-row">
         <div class="form-group">
-          <label>Moneda</label>
-          <select formControlName="moneda" class="form-control">
+          <label for="nombre">Nombre de la Empresa</label>
+          <input 
+            id="nombre" 
+            type="text" 
+            formControlName="nombre" 
+            placeholder="Ej. Mi Empresa SAS" 
+          />
+          <div *ngIf="nuevaEmpresaForm.get('nombre')?.invalid && nuevaEmpresaForm.get('nombre')?.touched" class="error-text" style="color: #f87171; font-size: 0.75rem; margin-top: 0.25rem;">
+            El nombre es obligatorio.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email de contacto</label>
+          <input 
+            id="email" 
+            type="email" 
+            formControlName="email" 
+            placeholder="contacto@empresa.com" 
+          />
+          <div *ngIf="nuevaEmpresaForm.get('email')?.invalid && nuevaEmpresaForm.get('email')?.touched" class="error-text" style="color: #f87171; font-size: 0.75rem; margin-top: 0.25rem;">
+            Ingrese un correo electrónico válido.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="moneda">Moneda</label>
+          <select id="moneda" formControlName="moneda">
             <option value="USD - Dólar">USD - Dólar</option>
             <option value="COP - Peso Colombiano">COP - Peso Colombiano</option>
-            <option value="EUR - Euro">EUR - Euro</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Formato de Fecha</label>
-          <select formControlName="formatoFecha" class="form-control">
+          <label for="formatoFecha">Formato de Fecha</label>
+          <select id="formatoFecha" formControlName="formatoFecha">
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="YYYY-MM-DD">YYYY-MM-DD</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
           </select>
         </div>
-      </div>
 
-      <div class="modal-actions">
-        <button type="submit" class="btn-crear" [disabled]="isLoading()">
-          {{ isLoading() ? 'Creando...' : 'Crear Empresa' }}
-        </button>
-      </div>
-
-    </form>
-
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModalCrear()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="nuevaEmpresaForm.invalid">Crear Empresa →</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>

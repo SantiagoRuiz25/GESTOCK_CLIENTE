@@ -77,8 +77,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/dashboard/registrar-empresa/registrar-empresa').then(m => m.RegistrarEmpresaComponent),
         title: 'Registrar Empresa - Gestock'
       },
-
-      // Módulo de Inventario
       {
         path: 'gestion/inventario',
         loadComponent: () => import('./pages/gestion/inventario/inventario').then(m => m.InventarioComponent),
@@ -117,7 +115,6 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['Administrador'] }
       },
-      // (Ruta de envíos eliminada por completo)
       {
         path: 'reportes',
         title: 'GESTOCK - Reportes y Estadísticas',
