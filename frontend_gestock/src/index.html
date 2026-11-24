@@ -2,19 +2,31 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>Gestock - Inicio</title>
+    <title>GESTOCK - Gestión de Inventarios</title>
     <base href="/" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="GESTOCK: plataforma de gestión de inventarios, recepción de mercancías y control de bodegas."
+    />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b0f19" />
+
     <!-- Enlace al icono de la pestaña -->
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <!-- Favicon con la URL directa en PNG del icono -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/10112/10112441.png" />
 
+    <!--
+      Las fuentes se cargan UNA vez desde el <head>, con preconnect para
+      ahorrar el handshake TLS. Antes cada CSS de componente traía su propio
+      @import de Inter, lo que además hacía que Angular inlineara el CSS
+      remoto dentro del bundle y disparara los warnings de budget.
+    -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />

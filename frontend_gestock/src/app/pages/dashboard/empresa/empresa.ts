@@ -50,6 +50,7 @@ export class EmpresasComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       moneda: ['USD - Dólar', Validators.required],
       formatoFecha: ['DD/MM/YYYY', Validators.required]
+      
     });
   }
 

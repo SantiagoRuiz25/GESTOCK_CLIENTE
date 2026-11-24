@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SesionesActivas } from './sesiones-activas';
+import { SesionesActivasComponent } from './sesiones-activas';
 
-describe('SesionesActivas', () => {
-  let component: SesionesActivas;
-  let fixture: ComponentFixture<SesionesActivas>;
+describe('SesionesActivasComponent', () => {
+  let component: SesionesActivasComponent;
+  let fixture: ComponentFixture<SesionesActivasComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SesionesActivas],
+      imports: [SesionesActivasComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SesionesActivas);
+    fixture = TestBed.createComponent(SesionesActivasComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

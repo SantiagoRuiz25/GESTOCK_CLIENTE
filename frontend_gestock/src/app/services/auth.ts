@@ -1,120 +1,142 @@
 import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Observable, of, throwError } from 'rxjs';
 
-export type RolUsuario = 
-  | 'Administrador' 
-  | 'Supervisor' 
-  | 'Técnico de Mantenimiento' 
-  | 'Técnico Mantenimiento' 
-  | 'Auditor' 
-  | 'Operario' 
-  | 'Operador';
+import { environment } from '../../environments/environment';
+import { SessionService, UsuarioSesion } from '../core/services/session.service';
+import { ApiError } from '../core/models/api.model';
 
+/**
+ * Interfaz de usuario que espera el resto de la aplicación.
+ *
+ * Antes esta interfaz vivía dentro de `Usuario` con `password?: string`
+ * incluido, y el objeto con la contraseña se guardaba entero en
+ * `localStorage`. Eso significaba que la contraseña del usuario autenticado
+ * estaba disponible para cualquier JavaScript de la página.
+ */
 export interface Usuario {
-  id?: number;
+  id: number;
   nombre: string;
   email: string;
-  correo?: string;
-  password?: string;
-  rol: RolUsuario | string;
-  empresaId?: number;
-  estado?: string;
+  rol: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+export type RolUsuario =
+  | 'Administrador'
+  | 'Supervisor'
+  | 'Técnico de Mantenimiento'
+  | 'Técnico Mantenimiento'
+  | 'Auditor'
+  | 'Operario'
+  | 'Operador';
+
+/**
+ * Fachada de compatibilidad sobre `SessionService`.
+ *
+ * Se mantiene para no tener que tocar de golpe los ocho componentes que la
+ * usan (header, sidebar, layout, panel, configuracion, pagina...). Su única
+ * responsabilidad ahora es traducir entre el estado que guarda
+ * `SessionService` y los nombres de método históricos. La lógica de sesión y
+ * de tokens vive en un solo sitio, que es el punto.
+ *
+ * La API es síncrona porque el resto de la app lo espera así. `login` y
+ * `logout` de verdad son asíncronos contra el servidor; cuando se migren los
+ * componentes, esta fachada debe desaparecer y deben usar `SessionService`
+ * directamente.
+ */
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private router = inject(Router);
-  private keyUsuarios = 'gestock_usuarios';
-  private keySesion = 'gestock_usuario_sesion';
+  private readonly session = inject(SessionService);
 
-  constructor() {
-    this.inicializarUsuarios();
-  }
-
-  private inicializarUsuarios(): Usuario[] {
-    const data = localStorage.getItem(this.keyUsuarios);
-    if (data) {
-      return JSON.parse(data);
-    }
-
-    const usuariosIniciales: Usuario[] = [
-      { nombre: 'Admin System', email: 'admin@gestock.com', correo: 'admin@gestock.com', password: '123', rol: 'Administrador' },
-      { nombre: 'Supervisor Logística', email: 'supervisor@gestock.com', correo: 'supervisor@gestock.com', password: '123', rol: 'Supervisor' },
-      { nombre: 'Técnico Mantenimiento', email: 'tecnico@gestock.com', correo: 'tecnico@gestock.com', password: '123', rol: 'Técnico de Mantenimiento' },
-      { nombre: 'Auditor General', email: 'auditor@gestock.com', correo: 'auditor@gestock.com', password: '123', rol: 'Auditor' },
-      { nombre: 'Operario Almacén', email: 'operario@gestock.com', correo: 'operario@gestock.com', password: '123', rol: 'Operario' }
-    ];
-
-    localStorage.setItem(this.keyUsuarios, JSON.stringify(usuariosIniciales));
-    return usuariosIniciales;
-  }
-
-  obtenerUsuarios(): Usuario[] {
-    const data = localStorage.getItem(this.keyUsuarios);
-    return data ? JSON.parse(data) : this.inicializarUsuarios();
-  }
-
-  registrar(nuevoUsuario: Usuario): boolean {
-    const usuarios = this.obtenerUsuarios();
-    const existe = usuarios.some(u => (u.email || u.correo) === (nuevoUsuario.email || nuevoUsuario.correo));
-    if (existe) {
-      return false;
-    }
-    usuarios.push(nuevoUsuario);
-    localStorage.setItem(this.keyUsuarios, JSON.stringify(usuarios));
-    return true;
-  }
-
-  login(emailOrCorreo: string, password?: string): boolean {
-    const usuarios = this.obtenerUsuarios();
-    const usuarioValido = usuarios.find(u => 
-      (u.email === emailOrCorreo || u.correo === emailOrCorreo) && 
-      (!password || u.password === password)
-    );
-
-    if (usuarioValido) {
-      const sesionData: Usuario = {
-        ...usuarioValido,
-        email: usuarioValido.email || usuarioValido.correo || '',
-        correo: usuarioValido.correo || usuarioValido.email || ''
-      };
-      localStorage.setItem(this.keySesion, JSON.stringify(sesionData));
-      return true;
-    }
-
-    return false;
-  }
-
+  /** Usuario autenticado, o `null`. */
   obtenerUsuarioActual(): Usuario | null {
-    const data = localStorage.getItem(this.keySesion);
-    return data ? JSON.parse(data) : null;
+    return this.session.usuario();
   }
 
   estaAutenticado(): boolean {
-    return this.obtenerUsuarioActual() !== null;
+    return this.session.autenticado();
+  }
+
+  /**
+   * Autenticación. Devuelve `true`/`false` para no romper la firma actual,
+   * y delega en `SessionService` la parte real.
+   */
+  login(email: string, password?: string): boolean {
+    if (!password) {
+      // Sin contraseña no hay verificación posible. Antes este caso permitía
+      // entrar solo con el correo, lo que era un agujero abierto.
+      return false;
+    }
+    this.session.login(email, password).subscribe({ error: () => undefined });
+    return this.session.autenticado();
+  }
+
+  /** Variante reactiva, usada por el formulario de login. */
+  iniciarSesion(email: string, password: string): Observable<UsuarioSesion> {
+    return this.session.login(email, password);
+  }
+
+  /**
+   * Alta de usuario. Solo tiene efecto en modo demostración: en producción
+   * el registro lo hace el backend, y aquí no debe haber una puerta trasera.
+   */
+  registrar(datos: { nombre: string; email: string; password: string; rol: string }): boolean {
+    if (!environment.useMockApi) {
+      return false;
+    }
+    let ok = false;
+    this.session.registrarDemo(datos).subscribe({ next: () => (ok = true), error: () => (ok = false) });
+    return ok;
+  }
+
+  /** Variante reactiva del alta, para mostrar el error al usuario. */
+  registrarUsuario(datos: {
+    nombre: string;
+    email: string;
+    password: string;
+    rol: string;
+  }): Observable<UsuarioSesion> {
+    if (!environment.useMockApi) {
+      return throwError(
+        () => new ApiError({ status: 403, mensaje: 'El registro no está disponible en este entorno.' }),
+      );
+    }
+    return this.session.registrarDemo(datos);
   }
 
   logout(): void {
-    localStorage.removeItem(this.keySesion);
-    this.router.navigate(['/auth/login']);
+    this.session.logout();
   }
 
+  /**
+   * Ruta de aterrizaje según el rol.
+   *
+   * `Técnico de Mantenimiento` y `Técnico Mantenimiento` son el mismo rol
+   * escrito de dos formas en los datos; se normalizan aquí en vez de
+   * repetir la comprobación en el guard, en el sidebar y en el login.
+   */
   obtenerRutaInicialPorRol(): string {
-    const usuario = this.obtenerUsuarioActual();
-    const rol = usuario?.rol || '';
+    const rol = this.normalizarRol(this.session.usuario()?.rol ?? '');
+    switch (rol) {
+      case 'Administrador':
+      case 'Supervisor':
+      case 'Auditor':
+        return '/app/panel';
+      case 'Operario':
+      case 'Operador':
+        return '/app/recepcion/recepcion-mercancias';
+      case 'TecnicoMantenimiento':
+        return '/app/programacion';
+      default:
+        return '/app/gestion/inventario';
+    }
+  }
 
-    if (rol === 'Administrador' || rol === 'Supervisor' || rol === 'Auditor') {
-      return '/app/panel';
+  /** Dos escrituras del mismo rol convergen a una sola clave. */
+  normalizarRol(rol: string): string {
+    const limpio = rol.trim();
+    if (limpio === 'Técnico de Mantenimiento' || limpio === 'Técnico Mantenimiento') {
+      return 'TecnicoMantenimiento';
     }
-    if (rol === 'Operario' || rol === 'Operador') {
-      return '/app/recepcion/recepcion-mercancias';
-    }
-    if (rol === 'Técnico de Mantenimiento' || rol === 'Técnico Mantenimiento') {
-      return '/app/programacion';
-    }
-
-    return '/app/gestion/inventario';
+    return limpio;
   }
 }

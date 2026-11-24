@@ -1,21 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Services } from './services';
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-describe('Services', () => {
-  let component: Services;
-  let fixture: ComponentFixture<Services>;
+import { RolesUsuariosService } from './services';
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Services],
-    }).compileComponents();
+describe('RolesUsuariosService', () => {
+  let service: RolesUsuariosService;
 
-    fixture = TestBed.createComponent(Services);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      // El servicio se obtiene con `inject`, no con `createComponent`: un
+      // servicio no es un componente y no se puede instanciar como tal.
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+
+    service = TestBed.inject(RolesUsuariosService);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(service).toBeTruthy();
   });
 });

@@ -80,6 +80,7 @@ export class IncidenciasComponent implements OnInit {
       alert('Por favor complete los campos obligatorios.');
       return;
     }
+    
 
     const ahora = new Date();
     const idNum = 100 + this.listaIncidencias.length + 1;
