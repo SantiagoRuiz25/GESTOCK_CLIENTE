@@ -36,10 +36,6 @@
             <span class="badge-status" [ngClass]="{ 'active': bodega.activa }">
               {{ bodega.activa ? 'Activa' : 'Inactiva' }}
             </span>
-            <label class="switch" title="Estado de la bodega" (click)="$event.stopPropagation()">
-              <input type="checkbox" [checked]="bodega.activa" disabled title="Estado registrado en el MID">
-              <span class="slider round"></span>
-            </label>
           </div>
         </div>
 
@@ -74,7 +70,7 @@
 <div class="modal-overlay animate-fade" *ngIf="mostrarModal()">
   <div class="modal-content">
     <div class="modal-header">
-      <h3><i class="fas fa-plus-circle"></i> Registrar Nueva Bodega</h3>
+      <h3><i class="fas fa-plus-circle"></i> {{ idEnEdicion() === null ? 'Registrar Nueva Bodega' : 'Editar Bodega' }}</h3>
       <p class="text-subtitle-sm">Completa los datos para habilitar el espacio logístico</p>
     </div>
     
@@ -134,7 +130,12 @@
     <p>Teléfono: {{ bodega.telefono }}</p>
     <p>Capacidad máxima: {{ bodega.capacidad | number }} un.</p>
     <div class="modal-actions">
-      <button type="button" class="btn-cancelar" (click)="cerrarModalDetalle()">Cerrar</button>
+      <button type="button" class="btn-cancelar" [disabled]="desactivando()" (click)="cerrarModalDetalle()">Cerrar</button>
+      <button type="button" class="btn-crear" [disabled]="desactivando()" (click)="abrirFormulario(bodega)">Editar</button>
+      <button type="button" class="btn-cancelar" *ngIf="bodega.activa" [disabled]="desactivando()" (click)="desactivarBodega(bodega)">
+        {{ desactivando() ? 'Desactivando…' : 'Desactivar' }}
+      </button>
+      <p *ngIf="errorDetalle()" role="alert">{{ errorDetalle() }}</p>
     </div>
   </div>
 </div>

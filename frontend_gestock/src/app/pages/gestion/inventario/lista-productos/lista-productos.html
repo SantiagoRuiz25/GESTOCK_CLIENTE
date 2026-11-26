@@ -243,7 +243,9 @@
               >
                 <option [ngValue]="0" disabled>Selecciona una bodega…</option>
                 @for (bod of bodegas(); track bod.id) {
-                  <option [ngValue]="bod.id">{{ bod.nombre }}</option>
+                  @if (bod.activa || bod.id === producto.bodegaId) {
+                    <option [ngValue]="bod.id">{{ bod.nombre }}</option>
+                  }
                 }
               </select>
             </div>

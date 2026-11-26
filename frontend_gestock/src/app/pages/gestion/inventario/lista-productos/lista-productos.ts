@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { InventarioService } from '../../../../core/services/inventario.service';
 import { ToastService } from '../../../../core/services/toast.service';
@@ -115,13 +116,15 @@ export class ListaProductosComponent implements OnInit {
     this.inventario.listarProductos().subscribe({
       error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar los productos.'),
     });
-
-    this.inventario.listarBodegas().subscribe({
-      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar las bodegas.'),
-    });
   }
 
   abrirModalEditar(producto: Producto): void {
+    this.inventario.listarCategorias().subscribe({
+      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar las categorías.'),
+    });
+    this.inventario.listarBodegas().subscribe({
+      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar las bodegas.'),
+    });
     this.idEnEdicion.set(producto.id);
     this.productoEnEdicion.set(producto);
     this.fNombre.set(producto.nombre);
@@ -193,32 +196,37 @@ export class ListaProductosComponent implements OnInit {
             stockMinimo: this.fStockMinimo(),
           });
 
-    peticion.subscribe({
-      next: () => {
-        this.toast.exito(esAlta ? 'Producto creado exitosamente.' : 'Producto actualizado exitosamente.');
-        this.cerrarModal();
-      },
-      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudo guardar el producto.'),
-      complete: () => this.guardando.set(false),
-    });
+          peticion.pipe(finalize(() => this.guardando.set(false))).subscribe({
+            next: () => {
+             this.toast.exito(
+              esAlta ? 'Producto creado exitosamente.' : 'Producto actualizado exitosamente.',
+            );
+            this.cerrarModal();
+          },
+          error: (err: unknown) => {
+            this.toast.errorDesdeApi(err, 'No se pudo guardar el producto.');
+          },
+        });
   }
 
-  ejecutarEliminacion(): void {
-    const producto = this.productoAEliminar();
-    if (!producto || this.guardando()) {
-      return;
-    }
+ejecutarEliminacion(): void {
+  const producto = this.productoAEliminar();
+  if (!producto || this.guardando()) {
+    return;
+  }
 
-    this.guardando.set(true);
-    this.inventario.eliminarProducto(producto.id).subscribe({
+  this.guardando.set(true);
+  this.inventario.eliminarProducto(producto.id)
+    .pipe(finalize(() => this.guardando.set(false)))
+    .subscribe({
       next: () => {
         this.toast.exito('Producto eliminado exitosamente.');
         this.productoAEliminar.set(null);
       },
-      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudo eliminar el producto.'),
-      complete: () => this.guardando.set(false),
+      error: (err: unknown) =>
+        this.toast.errorDesdeApi(err, 'No se pudo eliminar el producto.'),
     });
-  }
+}
 
   /** Clase CSS del badge de stock; la decisión vive en el dominio, no en el HTML. */
   claseStock(producto: Producto): string {

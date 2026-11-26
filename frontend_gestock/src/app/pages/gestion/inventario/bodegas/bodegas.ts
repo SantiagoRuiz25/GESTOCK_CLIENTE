@@ -63,8 +63,23 @@ export class BodegasComponent implements OnInit {
       });
   }
 
-  abrirFormulario(): void {
+  readonly idEnEdicion = signal<number | null>(null);
+  readonly desactivando = signal(false);
+  readonly errorDetalle = signal('');
+
+  abrirFormulario(bodega?: Bodega): void {
+    this.idEnEdicion.set(bodega?.id ?? null);
+    this.nuevaBodega = {
+      nombre: bodega?.nombre ?? '',
+      codigo: bodega?.codigo ?? '',
+      ciudad: bodega?.ciudad ?? '',
+      direccion: bodega?.direccion ?? '',
+      responsable: bodega?.responsable ?? '',
+      telefono: bodega?.telefono ?? '',
+      capacidad: bodega?.capacidad ?? 0,
+    };
     this.errorFormulario.set('');
+    this.cerrarModalDetalle();
     this.mostrarModal.set(true);
   }
 
@@ -72,29 +87,52 @@ export class BodegasComponent implements OnInit {
     if (form.invalid || this.guardando()) return;
 
     const { capacidad, ...campos } = this.nuevaBodega;
+    const datos = { ...campos, capacidad_maxima: capacidad };
+    const id = this.idEnEdicion();
+    const peticion = id === null
+      ? this.http.post<{ Data: BodegaApi }>(this.url, datos)
+      : this.http.put<{ Data: BodegaApi }>(`${this.url}/${id}`, datos);
+
     this.errorFormulario.set('');
     this.guardando.set(true);
-
-    this.http.post<{ Data: BodegaApi }>(this.url, {
-      ...campos,
-      capacidad_maxima: capacidad,
-    }).pipe(finalize(() => this.guardando.set(false))).subscribe({
+    peticion.pipe(finalize(() => this.guardando.set(false))).subscribe({
       next: ({ Data }) => {
-        const creada = this.convertirBodega(Data);
-        this.bodegas.update((lista) => [creada, ...lista]);
-        form.resetForm({
-          nombre: '', codigo: '', ciudad: '', direccion: '',
-          responsable: '', telefono: '', capacidad: 0,
-        });
+        const guardada = this.convertirBodega(Data);
+        this.bodegas.update((lista) => id === null
+          ? [guardada, ...lista]
+          : lista.map((bodega) => bodega.id === id ? guardada : bodega));
         this.mostrarModal.set(false);
       },
       error: (error: unknown) => {
-        const mensaje = error instanceof HttpErrorResponse ? error.error?.Message : undefined;
-        this.errorFormulario.set(
-          typeof mensaje === 'string' ? mensaje : 'No se pudo guardar la bodega.'
-        );
+        this.errorFormulario.set(this.mensajeError(error, 'No se pudo guardar la bodega.'));
       },
     });
+  }
+
+  desactivarBodega(bodega: Bodega): void {
+    if (!bodega.activa || this.desactivando()) return;
+    if (!window.confirm(`¿Desactivar la bodega ${bodega.nombre}?`)) return;
+
+    this.errorDetalle.set('');
+    this.desactivando.set(true);
+    this.http.delete(`${this.url}/${bodega.id}`)
+      .pipe(finalize(() => this.desactivando.set(false)))
+      .subscribe({
+        next: () => {
+          const inactiva = { ...bodega, activa: false };
+          this.bodegas.update((lista) =>
+            lista.map((actual) => actual.id === bodega.id ? inactiva : actual));
+          this.bodegaSeleccionada.set(inactiva);
+        },
+        error: (error: unknown) => {
+          this.errorDetalle.set(this.mensajeError(error, 'No se pudo desactivar la bodega.'));
+        },
+      });
+  }
+
+  private mensajeError(error: unknown, alternativa: string): string {
+    const mensaje = error instanceof HttpErrorResponse ? error.error?.Message : undefined;
+    return typeof mensaje === 'string' ? mensaje : alternativa;
   }
 
   private convertirBodega({ id_bodega, capacidad_maxima, activo, ...datos }: BodegaApi): Bodega {
@@ -116,6 +154,7 @@ export class BodegasComponent implements OnInit {
     
     // Muestra en formato JSON limpio la bodega seleccionada y sus productos en la consola
 
+    this.errorDetalle.set('');
     this.bodegaSeleccionada.set(bodega);
     this.mostrarModalDetalle.set(true);
   }
