@@ -1,0 +1,141 @@
+<div class="bodegas-container animate-fade">
+  
+  <!-- Cabecera de la sección -->
+  <div class="bodegas-header">
+    <div>
+      <h2>Listado y Control de Bodegas</h2>
+      <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación. Haz clic en una bodega para ver sus datos.</p>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <span class="bodegas-count">{{ bodegas().length }} Registradas</span>
+      <button class="btn-nueva" [disabled]="cargando() || !!errorListado()" (click)="abrirFormulario()">
+        <i class="fas fa-warehouse"></i> + Nueva Bodega
+      </button>
+    </div>
+  </div>
+
+  <!-- Cuadrícula de Tarjetas de Bodegas -->
+  <p *ngIf="cargando()" role="status">Cargando bodegas…</p>
+  <p *ngIf="errorListado()" role="alert">{{ errorListado() }}</p>
+  <p *ngIf="!cargando() && !errorListado() && bodegas().length === 0">Aún no hay bodegas registradas.</p>
+  <div class="bodegas-grid">
+    @for (bodega of bodegas(); track bodega.id) {
+      <div class="bodega-card" [ngClass]="{ 'inactiva': !bodega.activa }" (click)="verDetalleBodega(bodega, $event)">
+        
+        <!-- Header de la tarjeta -->
+        <div class="card-header">
+          <div class="bodega-info-main">
+            <div class="bodega-icon">{{ bodega.icono }}</div>
+            <div>
+              <h3>{{ bodega.nombre }}</h3>
+              <span class="bodega-ciudad">📍 {{ bodega.ciudad }} ({{ bodega.codigo }})</span>
+            </div>
+          </div>
+
+          <div class="switch-container">
+            <span class="badge-status" [ngClass]="{ 'active': bodega.activa }">
+              {{ bodega.activa ? 'Activa' : 'Inactiva' }}
+            </span>
+          </div>
+        </div>
+
+        <hr class="card-divider">
+
+        <!-- Cuerpo de detalles -->
+        <div class="card-body">
+          <div class="detail-row">
+            <span class="label"><i class="fas fa-map-marked-alt text-muted"></i> Dirección:</span>
+            <span class="value">{{ bodega.direccion }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label"><i class="fas fa-user-shield text-muted"></i> Responsable:</span>
+            <span class="value">{{ bodega.responsable }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label"><i class="fas fa-phone-alt text-muted"></i> Teléfono:</span>
+            <span class="value">{{ bodega.telefono }}</span>
+          </div>
+        </div>
+
+        <p>Capacidad máxima: {{ bodega.capacidad | number }} un.</p>
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL DE NUEVA BODEGA (ANIMADO Y OSCURO) -->
+<!-- ========================================== -->
+<div class="modal-overlay animate-fade" *ngIf="mostrarModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-plus-circle"></i> {{ idEnEdicion() === null ? 'Registrar Nueva Bodega' : 'Editar Bodega' }}</h3>
+      <p class="text-subtitle-sm">Completa los datos para habilitar el espacio logístico</p>
+    </div>
+    
+    <form #f="ngForm" (ngSubmit)="crearBodega(f)" class="modal-form">
+      <div class="input-group">
+        <label class="form-label">Nombre de Bodega</label>
+        <input type="text" [(ngModel)]="nuevaBodega.nombre" name="nombre" class="dark-input w-100" placeholder="Ej. Bodega Principal" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Código</label>
+        <input type="text" [(ngModel)]="nuevaBodega.codigo" name="codigo" class="dark-input w-100" placeholder="Ej. BOD-004" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Dirección</label>
+        <input type="text" [(ngModel)]="nuevaBodega.direccion" name="direccion" class="dark-input w-100" placeholder="Ej. Calle 100 # 15-20" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Ciudad</label>
+        <input type="text" [(ngModel)]="nuevaBodega.ciudad" name="ciudad" class="dark-input w-100" placeholder="Ej. Yopal" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Teléfono</label>
+        <input type="text" [(ngModel)]="nuevaBodega.telefono" name="telefono" class="dark-input w-100" placeholder="Ej. 3101234567" required>
+      </div>
+
+      <div class="input-group">
+        <label class="form-label">Responsable</label>
+        <input type="text" [(ngModel)]="nuevaBodega.responsable" name="responsable" class="dark-input w-100" placeholder="Ej. Juan Pérez" required>
+      </div>
+
+      <div class="input-group full-width">
+        <label class="form-label">Capacidad Máxima (Unidades)</label>
+        <input type="number" [(ngModel)]="nuevaBodega.capacidad" name="capacidad" min="1" step="1" class="dark-input w-100" placeholder="Ej. 10000" required>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-cancelar" [disabled]="guardando()" (click)="mostrarModal.set(false)">Cancelar</button>
+        <p *ngIf="errorFormulario()" role="alert">{{ errorFormulario() }}</p>
+        <button type="submit" class="btn-crear" [disabled]="f.invalid || guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar Bodega' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Detalle de la bodega -->
+<div class="modal-overlay animate-fade" *ngIf="mostrarModalDetalle()">
+  <div class="modal-content" *ngIf="bodegaSeleccionada() as bodega">
+    <div class="modal-header"><h3>{{ bodega.nombre }} ({{ bodega.codigo }})</h3></div>
+    <p>{{ bodega.direccion }}, {{ bodega.ciudad }}</p>
+    <p>Responsable: {{ bodega.responsable }}</p>
+    <p>Teléfono: {{ bodega.telefono }}</p>
+    <p>Capacidad máxima: {{ bodega.capacidad | number }} un.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancelar" [disabled]="desactivando()" (click)="cerrarModalDetalle()">Cerrar</button>
+      <button type="button" class="btn-crear" [disabled]="desactivando()" (click)="abrirFormulario(bodega)">Editar</button>
+      <button type="button" class="btn-cancelar" *ngIf="bodega.activa" [disabled]="desactivando()" (click)="desactivarBodega(bodega)">
+        {{ desactivando() ? 'Desactivando…' : 'Desactivar' }}
+      </button>
+      <p *ngIf="errorDetalle()" role="alert">{{ errorDetalle() }}</p>
+    </div>
+  </div>
+</div>

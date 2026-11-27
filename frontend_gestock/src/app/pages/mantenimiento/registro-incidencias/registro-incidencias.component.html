@@ -1,0 +1,107 @@
+<div class="inventory-container">
+  <!-- Cabecera de la Sección -->
+  <div class="section-header">
+    <div class="header-badge-container">
+      <span class="badge-active">Monitoreo Activo</span>
+      <h2>Registro de Incidencias</h2>
+      <p>Reporta y gestiona fallos técnicos o anomalías operativas del sistema Gestock.</p>
+    </div>
+  </div>
+
+  <div class="incidencias-layout">
+    <!-- Formulario de Reportar Incidencia -->
+    <div class="form-card">
+      <div class="card-title">
+        <span>⚠️</span>
+        <h3>Reportar Incidencia</h3>
+      </div>
+      <form (ngSubmit)="guardarIncidencia()">
+        <div class="form-group">
+          <label>Título de la Incidencia</label>
+          <input type="text" [(ngModel)]="nuevaIncidencia.titulo" name="titulo" placeholder="Ej. Fallo en sensor de temperatura" required class="form-input">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nivel de Prioridad</label>
+            <select [(ngModel)]="nuevaIncidencia.prioridad" name="prioridad" class="form-input">
+              <option value="Baja">🟢 Baja</option>
+              <option value="Media">🟡 Media</option>
+              <option value="Alta">🟠 Alta</option>
+              <option value="Crítica">🔴 Crítica</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Reportado por</label>
+            <input type="text" [(ngModel)]="nuevaIncidencia.reportadoPor" name="reportadoPor" placeholder="Ej. Maicol Nore" required class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción Detallada</label>
+          <textarea [(ngModel)]="nuevaIncidencia.descripcion" name="descripcion" placeholder="Describe lo sucedido, equipo afectado y pasos para reproducir..." rows="4" required class="form-textarea"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Estado Inicial</label>
+          <select [(ngModel)]="nuevaIncidencia.estado" name="estado" class="form-input">
+            <option value="En Revisión">En Revisión</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Resuelto">Resuelto</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit-incidencia">
+          Registrar Incidencia →
+        </button>
+      </form>
+    </div>
+
+    <!-- Historial de Reportes -->
+    <div class="history-card">
+      <div class="card-title">
+        <span>📄</span>
+        <h3>Historial de Reportes</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>zorro</th>
+              <th>PRIORIDAD</th>
+              <th>REPORTADO POR</th>
+              <th>ESTADO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of listaIncidencias">
+              <td><span class="badge-code">{{ item.id }}</span></td>
+              <td class="font-medium" title="{{ item.descripcion }}">{{ item.titulo }}</td>
+              <td>
+                <span class="priority-badge" [ngClass]="{
+                  'prio-baja': item.prioridad === 'Baja',
+                  'prio-media': item.prioridad === 'Media',
+                  'prio-alta': item.prioridad === 'Alta',
+                  'prio-critica': item.prioridad === 'Crítica'
+                }">
+                  {{ item.prioridad }}
+                </span>
+              </td>
+              <td>{{ item.reportadoPor }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="{
+                  'status-revision': item.estado === 'En Revisión',
+                  'status-pendiente': item.estado === 'Pendiente',
+                  'status-resuelto': item.estado === 'Resuelto'
+                }">
+                  {{ item.estado }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

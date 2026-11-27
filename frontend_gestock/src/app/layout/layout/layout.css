@@ -1,0 +1,69 @@
+/* Layout Principal Gestock Pro */
+.sofia-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 64px 1fr 40px;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar content"
+    "sidebar footer";
+  height: 100vh;
+  background-color: #070a12;
+  color: #f8fafc;
+  overflow: hidden; /* Evita scroll general en la ventana */
+}
+
+/* 1. Sidebar fijo */
+.sidebar-wrapper {
+  grid-area: sidebar;
+  height: 100%;
+  background-color: #0d121d;
+  overflow: hidden;
+}
+
+/* 2. Header fijo arriba (CORREGIDO: Desbloquea elementos flotantes y menús) */
+.header-container {
+  grid-area: header;
+  height: 100%;
+  overflow: visible !important; /* Permite que el desplegable del perfil sobresalga */
+  position: relative;
+  z-index: 1000; /* Hace que el menú quede por encima de las tarjetas y la tabla */
+}
+
+/* 3. Única zona con scroll (Aquí es donde se mueven las tarjetas y tablas) */
+.content-container {
+  grid-area: content;
+  overflow-y: auto;
+  overflow-x: hidden; /* Evita que un elemento ancho genere scroll horizontal */
+  padding: 32px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0; /* Permite que el contenido se reduzca en vez de forzar el ancho del grid */
+}
+
+/* 4. Footer fijo abajo */
+.footer-container {
+  grid-area: footer;
+  background-color: #060910;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsivo: el sidebar se colapsa a modo ícono */
+@media (max-width: 768px) {
+  .sofia-layout {
+    grid-template-columns: 65px 1fr;
+  }
+
+  .content-container {
+    padding: 20px;
+  }
+}
+
+/* Responsivo: pantallas muy angostas */
+@media (max-width: 480px) {
+  .content-container {
+    padding: 14px;
+  }
+}

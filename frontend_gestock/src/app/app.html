@@ -1,0 +1,7 @@
+<!--
+  El contenedor de toasts vive en la raíz y no en el layout a propósito: así
+  las notificaciones también funcionan en la landing y en las pantallas de
+  autenticación, que están fuera del `app` y antes no tenían forma de avisar.
+-->
+<router-outlet></router-outlet>
+<app-toast-container></app-toast-container>

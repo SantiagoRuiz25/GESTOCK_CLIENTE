@@ -1,0 +1,756 @@
+/* ==========================================================================
+   LISTA DE PRODUCTOS — MÓDULO DE REFERENCIA
+   Usa los tokens globales de styles.css en lugar de colores literales.
+   ========================================================================== */
+
+.contenedor-productos {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ---------------------------- CABECERA ---------------------------- */
+
+.cabecera-productos {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.titulos-cabecera h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--gs-text);
+}
+
+.texto-subtitulo {
+  margin: 0;
+  color: var(--gs-text-tenue);
+  font-size: 0.9rem;
+}
+
+.contador-productos {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--gs-surface);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-full);
+  font-size: 0.85rem;
+  color: var(--gs-text-suave);
+  min-height: 2.25rem;
+}
+
+.contador-dato {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--gs-text);
+}
+
+.contador-separador {
+  color: var(--gs-border);
+}
+
+.contador-alerta {
+  color: var(--gs-aviso);
+  font-weight: 600;
+}
+
+/* ---------------------------- BÚSQUEDA ---------------------------- */
+
+.envoltorio-input-busqueda {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icono-busqueda {
+  position: absolute;
+  left: 0.9rem;
+  font-size: 0.9rem;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.input-busqueda {
+  width: 100%;
+  padding: 0.7rem 0.9rem 0.7rem 2.5rem;
+  background: var(--gs-bg-elevado);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-md);
+  color: var(--gs-text);
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition:
+    border-color var(--gs-transicion-rapida) var(--gs-curva),
+    box-shadow var(--gs-transicion-rapida) var(--gs-curva);
+}
+
+.input-busqueda::placeholder {
+  color: var(--gs-text-tenue);
+}
+
+.input-busqueda:focus {
+  outline: none;
+  border-color: var(--gs-primary);
+  box-shadow: 0 0 0 3px var(--gs-primary-suave);
+}
+
+/* ---------------------------- ESQUELETOS ---------------------------- */
+
+.gs-skeleton-filas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--gs-bg-elevado);
+  border: 1px solid var(--gs-border-sutil);
+  border-radius: var(--gs-radio-md);
+}
+
+.gs-skeleton-fila {
+  display: grid;
+  grid-template-columns: 5rem 1fr 7rem 8rem 5rem 4rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ---------------------------- TABLA ---------------------------- */
+
+.tabla-responsiva {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--gs-bg-elevado);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-lg);
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabla-productos {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+}
+
+.tabla-productos thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.9rem 1rem;
+  background: var(--gs-surface);
+  color: var(--gs-text-tenue);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+  border-bottom: 1px solid var(--gs-border);
+  white-space: nowrap;
+}
+
+.tabla-productos tbody td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--gs-border-sutil);
+  color: var(--gs-text-suave);
+  font-size: 0.88rem;
+  vertical-align: middle;
+}
+
+.fila-tabla {
+  transition: background-color var(--gs-transicion-rapida) var(--gs-curva);
+}
+
+.fila-tabla:hover {
+  background: var(--gs-surface-hover);
+}
+
+.fila-tabla:last-child td {
+  border-bottom: none;
+}
+
+.col-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.texto-centro {
+  text-align: center;
+}
+
+/* ---------------------------- INSIGNIAS ---------------------------- */
+
+.insignia-codigo {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: var(--gs-primary-suave);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--gs-radio-xs);
+  color: var(--gs-accent);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.insignia-categoria {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  background: var(--gs-bg-elevado);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-full);
+  color: var(--gs-text-suave);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.texto-bodega-info {
+  color: var(--gs-text-tenue);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.insignia-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--gs-radio-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.punto-stock {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.stock-suficiente {
+  background: var(--gs-exito-suave);
+  color: var(--gs-exito);
+}
+
+.stock-bajo {
+  background: var(--gs-aviso-suave);
+  color: var(--gs-aviso);
+}
+
+.stock-agotado {
+  background: var(--gs-error-suave);
+  color: var(--gs-error);
+}
+
+/* ---------------------------- ACCIONES ---------------------------- */
+
+.celda-acciones {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.btn-accion-interactiva {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--gs-bg-elevado);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-sm);
+  color: var(--gs-text-suave);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn-editar-prod:hover:not(:disabled) {
+  background: var(--gs-primary-suave);
+  border-color: var(--gs-primary);
+  color: var(--gs-accent);
+  transform: translateY(-1px);
+}
+
+.btn-eliminar-prod:hover:not(:disabled) {
+  background: var(--gs-error-suave);
+  border-color: var(--gs-error);
+  color: var(--gs-error);
+  transform: translateY(-1px);
+}
+
+/* ---------------------------- ESTADO VACÍO ---------------------------- */
+
+.estado-vacio {
+  padding: 3rem 1.5rem !important;
+  text-align: center;
+}
+
+.estado-vacio-icono {
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.55;
+}
+
+.estado-vacio-titulo {
+  margin: 0 0 0.35rem;
+  color: var(--gs-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.estado-vacio-texto {
+  margin: 0 0 1rem;
+  color: var(--gs-text-tenue);
+  font-size: 0.87rem;
+}
+
+.btn-enlace {
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  border: 1px solid var(--gs-primary);
+  border-radius: var(--gs-radio-sm);
+  color: var(--gs-accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-enlace:hover {
+  background: var(--gs-primary-suave);
+}
+
+/* ---------------------------- MODALES ---------------------------- */
+
+.superposicion-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--gs-z-modal);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 1rem;
+  overflow-y: auto;
+  background: rgba(2, 6, 23, 0.78);
+  backdrop-filter: blur(4px);
+  animation: fundido-entrada var(--gs-transicion-media) var(--gs-curva) both;
+}
+
+.tarjeta-modal {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  background: var(--gs-surface);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-lg);
+  box-shadow: var(--gs-sombra-lg);
+}
+
+.modal-confirmacion {
+  max-width: 420px;
+  padding: 1.75rem;
+  text-align: center;
+}
+
+.modal-confirmacion h3 {
+  margin: 0 0 0.5rem;
+  color: var(--gs-text);
+  font-size: 1.1rem;
+}
+
+.modal-confirmacion p {
+  margin: 0 0 1.5rem;
+  color: var(--gs-text-suave);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.icono-peligro {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cabecera-modal {
+  position: relative;
+  padding: 1.35rem 1.5rem 0.75rem;
+  border-bottom: 1px solid var(--gs-border-sutil);
+}
+
+.cabecera-modal h3 {
+  margin: 0 0 0.25rem;
+  color: var(--gs-text);
+  font-size: 1.15rem;
+}
+
+.cabecera-modal p {
+  margin: 0;
+  color: var(--gs-text-tenue);
+  font-size: 0.85rem;
+}
+
+.btn-cerrar-modal {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--gs-radio-sm);
+  color: var(--gs-text-tenue);
+  font-size: 1rem;
+}
+
+.btn-cerrar-modal:hover {
+  background: var(--gs-bg-elevado);
+  border-color: var(--gs-border);
+  color: var(--gs-text);
+}
+
+/* ---------------------------- FORMULARIO ---------------------------- */
+
+.rejilla-formulario-modal {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1.35rem 1.5rem;
+}
+
+.grupo-formulario-completo {
+  grid-column: 1 / -1;
+}
+
+.etiqueta-formulario-modal {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--gs-text-suave);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.obligatorio {
+  color: var(--gs-error);
+}
+
+.input-oscuro-modal {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: var(--gs-bg-elevado);
+  border: 1px solid var(--gs-border);
+  border-radius: var(--gs-radio-sm);
+  color: var(--gs-text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition:
+    border-color var(--gs-transicion-rapida) var(--gs-curva),
+    box-shadow var(--gs-transicion-rapida) var(--gs-curva);
+}
+
+.input-oscuro-modal:focus {
+  outline: none;
+  border-color: var(--gs-primary);
+  box-shadow: 0 0 0 3px var(--gs-primary-suave);
+}
+
+.input-oscuro-modal:read-only {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.input-oscuro-modal.campo-invalido {
+  border-color: var(--gs-error);
+  box-shadow: 0 0 0 3px var(--gs-error-suave);
+}
+
+.select-campo {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--gs-text-tenue) 50%),
+    linear-gradient(135deg, var(--gs-text-tenue) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.1rem) 1.15rem,
+    calc(100% - 0.8rem) 1.15rem;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.2rem;
+}
+
+.error-campo {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--gs-error);
+  font-size: 0.75rem;
+}
+
+.pista-campo {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--gs-text-tenue);
+  font-size: 0.72rem;
+}
+
+/* ---------------------------- ACCIONES DEL MODAL ---------------------------- */
+
+.acciones-modal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1rem 1.5rem 1.35rem;
+  border-top: 1px solid var(--gs-border-sutil);
+}
+
+.modal-confirmacion .acciones-modal {
+  justify-content: center;
+  border-top: none;
+  padding: 0;
+}
+
+.btn-modal-cancelar,
+.btn-modal-enviar,
+.btn-modal-peligro {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--gs-radio-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.btn-modal-cancelar {
+  background: transparent;
+  border: 1px solid var(--gs-border);
+  color: var(--gs-text-suave);
+}
+
+.btn-modal-cancelar:hover:not(:disabled) {
+  background: var(--gs-bg-elevado);
+  color: var(--gs-text);
+}
+
+.btn-modal-enviar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--gs-primary);
+  border: 1px solid var(--gs-primary);
+  color: #fff;
+}
+
+.btn-modal-enviar:hover:not(:disabled) {
+  background: var(--gs-primary-fuerte);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -6px rgba(59, 130, 246, 0.6);
+}
+
+.btn-modal-peligro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--gs-error);
+  border: 1px solid var(--gs-error);
+  color: #fff;
+}
+
+.btn-modal-peligro:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -6px rgba(239, 68, 68, 0.55);
+}
+
+.spinner-mini {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------------------------- ANIMACIONES ---------------------------- */
+
+.animate-slide-up {
+  animation: slidear-arriba var(--gs-transicion-lenta) var(--gs-curva-entrada) both;
+}
+
+.animar-desvanecer {
+  animation: aparecer var(--gs-transicion-media) var(--gs-curva) both;
+}
+
+@keyframes slidear-arriba {
+  from {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fundido-entrada {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   --------------------------------------------------------------------------
+   Por debajo de 720px la tabla deja de ser tabla: cada celda se convierte en
+   una fila apilada usando `data-label`, que es lo que ya tenía el CSS
+   original pero sin el `display: block` sobre los `<td>`, que es justamente lo
+   que lo hacía funcionar.
+   ========================================================================== */
+
+@media (max-width: 720px) {
+  .contenedor-productos {
+    padding: 1rem 0.75rem;
+    gap: 1rem;
+  }
+
+  .titulos-cabecera h2 {
+    font-size: 1.3rem;
+  }
+
+  .cabecera-productos {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contador-productos {
+    justify-content: center;
+  }
+
+  .rejilla-formulario-modal {
+    grid-template-columns: 1fr;
+  }
+
+  .tabla-responsiva {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+  }
+
+  .tabla-productos {
+    min-width: 0;
+  }
+
+  .tabla-productos thead {
+    /* La cabecera se oculta: cada celda lleva su propio data-label. */
+    display: none;
+  }
+
+  .tabla-productos,
+  .tabla-productos tbody,
+  .tabla-productos tr,
+  .tabla-productos td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla-productos tbody tr {
+    margin-bottom: 0.75rem;
+    background: var(--gs-bg-elevado);
+    border: 1px solid var(--gs-border);
+    border-radius: var(--gs-radio-md);
+    overflow: hidden;
+  }
+
+  .tabla-productos tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--gs-border-sutil);
+    text-align: right;
+  }
+
+  .tabla-productos tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--gs-text-tenue);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+  }
+
+  .tabla-productos tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .celda-acciones {
+    justify-content: flex-end;
+  }
+
+  .celda-acciones::before {
+    display: none;
+  }
+
+  .btn-accion-interactiva {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .gs-skeleton-fila {
+    grid-template-columns: 4rem 1fr;
+  }
+
+  .gs-skeleton-fila > span:nth-child(n + 3) {
+    display: none;
+  }
+
+  .superposicion-modal {
+    padding: 1rem 0.75rem;
+    align-items: flex-end;
+  }
+
+  .acciones-modal {
+    flex-direction: column-reverse;
+  }
+
+  .acciones-modal button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* En móvil el esqueleto se simplifica: seis columnas no caben. */
+@media (max-width: 480px) {
+  .estado-vacio {
+    padding: 2rem 1rem !important;
+  }
+
+  .modal-confirmacion {
+    padding: 1.35rem;
+  }
+}
