@@ -1,158 +1,138 @@
-/* Fondo oscuro translúcido que cubre la pantalla manteniendo de fondo el componente de empresas */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(5, 9, 20, 0.75);
-  backdrop-filter: blur(3px);
+/* Contenedor principal para centrar la tarjeta dentro del layout */
+:host {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
-  box-sizing: border-box;
-}
-
-/* Tarjeta flotante con estilo idéntico al de Gestock */
-.modal-card {
-  background: #111827;
-  border: 1px solid #1f2937;
-  border-radius: 12px;
-  padding: 24px 28px;
+  min-height: calc(100vh - 120px);
   width: 100%;
-  max-width: 450px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  padding: 2rem 1rem;
   box-sizing: border-box;
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
+/* Capa que difumina TODO lo que está detrás de esta vista */
+:host::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(2, 6, 23, 0.45);
+  z-index: 0;
 }
 
-.modal-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+/* Tarjeta flotante, ahora por encima de la capa de blur */
+.registro-card,
+.register-card {
+  position: relative;
+  z-index: 1;
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+}
+
+.registro-card h2,
+.register-card h2 {
   color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
 }
 
-.btn-close {
-  background: transparent;
-  border: none;
+.subtitle {
   color: #94a3b8;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
+  font-size: 0.875rem;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
 }
 
-.btn-close:hover {
-  color: #ffffff;
-}
-
-.modal-subtitle {
-  margin: 0 0 16px 0;
-  font-size: 12px;
-  color: #94a3b8;
-  line-height: 1.4;
-}
-
-.alert-error {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #f87171;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  margin-bottom: 14px;
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
+/* Campos de entrada integrados */
 .form-group {
+  margin-bottom: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0.5rem;
 }
 
 .form-group label {
-  font-size: 11px;
-  color: #94a3b8;
+  color: #e2e8f0;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
-.form-control {
-  background: #1f2937;
-  border: 1px solid #374151;
-  color: #ffffff;
-  padding: 9px 12px;
-  border-radius: 6px;
-  font-size: 13px;
+.form-group input,
+.form-group select {
+  background-color: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
   outline: none;
   width: 100%;
   box-sizing: border-box;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
-.form-control:focus {
+.form-group input::placeholder {
+  color: #475569;
+}
+
+.form-group input:focus,
+.form-group select:focus {
   border-color: #3b82f6;
+  background-color: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
+.field-error {
+  color: #f87171;
+  font-size: 0.75rem;
+}
+
+/* Grilla de selects inferiores */
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 1rem;
 }
 
-.modal-actions {
+/* Botón de envío estilizado */
+.form-actions {
+  margin-top: 2rem;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
 }
 
-.btn-cancelar {
-  background: transparent;
-  border: 1px solid #374151;
-  color: #94a3b8;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-cancelar:hover {
-  background: rgba(255, 255, 255, 0.05);
+.btn-primary-action,
+.btn-submit {
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
   color: #ffffff;
-}
-
-.btn-crear {
-  background: #2563eb;
-  border: 1px solid #3b82f6;
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 6px;
-  font-size: 12px;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
-.btn-crear:hover {
-  background: #1d4ed8;
+.btn-primary-action:hover:not(:disabled),
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+  filter: brightness(1.1);
 }
 
-.btn-crear:disabled {
-  opacity: 0.6;
+.btn-primary-action:disabled,
+.btn-submit:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }

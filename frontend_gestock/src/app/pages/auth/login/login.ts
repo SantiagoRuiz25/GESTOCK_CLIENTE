@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth';
@@ -8,18 +9,23 @@ import { ApiError } from '../../../core/models/api.model';
 declare const google: any;
 
 const GOOGLE_CLIENT_ID = '863694515165-6dovpoe54dq2j63kkln7po1vuvciiqmh.apps.googleusercontent.com';
+=======
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+>>>>>>> origin/develop
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent implements OnInit {
+  private fb = inject(FormBuilder);
   private router = inject(Router);
-  private authService = inject(AuthService);
 
+<<<<<<< HEAD
   credentials = {
     email: '',
     password: '',
@@ -29,10 +35,15 @@ export class LoginComponent implements OnInit {
   
   activeField: string | null = null;
   isLoading: boolean = false;
+=======
+  loginForm!: FormGroup;
+  mostrarModalRol: boolean = false;
+>>>>>>> origin/develop
   errorMessage: string = '';
-  mouseX: number = 0;
-  mouseY: number = 0;
+  
+  private readonly ADMIN_SUPERIOR_EMAIL = 'admin@gestock.com';
 
+<<<<<<< HEAD
   private tokenClient: any;
 
   /**
@@ -179,10 +190,54 @@ export class LoginComponent implements OnInit {
     if (!this.validarEmail(email)) {
       this.errorMessage = '⚠️ Error: Debe ingresar un correo electrónico válido.';
       return;
+=======
+  ngOnInit() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      recordar: [false]
+    });
+  }
+
+  procesarLogin() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      console.warn('El formulario tiene errores de validación.');
+      return;
     }
 
-    this.isLoading = true;
+    const emailIngresado = this.loginForm.value.email.trim().toLowerCase();
+    console.log('Intentando iniciar sesión con:', emailIngresado);
 
+    if (emailIngresado === this.ADMIN_SUPERIOR_EMAIL) {
+      localStorage.setItem('user_role', 'super_admin');
+      localStorage.setItem('user_email', emailIngresado);
+      localStorage.setItem('gestock_usuario_sesion', JSON.stringify({ 
+        email: emailIngresado, 
+        rol: 'Administrador', 
+        nombre: 'Administrador Principal' 
+      }));
+      
+      this.enrutarARegistroEmpresa();
+    } else {
+      this.mostrarModalRol = true;
+>>>>>>> origin/develop
+    }
+  }
+
+  confirmarAcceso(tipoRol: 'admin' | 'usuario') {
+    const email = this.loginForm.value.email.trim().toLowerCase();
+    const nombreRol = tipoRol === 'admin' ? 'Administrador' : 'Auditor General';
+    
+    localStorage.setItem('user_email', email);
+    localStorage.setItem('user_role', tipoRol);
+    localStorage.setItem('gestock_usuario_sesion', JSON.stringify({ 
+      email: email, 
+      rol: nombreRol, 
+      nombre: 'Usuario' 
+    }));
+
+<<<<<<< HEAD
     // El `setTimeout` de 400 ms que simulaba latencia se elimina: la espera
     // ahora es la red real, y mantenerla hacía creer al usuario que el sistema
     // era más lento de lo que es.
@@ -198,6 +253,22 @@ export class LoginComponent implements OnInit {
             ? `⚠️ ${err.mensaje}`
             : '⚠️ Credenciales incorrectas. Verifica tu correo y contraseña.';
       },
+=======
+    this.mostrarModalRol = false;
+    this.enrutarARegistroEmpresa();
+  }
+
+  cancelarSeleccionRol() {
+    this.mostrarModalRol = false;
+  }
+
+  private enrutarARegistroEmpresa() {
+    console.log('Redirigiendo a registrar-empresa...');
+    
+    this.router.navigate(['/app/registrar-empresa']).catch(err => {
+      console.error('No se encontró /app/registrar-empresa, intentando ruta raíz...', err);
+      this.router.navigate(['/registrar-empresa']);
+>>>>>>> origin/develop
     });
   }
 }

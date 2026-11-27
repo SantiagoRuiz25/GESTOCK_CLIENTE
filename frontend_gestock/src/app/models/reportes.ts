@@ -34,19 +34,8 @@ export interface BodegaReporte {
   cantidadProductos: number;
   porcentajeValorTotal: number;
   ubicacion?: string;
-}
-
-export interface BodegaReporte {
-  id: number;
-  nombre: string;
-  estado?: 'Activa' | 'Inactiva';
-  valorTotal: number;
-  cantidadProductos: number;
-  porcentajeValorTotal: number;
-  ubicacion?: string;
-  // Campos para el detalle expandible
   responsable?: string;
   direccion?: string;
-  capacidadOcupada?: number; // Ej: 85 (%)
+  capacidadOcupada?: number;
   topProductos?: { nombre: string; stock: number; valor: number }[];
 }

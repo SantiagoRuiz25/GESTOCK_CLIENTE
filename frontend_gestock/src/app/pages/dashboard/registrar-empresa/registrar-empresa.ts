@@ -16,36 +16,44 @@ export class RegistrarEmpresaComponent {
   private fb = inject(FormBuilder);
   private estadisticasService = inject(EstadisticasService);
 
-  // Uso de Signals para el estado del componente (Angular moderno)
   isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
+  
+  // Propiedad añadida para solucionar el error de plantilla al reutilizar el modal
+  mostrarModalCrear: boolean = true;
 
-  // Definición del formulario con validadores reactivos
-  empresaForm: FormGroup = this.fb.group({
+  nuevaEmpresaForm: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     moneda: ['COP - Peso Colombiano', Validators.required],
     formatoFecha: ['DD/MM/YYYY', Validators.required]
   });
 
-  guardarEmpresa(): void {
+  cerrarModalCrear() {
+    this.mostrarModalCrear = false;
+    this.router.navigate(['/app/panel']).catch(() => {
+      window.location.hash = '/app/panel';
+    });
+  }
+
+  crearNuevaEmpresa(): void {
     this.errorMessage.set('');
 
-    if (this.empresaForm.invalid) {
-      this.empresaForm.markAllAsTouched();
+    if (this.nuevaEmpresaForm.invalid) {
+      this.nuevaEmpresaForm.markAllAsTouched();
       this.errorMessage.set('⚠️ Por favor, complete correctamente los campos obligatorios.');
       return;
     }
 
-    this.isLoading.set(false);
+    this.isLoading.set(true);
 
-    // Simulamos un breve respiro del hilo principal (macrotarea) para evitar bloqueos de renderizado
     setTimeout(() => {
       try {
-        const formValues = this.empresaForm.value;
+        const formValues = this.nuevaEmpresaForm.value;
+        const nuevaId = `EMP-${Date.now().toString().slice(-4)}`;
         
         const nuevaEmpresa: Empresa = {
-          id: Date.now().toString(),
+          id: nuevaId,
           nombre: formValues.nombre.trim(),
           email: formValues.email.trim(),
           moneda: formValues.moneda,
@@ -56,18 +64,38 @@ export class RegistrarEmpresaComponent {
           alertasStock: 0
         };
 
-        // Notificar al servicio
+        const localData = localStorage.getItem('gestock_empresas');
+        const empresas = localData ? JSON.parse(localData) : [];
+        
+        const empresaItem = {
+          id: nuevaId,
+          nombre: nuevaEmpresa.nombre,
+          email: nuevaEmpresa.email,
+          moneda: nuevaEmpresa.moneda,
+          formatoFecha: nuevaEmpresa.formatoFecha,
+          estado: 'Activa'
+        };
+        
+        empresas.unshift(empresaItem);
+
+        localStorage.setItem('gestock_empresas', JSON.stringify(empresas));
+        localStorage.setItem('empresa_activa', JSON.stringify(empresaItem));
+        localStorage.setItem('gestock_empresa_activa', JSON.stringify(empresaItem));
+        localStorage.setItem('empresaIdSeleccionada', nuevaId);
+
         this.estadisticasService.cambiarEmpresaActiva(nuevaEmpresa);
 
         console.log('%c[GESTOCK] Empresa creada con éxito:', 'color: #10b981; font-weight: bold;', nuevaEmpresa);
         
-        this.router.navigate(['/app/panel']);
+        this.isLoading.set(false);
+        this.router.navigate(['/app/panel']).catch(() => {
+          window.location.hash = '/app/panel';
+        });
       } catch (error) {
         console.error('[GESTOCK Error]:', error);
         this.errorMessage.set('❌ Ocurrió un error al guardar la empresa.');
         this.isLoading.set(false);
       }
     }, 300);
-    
   }
 }

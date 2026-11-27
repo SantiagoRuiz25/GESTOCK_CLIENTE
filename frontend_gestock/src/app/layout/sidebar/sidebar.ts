@@ -108,6 +108,13 @@ export class SidebarComponent implements OnInit {
       route: '/app/incidencias', 
       section: 'MANTENIMIENTO', 
       rolesPermitidos: ['Administrador', 'Supervisor', 'Operario', 'Operador', 'Técnico de Mantenimiento', 'Técnico Mantenimiento'] 
+    },
+    {
+      section: 'GESTIÓN', // o la sección donde prefieras ubicarlo ('PANEL' o 'MANTENIMIENTO')
+      label: 'Reportes',
+      icon: '📊', // O el emoji/icono que utilices
+      route: '/app/reportes',
+      rolesPermitidos: ['Administrador', 'Gerente', 'Operador'] // Ajusta según los roles que deban verlo
     }
   ];
 
