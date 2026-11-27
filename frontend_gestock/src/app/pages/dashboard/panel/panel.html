@@ -1,120 +1,141 @@
-<div class="panel-layout" (click)="cerrarMenu()">
+<div class="panel-layout">
   <div class="panel-header">
     <div class="panel-header-title">
-      <span class="panel-header-icon">📊</span>
+      <span class="panel-header-icon" aria-hidden="true">📊</span>
       <div>
         <h1>Panel</h1>
-        <!-- Subtítulo con el indicador dinámico de la empresa actual -->
-        <p class="panel-subtitle">
-          Resumen general del sistema de inventario — <span class="empresa-badge">🏢 {{ empresaActual?.nombre }}</span>
-        </p>
+        <p class="panel-subtitle">Resumen general del inventario</p>
+        @if (empresaSeleccionada(); as empresa) {
+          <span class="empresa-badge">🏢 {{ empresa.nombre }}</span>
+        }
       </div>
     </div>
 
-    <!-- Botón de acciones con menú desplegable -->
-    <div class="panel-actions-container">
-      <div class="inventory-dropdown" *ngIf="mostrarMenuInventario" (click)="$event.stopPropagation()">
-        
+    @if (resumen(); as datos) {
+      <div class="panel-actions-container">
+        @if (datos.empresas_activas.length > 0) {
+          <label for="empresa-panel">Empresa seleccionada</label>
+          <select
+            id="empresa-panel"
+            class="empresa-badge"
+            [value]="empresaId() ?? ''"
+            (change)="cambiarEmpresa($any($event.target).value)"
+          >
+            @for (empresa of datos.empresas_activas; track empresa.id) {
+              <option [value]="empresa.id">{{ empresa.nombre }}</option>
+            }
+          </select>
+        } @else {
+          <span>No hay empresas activas.</span>
+        }
       </div>
-    </div>
+    }
   </div>
 
-  <!-- Cuadrícula de Estadísticas -->
-  <div class="stats-section">
-    <div class="stat-card accent-blue">
-      <div class="stat-icon">🏷️</div>
-      <h3>Total precios</h3>
-      <p>{{ empresaActual?.totalPrecios }}</p>
-      <span class="subtext positive">{{ empresaActual?.totalPrecios }} activos</span>
-    </div>
+  @if (cargando()) {
+    <p role="status">Actualizando resumen…</p>
+  }
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+    <button type="button" (click)="cargarResumen()">Reintentar</button>
+  }
 
-    <div class="stat-card accent-green">
-      <div class="stat-icon">💰</div>
-      <h3>Valor de inventario</h3>
-      <p>${{ empresaActual?.valorInventario | number }}</p>
-      <span class="subtext positive">▲ 12% vs mes anterior</span>
-    </div>
-
-    <div class="stat-card accent-amber">
-      <div class="stat-icon">⚠️</div>
-      <h3>Alertas de stock</h3>
-      <p>{{ empresaActual?.alertasStock }}</p>
-      <span class="subtext warning">2 bajo · 2 agotado</span>
-    </div>
-
-    <div class="stat-card accent-purple">
-      <div class="stat-icon">🏬</div>
-      <h3>Bodegas activas</h3>
-      <p>{{ empresaActual?.bodegasActivas }}</p>
-    </div>
-
-    <div class="stat-card accent-cyan">
-      <div class="stat-icon">👥</div>
-      <h3>Usuarios activos</h3>
-      <p>4</p>
-    </div>
-
-    <div class="stat-card accent-pink">
-      <div class="stat-icon">📈</div>
-      <h3>Tasa de ocupación</h3>
-      <p>63%</p>
-    </div>
-  </div>
-
-  <!-- Bloques de alertas y movimientos -->
-  <div class="panel-grid">
-    <div class="section-block">
-      <div class="section-block-header">
-        <h3><span class="section-icon warning-icon">⚠️</span> Producto con stock bajo</h3>
-        <span class="section-badge warning">2 alertas</span>
+  @if (resumen(); as datos) {
+    <div class="stats-section">
+      <div class="stat-card accent-blue">
+        <div class="stat-icon">🏷️</div>
+        <h3>Productos activos</h3>
+        <p>{{ datos.productos_activos | number }}</p>
       </div>
-      <ul>
-        <li>
-          <span class="item-dot warning-dot"></span>
-          <div class="item-text">
-            <strong>Disco duro externo 1TB</strong>
-            <span>Bodega central</span>
-          </div>
-          <span class="item-value warning">3/10</span>
-        </li>
-        <li>
-          <span class="item-dot warning-dot"></span>
-          <div class="item-text">
-            <strong>Mouse inalámbrico Logitech</strong>
-            <span>Sucursal Norte</span>
-          </div>
-          <span class="item-value warning">8/20</span>
-        </li>
-      </ul>
+
+      <div class="stat-card accent-green">
+        <div class="stat-icon">💰</div>
+        <h3>Valor de inventario</h3>
+        <p>{{ datos.valor_inventario | number:'1.2-2' }}</p>
+      </div>
+
+      <div class="stat-card accent-amber">
+        <div class="stat-icon">⚠️</div>
+        <h3>Alertas de stock</h3>
+        <p>{{ datos.stock_bajo + datos.agotados }}</p>
+        <span class="subtext warning">
+          {{ datos.stock_bajo }} con stock bajo · {{ datos.agotados }} agotados
+        </span>
+      </div>
+
+      <div class="stat-card accent-purple">
+        <div class="stat-icon">🏬</div>
+        <h3>Bodegas activas</h3>
+        <p>{{ datos.bodegas_activas | number }}</p>
+      </div>
+
+      <div class="stat-card accent-cyan">
+        <div class="stat-icon">👥</div>
+        <h3>Usuarios habilitados</h3>
+        <p>{{ datos.usuarios_activos | number }}</p>
+      </div>
+
+      <div class="stat-card accent-pink">
+        <div class="stat-icon">📈</div>
+        <h3>Ocupación de bodegas activas</h3>
+        @if (datos.ocupacion_porcentaje !== null) {
+          <p>{{ datos.ocupacion_porcentaje | number:'1.0-1' }} %</p>
+          <span class="subtext">
+            {{ datos.unidades_ocupadas | number }} de {{ datos.capacidad_activa | number }} unidades
+          </span>
+        } @else {
+          <p>Sin capacidad registrada</p>
+        }
+      </div>
     </div>
 
-    <div class="section-block">
-      <div class="section-block-header">
-        <h3><span class="section-icon">🕘</span> Últimos movimientos</h3>
+    <div class="panel-grid">
+      <div class="section-block">
+        <div class="section-block-header">
+          <h3><span class="section-icon warning-icon">⚠️</span> Alertas de stock</h3>
+          <span class="section-badge warning">{{ datos.alertas_stock.length }}</span>
+        </div>
+        <ul>
+          @for (alerta of datos.alertas_stock; track alerta.id) {
+            <li>
+              <span class="item-dot warning-dot"></span>
+              <div class="item-text">
+                <strong>{{ alerta.producto }}</strong>
+                <span>{{ alerta.bodega }}</span>
+              </div>
+              <span class="item-value warning">{{ alerta.stock }}/{{ alerta.stock_minimo }}</span>
+            </li>
+          } @empty {
+            <li>No hay alertas de stock.</li>
+          }
+        </ul>
       </div>
-      <ul>
-        <li>
-          <div class="item-text">
-            <strong>Pc <span class="qty positive">+10 unidades</span></strong>
-            <span>Administrador · 20/01/2025</span>
-          </div>
-          <span class="movement-badge entrada">Entrada</span>
-        </li>
-        <li>
-          <div class="item-text">
-            <strong>Monitor <span class="qty negative">+5 unidades</span></strong>
-            <span>Maicol Nore [Gerente] · 24/01/2025</span>
-          </div>
-          <span class="movement-badge salida">Salida</span>
-        </li>
-        <li>
-          <div class="item-text">
-            <strong>Mouse <span class="qty neutral">+8 unidades</span></strong>
-            <span>Erick Ruiz [Operador] · 28/01/2025</span>
-          </div>
-          <span class="movement-badge transferencia">Transferencia</span>
-        </li>
-      </ul>
+
+      <div class="section-block">
+        <div class="section-block-header">
+          <h3><span class="section-icon">🕘</span> Últimos movimientos</h3>
+        </div>
+        <ul>
+          @for (movimiento of datos.ultimos_movimientos; track movimiento.id) {
+            <li>
+              <div class="item-text">
+                <strong>
+                  {{ movimiento.producto }} · {{ movimiento.cantidad | number }} unidades
+                </strong>
+                <span>
+                  @if (movimiento.responsable) {
+                    {{ movimiento.responsable }} ·
+                  }
+                  {{ movimiento.fecha | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+              <span class="movement-badge">{{ movimiento.tipo }}</span>
+            </li>
+          } @empty {
+            <li>No hay movimientos registrados.</li>
+          }
+        </ul>
+      </div>
     </div>
-  </div>
+  }
 </div>

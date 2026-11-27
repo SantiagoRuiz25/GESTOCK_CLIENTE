@@ -1,8 +1,11 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs';
+import { EmpresasService, etiquetaMoneda } from '../../../services/empresas.service';
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EstadisticasService, Empresa } from '../../../services/estadisticas.service';
+import { EstadisticasService } from '../../../services/estadisticas.service';
 
 @Component({
   selector: 'app-registrar-empresa',
@@ -15,6 +18,7 @@ export class RegistrarEmpresaComponent {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private estadisticasService = inject(EstadisticasService);
+  private readonly apiEmpresas = inject(EmpresasService);
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
@@ -37,65 +41,50 @@ export class RegistrarEmpresaComponent {
   }
 
   crearNuevaEmpresa(): void {
+    if (this.isLoading()) return;
     this.errorMessage.set('');
 
     if (this.nuevaEmpresaForm.invalid) {
       this.nuevaEmpresaForm.markAllAsTouched();
-      this.errorMessage.set('⚠️ Por favor, complete correctamente los campos obligatorios.');
+      this.errorMessage.set('Completa correctamente los campos obligatorios.');
       return;
     }
 
     this.isLoading.set(true);
+    this.apiEmpresas.crear(this.nuevaEmpresaForm.getRawValue())
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (empresa) => {
+          const seleccion = {
+            id: String(empresa.id),
+            nombre: empresa.nombre,
+            email: empresa.correo,
+            moneda: etiquetaMoneda[empresa.moneda],
+            formatoFecha: empresa.formato_fecha,
+            estado: empresa.activo ? 'Activa' : 'Inactiva',
+          };
 
-    setTimeout(() => {
-      try {
-        const formValues = this.nuevaEmpresaForm.value;
-        const nuevaId = `EMP-${Date.now().toString().slice(-4)}`;
-        
-        const nuevaEmpresa: Empresa = {
-          id: nuevaId,
-          nombre: formValues.nombre.trim(),
-          email: formValues.email.trim(),
-          moneda: formValues.moneda,
-          formatoFecha: formValues.formatoFecha,
-          bodegasActivas: 1,
-          totalPrecios: 0,
-          valorInventario: 0,
-          alertasStock: 0
-        };
+          localStorage.setItem('empresaIdSeleccionada', seleccion.id);
+          localStorage.setItem('empresa_activa', JSON.stringify(seleccion));
+          localStorage.setItem('gestock_empresa_activa', JSON.stringify(seleccion));
 
-        const localData = localStorage.getItem('gestock_empresas');
-        const empresas = localData ? JSON.parse(localData) : [];
-        
-        const empresaItem = {
-          id: nuevaId,
-          nombre: nuevaEmpresa.nombre,
-          email: nuevaEmpresa.email,
-          moneda: nuevaEmpresa.moneda,
-          formatoFecha: nuevaEmpresa.formatoFecha,
-          estado: 'Activa'
-        };
-        
-        empresas.unshift(empresaItem);
+          this.estadisticasService.cambiarEmpresaActiva({
+            ...seleccion,
+            activa: empresa.activo,
+            bodegasActivas: 0,
+            totalPrecios: 0,
+            valorInventario: 0,
+            alertasStock: 0,
+          });
 
-        localStorage.setItem('gestock_empresas', JSON.stringify(empresas));
-        localStorage.setItem('empresa_activa', JSON.stringify(empresaItem));
-        localStorage.setItem('gestock_empresa_activa', JSON.stringify(empresaItem));
-        localStorage.setItem('empresaIdSeleccionada', nuevaId);
-
-        this.estadisticasService.cambiarEmpresaActiva(nuevaEmpresa);
-
-        console.log('%c[GESTOCK] Empresa creada con éxito:', 'color: #10b981; font-weight: bold;', nuevaEmpresa);
-        
-        this.isLoading.set(false);
-        this.router.navigate(['/app/panel']).catch(() => {
-          window.location.hash = '/app/panel';
-        });
-      } catch (error) {
-        console.error('[GESTOCK Error]:', error);
-        this.errorMessage.set('❌ Ocurrió un error al guardar la empresa.');
-        this.isLoading.set(false);
-      }
-    }, 300);
+          void this.router.navigate(['/app/panel']);
+        },
+        error: (error: unknown) => {
+          const mensaje = error instanceof HttpErrorResponse ? error.error?.Message : undefined;
+          this.errorMessage.set(
+            typeof mensaje === 'string' ? mensaje : 'No se pudo guardar la empresa. Inténtalo de nuevo.',
+          );
+        },
+      });
   }
 }
