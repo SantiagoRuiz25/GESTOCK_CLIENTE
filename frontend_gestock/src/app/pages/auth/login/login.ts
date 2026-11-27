@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-<<<<<<< HEAD
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 import { ApiError } from '../../../core/models/api.model';
@@ -9,54 +8,47 @@ import { ApiError } from '../../../core/models/api.model';
 declare const google: any;
 
 const GOOGLE_CLIENT_ID = '863694515165-6dovpoe54dq2j63kkln7po1vuvciiqmh.apps.googleusercontent.com';
-=======
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
->>>>>>> origin/develop
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
-<<<<<<< HEAD
+  loginForm!: FormGroup;
+  mostrarModalRol: boolean = false;
+
   credentials = {
     email: '',
     password: '',
     rememberMe: false,
   };
 
-  
   activeField: string | null = null;
   isLoading: boolean = false;
-=======
-  loginForm!: FormGroup;
-  mostrarModalRol: boolean = false;
->>>>>>> origin/develop
   errorMessage: string = '';
-  
-  private readonly ADMIN_SUPERIOR_EMAIL = 'admin@gestock.com';
+  mouseX: number = 0;
+  mouseY: number = 0;
 
-<<<<<<< HEAD
+  private readonly ADMIN_SUPERIOR_EMAIL = 'admin@gestock.com';
   private tokenClient: any;
 
-  /**
-   * Intentos de carga del SDK de Google.
-   *
-   * Antes era un `setTimeout` recursivo sin límite: si el script de Google no
-   * cargaba, el bucle seguía para siempre quemando CPU en segundo plano. Tres
-   * intentos bastan; si falla, el login con Google simplemente no aparece.
-   */
   private static readonly MAX_INTENTOS_GOOGLE = 3;
   private intentosGoogle = 0;
 
   ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      recordar: [false]
+    });
+
     this.inicializarGoogle();
   }
 
@@ -80,16 +72,9 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  /**
-   * Canjea el token de Google por una sesión de GESTOCK.
-   *
-   * El `rol: 'Operario'` fijo que tenía antes era un agujero de autorización:
-   * cualquiera que se autenticara con Google entraba con permisos de operario
-   * sin que el servidor opinara. Ahora el perfil se envía al backend, que es
-   * quien decide el rol; en modo demo se conserva el operario como antes.
-   */
   private obtenerPerfilGoogle(accessToken: string): void {
     this.isLoading = true;
+    this.errorMessage = '';
 
     fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -109,9 +94,6 @@ export class LoginComponent implements OnInit {
         this.authService.registrarUsuario({
           nombre: perfil.name || 'Usuario Google',
           email,
-          // Contraseña derivada del id de Google. No es una credencial real
-          // que el usuario pueda teclear ni adivinar, y evita el alta con
-          // 'demo' que colisionaba entre dos cuentas de Google distintas.
           password: `g-${perfil.sub}`,
           rol: 'Operario',
         }).subscribe({
@@ -128,7 +110,6 @@ export class LoginComponent implements OnInit {
             });
           },
           error: () => {
-            // Ya existía: solo hay que iniciar sesión.
             this.authService.iniciarSesion(email, 'demo').subscribe({
               next: () => {
                 this.isLoading = false;
@@ -175,7 +156,6 @@ export class LoginComponent implements OnInit {
     this.activeField = null;
   }
 
-  // Procesa el inicio de sesión manual
   onLogin(): void {
     this.errorMessage = '';
 
@@ -190,57 +170,9 @@ export class LoginComponent implements OnInit {
     if (!this.validarEmail(email)) {
       this.errorMessage = '⚠️ Error: Debe ingresar un correo electrónico válido.';
       return;
-=======
-  ngOnInit() {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      recordar: [false]
-    });
-  }
-
-  procesarLogin() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      console.warn('El formulario tiene errores de validación.');
-      return;
     }
 
-    const emailIngresado = this.loginForm.value.email.trim().toLowerCase();
-    console.log('Intentando iniciar sesión con:', emailIngresado);
-
-    if (emailIngresado === this.ADMIN_SUPERIOR_EMAIL) {
-      localStorage.setItem('user_role', 'super_admin');
-      localStorage.setItem('user_email', emailIngresado);
-      localStorage.setItem('gestock_usuario_sesion', JSON.stringify({ 
-        email: emailIngresado, 
-        rol: 'Administrador', 
-        nombre: 'Administrador Principal' 
-      }));
-      
-      this.enrutarARegistroEmpresa();
-    } else {
-      this.mostrarModalRol = true;
->>>>>>> origin/develop
-    }
-  }
-
-  confirmarAcceso(tipoRol: 'admin' | 'usuario') {
-    const email = this.loginForm.value.email.trim().toLowerCase();
-    const nombreRol = tipoRol === 'admin' ? 'Administrador' : 'Auditor General';
-    
-    localStorage.setItem('user_email', email);
-    localStorage.setItem('user_role', tipoRol);
-    localStorage.setItem('gestock_usuario_sesion', JSON.stringify({ 
-      email: email, 
-      rol: nombreRol, 
-      nombre: 'Usuario' 
-    }));
-
-<<<<<<< HEAD
-    // El `setTimeout` de 400 ms que simulaba latencia se elimina: la espera
-    // ahora es la red real, y mantenerla hacía creer al usuario que el sistema
-    // era más lento de lo que es.
+    this.isLoading = true;
     this.authService.iniciarSesion(email, password).subscribe({
       next: () => {
         this.isLoading = false;
@@ -253,22 +185,75 @@ export class LoginComponent implements OnInit {
             ? `⚠️ ${err.mensaje}`
             : '⚠️ Credenciales incorrectas. Verifica tu correo y contraseña.';
       },
-=======
+    });
+  }
+
+  procesarLogin(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      console.warn('El formulario tiene errores de validación.');
+      return;
+    }
+
+    const emailIngresado = (this.loginForm.value.email ?? '').trim().toLowerCase();
+    const passwordIngresado = (this.loginForm.value.password ?? '').trim();
+    console.log('Intentando iniciar sesión con:', emailIngresado);
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.iniciarSesion(emailIngresado, passwordIngresado).subscribe({
+      next: () => {
+        this.isLoading = false;
+        if (emailIngresado === this.ADMIN_SUPERIOR_EMAIL) {
+          localStorage.setItem('user_role', 'super_admin');
+          localStorage.setItem('user_email', emailIngresado);
+          localStorage.setItem('gestock_usuario_sesion', JSON.stringify({
+            email: emailIngresado,
+            rol: 'Administrador',
+            nombre: 'Administrador Principal'
+          }));
+          this.enrutarARegistroEmpresa();
+        } else {
+          this.mostrarModalRol = true;
+        }
+      },
+      error: (err: unknown) => {
+        this.isLoading = false;
+        this.errorMessage =
+          err instanceof ApiError
+            ? `⚠️ ${err.mensaje}`
+            : '⚠️ No se pudo iniciar sesión. Verifica tus credenciales.';
+      }
+    });
+  }
+
+  confirmarAcceso(tipoRol: 'admin' | 'usuario'): void {
+    const email = (this.loginForm?.value?.email ?? '').trim().toLowerCase();
+    const nombreRol = tipoRol === 'admin' ? 'Administrador' : 'Auditor General';
+
+    localStorage.setItem('user_email', email);
+    localStorage.setItem('user_role', tipoRol);
+    localStorage.setItem('gestock_usuario_sesion', JSON.stringify({
+      email,
+      rol: nombreRol,
+      nombre: 'Usuario'
+    }));
+
     this.mostrarModalRol = false;
     this.enrutarARegistroEmpresa();
   }
 
-  cancelarSeleccionRol() {
+  cancelarSeleccionRol(): void {
     this.mostrarModalRol = false;
   }
 
-  private enrutarARegistroEmpresa() {
+  private enrutarARegistroEmpresa(): void {
     console.log('Redirigiendo a registrar-empresa...');
-    
+
     this.router.navigate(['/app/registrar-empresa']).catch(err => {
       console.error('No se encontró /app/registrar-empresa, intentando ruta raíz...', err);
-      this.router.navigate(['/registrar-empresa']);
->>>>>>> origin/develop
+      void this.router.navigate(['/registrar-empresa']);
     });
   }
 }
