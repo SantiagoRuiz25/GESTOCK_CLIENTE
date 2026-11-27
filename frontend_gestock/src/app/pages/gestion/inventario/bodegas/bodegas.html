@@ -4,17 +4,20 @@
   <div class="bodegas-header">
     <div>
       <h2>Listado y Control de Bodegas</h2>
-      <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación. Haz clic en cualquier bodega para ver su inventario exacto.</p>
+      <p class="text-subtitle">Administra capacidad logística, responsables y estado de operación. Haz clic en una bodega para ver sus datos.</p>
     </div>
     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
       <span class="bodegas-count">{{ bodegas().length }} Registradas</span>
-      <button class="btn-nueva" (click)="mostrarModal.set(true)">
+      <button class="btn-nueva" [disabled]="cargando() || !!errorListado()" (click)="abrirFormulario()">
         <i class="fas fa-warehouse"></i> + Nueva Bodega
       </button>
     </div>
   </div>
 
   <!-- Cuadrícula de Tarjetas de Bodegas -->
+  <p *ngIf="cargando()" role="status">Cargando bodegas…</p>
+  <p *ngIf="errorListado()" role="alert">{{ errorListado() }}</p>
+  <p *ngIf="!cargando() && !errorListado() && bodegas().length === 0">Aún no hay bodegas registradas.</p>
   <div class="bodegas-grid">
     @for (bodega of bodegas(); track bodega.id) {
       <div class="bodega-card" [ngClass]="{ 'inactiva': !bodega.activa }" (click)="verDetalleBodega(bodega, $event)">
@@ -33,10 +36,6 @@
             <span class="badge-status" [ngClass]="{ 'active': bodega.activa }">
               {{ bodega.activa ? 'Activa' : 'Inactiva' }}
             </span>
-            <label class="switch" title="Activar / Desactivar Bodega" (click)="$event.stopPropagation()">
-              <input type="checkbox" [checked]="bodega.activa" (change)="toggleEstado(bodega.id)">
-              <span class="slider round"></span>
-            </label>
           </div>
         </div>
 
@@ -58,21 +57,7 @@
           </div>
         </div>
 
-        <!-- Barra de capacidad -->
-        <div class="capacidad-container">
-          <div class="capacidad-header">
-            <span>Capacidad: {{ getPorcentaje(bodega.ocupado, bodega.capacidad) }}%</span>
-            <span>{{ bodega.ocupado | number }} / {{ bodega.capacidad | number }} un.</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div 
-              class="progress-bar-fill" 
-              [style.width.%]="getPorcentaje(bodega.ocupado, bodega.capacidad)"
-              [ngClass]="{ 'high-capacity': getPorcentaje(bodega.ocupado, bodega.capacidad) > 80 }">
-            </div>
-          </div>
-        </div>
-
+        <p>Capacidad máxima: {{ bodega.capacidad | number }} un.</p>
       </div>
     }
   </div>
@@ -85,7 +70,7 @@
 <div class="modal-overlay animate-fade" *ngIf="mostrarModal()">
   <div class="modal-content">
     <div class="modal-header">
-      <h3><i class="fas fa-plus-circle"></i> Registrar Nueva Bodega</h3>
+      <h3><i class="fas fa-plus-circle"></i> {{ idEnEdicion() === null ? 'Registrar Nueva Bodega' : 'Editar Bodega' }}</h3>
       <p class="text-subtitle-sm">Completa los datos para habilitar el espacio logístico</p>
     </div>
     
@@ -122,67 +107,35 @@
 
       <div class="input-group full-width">
         <label class="form-label">Capacidad Máxima (Unidades)</label>
-        <input type="number" [(ngModel)]="nuevaBodega.capacidad" name="capacidad" class="dark-input w-100" placeholder="Ej. 10000" required>
+        <input type="number" [(ngModel)]="nuevaBodega.capacidad" name="capacidad" min="1" step="1" class="dark-input w-100" placeholder="Ej. 10000" required>
       </div>
       
       <div class="modal-actions">
-        <button type="button" class="btn-cancelar" (click)="mostrarModal.set(false)">Cancelar</button>
-        <button type="submit" class="btn-crear">Guardar Bodega</button>
+        <button type="button" class="btn-cancelar" [disabled]="guardando()" (click)="mostrarModal.set(false)">Cancelar</button>
+        <p *ngIf="errorFormulario()" role="alert">{{ errorFormulario() }}</p>
+        <button type="submit" class="btn-crear" [disabled]="f.invalid || guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar Bodega' }}
+        </button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- ================================================= -->
-<!-- MODAL DE DETALLE DE PRODUCTOS (CARGA AL CLIC)    -->
-<!-- ================================================= -->
-<div class="modal-overlay animate-fade" *ngIf="mostrarModalDetalle() && bodegaSeleccionada()">
-  <div class="modal-content modal-detalle-ancho">
-    
-    <div class="modal-header-detalle">
-      <div>
-        <h3>📦 {{ bodegaSeleccionada()?.nombre }}</h3>
-        <p class="text-subtitle-sm">Código: <code>{{ bodegaSeleccionada()?.codigo }}</code> | Responsable: {{ bodegaSeleccionada()?.responsable }}</p>
-      </div>
-      <button class="btn-cerrar-x" (click)="cerrarModalDetalle()">✕</button>
+<!-- Detalle de la bodega -->
+<div class="modal-overlay animate-fade" *ngIf="mostrarModalDetalle()">
+  <div class="modal-content" *ngIf="bodegaSeleccionada() as bodega">
+    <div class="modal-header"><h3>{{ bodega.nombre }} ({{ bodega.codigo }})</h3></div>
+    <p>{{ bodega.direccion }}, {{ bodega.ciudad }}</p>
+    <p>Responsable: {{ bodega.responsable }}</p>
+    <p>Teléfono: {{ bodega.telefono }}</p>
+    <p>Capacidad máxima: {{ bodega.capacidad | number }} un.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancelar" [disabled]="desactivando()" (click)="cerrarModalDetalle()">Cerrar</button>
+      <button type="button" class="btn-crear" [disabled]="desactivando()" (click)="abrirFormulario(bodega)">Editar</button>
+      <button type="button" class="btn-cancelar" *ngIf="bodega.activa" [disabled]="desactivando()" (click)="desactivarBodega(bodega)">
+        {{ desactivando() ? 'Desactivando…' : 'Desactivar' }}
+      </button>
+      <p *ngIf="errorDetalle()" role="alert">{{ errorDetalle() }}</p>
     </div>
-
-    <!-- Contenedor con espacio y scroll fluido para la tabla -->
-    <div class="table-container-wrapper">
-      <table class="productos-table">
-        <thead>
-          <tr>
-            <th>SKU</th>
-            <th>Producto</th>
-            <th>Categoría</th>
-            <th style="text-align: right;">Cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (bodegaSeleccionada()?.productos && bodegaSeleccionada()?.productos!.length > 0) {
-            @for (prod of bodegaSeleccionada()?.productos; track prod.id) {
-              <tr>
-                <td data-label="SKU"><code>{{ prod.sku }}</code></td>
-                <td data-label="Producto" style="font-weight: 500; color: #fff;">{{ prod.nombre }}</td>
-                <td data-label="Categoría"><span class="badge-categoria">{{ prod.categoria }}</span></td>
-                <td data-label="Cantidad" style="text-align: right; font-weight: 600; color: #34d399;">{{ prod.cantidad | number }} un.</td>
-              </tr>
-            }
-          } @else {
-            <tr>
-              <td colspan="4" class="empty-state-row">
-                <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: #64748b;"></i>
-                No hay productos registrados en esta bodega actualmente.
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="modal-actions" style="margin-top: 1.5rem;">
-      <button type="button" class="btn-cancelar w-100" (click)="cerrarModalDetalle()">Cerrar Ventana</button>
-    </div>
-
   </div>
 </div>

@@ -65,18 +65,19 @@ export class CreacionUsuariosComponent {
 
     const rolMapeado = this.mapaRoles[this.nuevoUsuario.rol] || 'Operario';
 
-    const exito = this.authService.registrar({
+    this.authService.registrarUsuario({
       nombre: this.nuevoUsuario.nombre,
       email: this.nuevoUsuario.correo,
+      // Antes no se enviaba, y el alta guardaba una contraseña fija. El
+      // usuario fijaba una contraseña y luego no podía entrar con ella.
       password: this.nuevoUsuario.password,
-      rol: rolMapeado
+      rol: rolMapeado,
+    }).subscribe({
+      next: () => void this.router.navigate(['/auth/login']),
+      error: () => {
+        this.pasoActual = 1;
+        this.errorMessage = '⚠️ El correo electrónico ya se encuentra registrado.';
+      },
     });
-
-    if (exito) {
-      this.router.navigate(['/auth/login']);
-    } else {
-      this.pasoActual = 1;
-      this.errorMessage = '⚠️ El correo electrónico ya se encuentra registrado.';
-    }
   }
 }

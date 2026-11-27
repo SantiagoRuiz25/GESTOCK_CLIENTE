@@ -1,215 +1,271 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
+import { InventarioService } from '../../../../core/services/inventario.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { Producto, ProductoUpdate, nivelDeStock } from '../../../../core/models/inventario.model';
+
+/**
+ * MÓDULO DE REFERENCIA
+ *
+ * Este componente es el patrón de referencia para migrar el resto de la app.
+ * Los cambios que introduce, y el porqué de cada uno:
+ *
+ * 1. Los datos vienen de un servicio, no de `localStorage` leído dentro del
+ *    componente. Aquí no se sabe de dónde salen; solo se piden y se pintan.
+ *
+ * 2. Todo el estado mutable es un signal. Por eso este archivo ya no inyecta
+ *    `ChangeDetectorRef` ni llama a `detectChanges()`, que era el parche que
+ *    se usaba antes para forzar el repintado a mano.
+ *
+ * 3. Las vistas derivadas usan `computed`. `productosFiltrados` y `resumen`
+ *    antes eran getters, así que se recalculaban en cada ciclo de detección
+ *    de cambios aunque nada hubiera cambiado.
+ *
+ * 4. Los errores pasan por `ToastService` y llegan normalizados desde el
+ *    interceptor. Desaparecen el `alert()`, el `confirm()` y el toast hecho a
+ *    mano con `setTimeout` que tenía este mismo componente.
+ *
+ * 5. Se eliminan los `document.body.style.overflow`, que congelaban la página
+ *    al abrir el modal y la dejaban bloqueada si el usuario pulsaba Esc.
+ *
+ * 6. Hay estados explícitos de carga, de error y de vacío, en vez de una
+ *    tabla que salta de "cargando" a "no hay datos" sin avisar.
+ */
 @Component({
   selector: 'app-lista-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CurrencyPipe, RouterLink],
   templateUrl: './lista-productos.html',
-  styleUrls: ['./lista-productos.css']
+  styleUrl: './lista-productos.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListaProductosComponent implements OnInit {
+  private readonly inventario = inject(InventarioService);
+  private readonly toast = inject(ToastService);
 
-  private productosIniciales: any[] = [
-    { codigo: 'PROD-001', nombre: 'Laptop HP ProBook', categoria: 'Tecnología', bodega: 'Bodega Central', precio: 2500000, stock: 12 },
-    { codigo: 'PROD-002', nombre: 'Mouse Inalámbrico Logitech', categoria: 'Accesorios', bodega: 'Bodega Norte', precio: 65000, stock: 45 },
-    { codigo: 'PROD-003', nombre: 'Silla Ergonómica Ejecutiva', categoria: 'Mobiliario', bodega: 'Bodega Central', precio: 450000, stock: 8 }
-  ];
+  readonly productos = this.inventario.productos;
+  readonly bodegas = this.inventario.bodegas;
+  readonly categorias = this.inventario.categorias;
 
-  productosOriginales: any[] = [];
-  filtroBusqueda: string = '';
-  menuActivoIndex: number | null = null;
-  productoEnEdicion: any = null;
-  private productoOriginalSnapshot: any = null;
-  
-  mensajeNotificacion: string | null = null;
-  mensajeAlertaModal: string | null = null;
-  productoAEliminar: any = null;
+  /** `true` durante la carga inicial; distingue "vacío" de "aún no ha llegado". */
+  readonly cargando = this.inventario.cargando;
+  /** `true` mientras se guarda o borra; deshabilita botones y evita doble envío. */
+  readonly guardando = signal(false);
 
-  // Inyectamos ChangeDetectorRef para forzar el renderizado inmediato en pantalla
-  constructor(private cdRef: ChangeDetectorRef) {}
+  readonly filtroBusqueda = signal('');
+  readonly productoEnEdicion = signal<Producto | null>(null);
+  readonly productoAEliminar = signal<Producto | null>(null);
 
-  ngOnInit() {
-    this.cargarProductos();
-  }
+  /** ID real del producto; `null` cuando el alta es nueva. */
+  private readonly idEnEdicion = signal<number | null>(null);
 
-  cargarProductos() {
-    const datos = localStorage.getItem('inventario_productos');
-    if (!datos) {
-      localStorage.setItem('inventario_productos', JSON.stringify(this.productosIniciales));
-      this.productosOriginales = [...this.productosIniciales];
-    } else {
-      try {
-        this.productosOriginales = JSON.parse(datos);
-      } catch (e) {
-        this.productosOriginales = [...this.productosIniciales];
-      }
+  // --- Campos del formulario, signals separados ---
+  // Separados en lugar de un objeto único porque mutar un objeto dentro de
+  // un signal obliga a spreads en cada campo; un signal por campo hace que
+  // `[(ngModel)]` sea directo y que `computed` sepa qué cambió.
+  readonly fNombre = signal('');
+  readonly fCategoria = signal('');
+  readonly fBodegaId = signal(0);
+  readonly fPrecio = signal(0);
+  readonly fStock = signal(0);
+  readonly fStockMinimo = signal(0);
+
+  readonly editando = computed(() => this.productoEnEdicion() !== null);
+  readonly esAltaNueva = computed(() => this.idEnEdicion() === null);
+
+  /** Catálogo ya filtrado por el texto de búsqueda. */
+  readonly productosFiltrados = computed(() => {
+    const texto = this.filtroBusqueda().trim().toLowerCase();
+    if (!texto) {
+      return this.productos();
     }
-  }
-
-  get categoriasDisponibles(): string[] {
-    const categorias = this.productosOriginales.map(p => p.categoria);
-    return Array.from(new Set(categorias)).sort();
-  }
-
-  get bodegasDisponibles(): string[] {
-    const bodegas = this.productosOriginales.map(p => p.bodega);
-    return Array.from(new Set(bodegas)).sort();
-  }
-
-  get productosFiltrados(): any[] {
-    const lista = this.productosOriginales || [];
-    if (!this.filtroBusqueda || !this.filtroBusqueda.trim()) {
-      return lista;
-    }
-    const texto = this.filtroBusqueda.toLowerCase().trim();
-    return lista.filter(p => 
-      (p.nombre && p.nombre.toLowerCase().includes(texto)) ||
-      (p.codigo && p.codigo.toLowerCase().includes(texto)) ||
-      (p.categoria && p.categoria.toLowerCase().includes(texto)) ||
-      (p.bodega && p.bodega.toLowerCase().includes(texto))
+    return this.productos().filter(
+      (p) =>
+        p.nombre.toLowerCase().includes(texto) ||
+        p.codigo.toLowerCase().includes(texto) ||
+        p.categoria.toLowerCase().includes(texto) ||
+        p.bodegaNombre.toLowerCase().includes(texto),
     );
-  }
+  });
 
-  abrirModalEditar(prod: any) {
-    this.productoEnEdicion = { ...prod };
-    this.productoOriginalSnapshot = { ...prod };
-    this.mensajeAlertaModal = null;
-    this.menuActivoIndex = null;
-    document.body.style.overflow = 'hidden';
-  }
-
-  cerrarModal() {
-    this.productoEnEdicion = null;
-    this.productoOriginalSnapshot = null;
-    this.mensajeAlertaModal = null;
-    document.body.style.overflow = 'auto';
-  }
-
-  registrarAuditoria(accion: 'CREAR' | 'ACTUALIZAR' | 'ELIMINAR', producto: any, usuario: string = 'Administrador') {
-    const nuevoRegistro = {
-      id: `#${Date.now().toString().slice(-3)}`,
-      usuario: usuario,
-      accion: accion,
-      entidad: `Producto: ${producto.nombre}`,
-      detalles: `Bodega: ${producto.bodega} | Cantidad: ${producto.stock} un.`,
-      fechaHora: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
-      estado: 'Completado',
-      jsonDetalle: producto
+  /** Resumen de cabecera. */
+  readonly resumen = computed(() => {
+    const lista = this.productos();
+    return {
+      total: lista.length,
+      valorTotal: lista.reduce((suma, p) => suma + p.precio * p.stock, 0),
+      enAlerta: lista.filter((p) => nivelDeStock(p) !== 'suficiente').length,
     };
+  });
 
-    const llaves = ['sistema_auditorias', 'auditorias'];
-    llaves.forEach(key => {
-      const actual = JSON.parse(localStorage.getItem(key) || '[]');
-      actual.unshift(nuevoRegistro);
-      localStorage.setItem(key, JSON.stringify(actual));
+  /** Vacío de verdad: ya terminó de cargar y no hay nada que mostrar. */
+  readonly sinResultados = computed(
+    () => !this.cargando() && this.productosFiltrados().length === 0,
+  );
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.inventario.listarProductos().subscribe({
+      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar los productos.'),
     });
   }
 
-  guardarEdicion(form: any) {
-    if (form.valid && this.productoEnEdicion) {
-      const productoLimpio = {
-        ...this.productoEnEdicion,
-        precio: Number(this.productoEnEdicion.precio),
-        stock: Number(this.productoEnEdicion.stock)
-      };
+  abrirModalEditar(producto: Producto): void {
+    this.inventario.listarCategorias().subscribe({
+      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar las categorías.'),
+    });
+    this.inventario.listarBodegas().subscribe({
+      error: (err: unknown) => this.toast.errorDesdeApi(err, 'No se pudieron cargar las bodegas.'),
+    });
+    this.idEnEdicion.set(producto.id);
+    this.productoEnEdicion.set(producto);
+    this.fNombre.set(producto.nombre);
+    this.fCategoria.set(producto.categoria);
+    this.fBodegaId.set(producto.bodegaId);
+    this.fPrecio.set(producto.precio);
+    this.fStock.set(producto.stock);
+    this.fStockMinimo.set(producto.stockMinimo);
+  }
 
-      const indexReal = this.productosOriginales.findIndex(p => p.codigo === productoLimpio.codigo);
-      
-      if (indexReal !== -1 && this.productoOriginalSnapshot) {
-        if (verificarSinCambios(productoLimpio, this.productoOriginalSnapshot)) {
-          this.cerrarModal();
-          this.mensajeAlertaModal = 'No se realizaron modificaciones en el producto.';
-          return; 
-        }
-      }
+  cerrarModal(): void {
+    this.idEnEdicion.set(null);
+    this.productoEnEdicion.set(null);
+    this.resetFormulario();
+  }
 
-      if (indexReal !== -1) {
-        this.productosOriginales[indexReal] = productoLimpio;
-        this.registrarAuditoria('ACTUALIZAR', productoLimpio);
+  confirmarEliminacion(producto: Producto): void {
+    this.productoAEliminar.set(producto);
+  }
 
-        console.group(`✏️ PRODUCTO ACTUALIZADO [ ACCIÓN: ACTUALIZAR ]`);
-        console.log('Datos Anteriores:', this.productoOriginalSnapshot);
-        console.log('Datos Nuevos (Modificados):', productoLimpio);
-        console.log('=== JSON COMPLETO ===');
-        console.log(JSON.stringify(productoLimpio, null, 2));
-        console.groupEnd();
+  cancelarEliminacion(): void {
+    this.productoAEliminar.set(null);
+  }
 
-      } else {
-        this.productosOriginales.unshift(productoLimpio);
-        this.registrarAuditoria('CREAR', productoLimpio);
+  /**
+   * Persiste el formulario.
+   *
+   * `form.invalid` cubre lo declarado en la plantilla; aquí se añade la
+   * comprobación de dominio que el HTML no puede expresar. Los errores por
+   * campo que devuelve el backend en un 422 ya llegan mapeados en el
+   * `ApiError`, así que no hace falta interpretarlos aquí.
+   */
+  guardar(form: NgForm): void {
+    if (form.invalid || this.guardando()) {
+      form.control.markAllAsTouched();
+      return;
+    }
 
-        console.group(`✨ PRODUCTO CREADO [ ACCIÓN: CREAR ]`);
-        console.log('=== JSON COMPLETO ===');
-        console.log(JSON.stringify(productoLimpio, null, 2));
-        console.groupEnd();
-      }
+    const nombre = this.fNombre().trim();
+    const categoria = this.fCategoria().trim();
+    const bodegaId = this.fBodegaId();
 
-      localStorage.setItem('inventario_productos', JSON.stringify(this.productosOriginales));
-      this.productosOriginales = [...this.productosOriginales];
-      
-      this.cerrarModal();
-      
-      // Muestra la notificación de inmediato y fuerza el refresco visual de Angular
-      this.mostrarNotificacion('¡Producto actualizado exitosamente!');
+    if (!nombre || !categoria || !bodegaId) {
+      this.toast.aviso('Completa todos los campos obligatorios.');
+      return;
+    }
+
+    this.guardando.set(true);
+    const esAlta = this.esAltaNueva();
+    const id = this.idEnEdicion();
+
+    const peticion =
+      esAlta || id === null
+        ? this.inventario.crearProducto({
+            codigo: this.codigoGenerado(),
+            nombre,
+            categoria,
+            bodegaId,
+            precio: this.fPrecio(),
+            stock: this.fStock(),
+            stockMinimo: this.fStockMinimo(),
+          })
+        : this.inventario.actualizarProducto(id, {
+            nombre,
+            categoria,
+            bodegaId,
+            precio: this.fPrecio(),
+            stock: this.fStock(),
+            stockMinimo: this.fStockMinimo(),
+          });
+
+          peticion.pipe(finalize(() => this.guardando.set(false))).subscribe({
+            next: () => {
+             this.toast.exito(
+              esAlta ? 'Producto creado exitosamente.' : 'Producto actualizado exitosamente.',
+            );
+            this.cerrarModal();
+          },
+          error: (err: unknown) => {
+            this.toast.errorDesdeApi(err, 'No se pudo guardar el producto.');
+          },
+        });
+  }
+
+ejecutarEliminacion(): void {
+  const producto = this.productoAEliminar();
+  if (!producto || this.guardando()) {
+    return;
+  }
+
+  this.guardando.set(true);
+  this.inventario.eliminarProducto(producto.id)
+    .pipe(finalize(() => this.guardando.set(false)))
+    .subscribe({
+      next: () => {
+        this.toast.exito('Producto eliminado exitosamente.');
+        this.productoAEliminar.set(null);
+      },
+      error: (err: unknown) =>
+        this.toast.errorDesdeApi(err, 'No se pudo eliminar el producto.'),
+    });
+}
+
+  /** Clase CSS del badge de stock; la decisión vive en el dominio, no en el HTML. */
+  claseStock(producto: Producto): string {
+    switch (nivelDeStock(producto)) {
+      case 'agotado':
+        return 'insignia-stock stock-agotado';
+      case 'bajo':
+        return 'insignia-stock stock-bajo';
+      default:
+        return 'insignia-stock stock-suficiente';
     }
   }
 
-  confirmarEliminacion(prod: any) {
-    this.productoAEliminar = prod;
-    this.menuActivoIndex = null;
-    document.body.style.overflow = 'hidden';
+  textoEstadoStock(producto: Producto): string {
+    switch (nivelDeStock(producto)) {
+      case 'agotado':
+        return 'Agotado';
+      case 'bajo':
+        return 'Stock bajo';
+      default:
+        return 'Disponible';
+    }
   }
 
-  cancelarEliminacion() {
-    this.productoAEliminar = null;
-    document.body.style.overflow = 'auto';
+  /** Código correlativo legible. En producción lo asigna el servidor. */
+  private codigoGenerado(): string {
+    const siguiente = this.productos().reduce((max, p) => {
+      const numero = Number(p.codigo.replace(/\D/g, ''));
+      return Number.isNaN(numero) ? max : Math.max(max, numero);
+    }, 0);
+    return `PROD-${String(siguiente + 1).padStart(3, '0')}`;
   }
 
-  ejecutarEliminacion() {
-    if (!this.productoAEliminar) return;
-
-    const prod = this.productoAEliminar;
-    this.productosOriginales = this.productosOriginales.filter(p => p.codigo !== prod.codigo);
-    
-    localStorage.setItem('inventario_productos', JSON.stringify(this.productosOriginales));
-    this.productosOriginales = [...this.productosOriginales];
-    
-    this.registrarAuditoria('ELIMINAR', prod);
-
-    console.group(`🗑️ PRODUCTO ELIMINADO [ ACCIÓN: ELIMINAR ]`);
-    console.log('El siguiente producto fue retirado del inventario:');
-    console.log(JSON.stringify(prod, null, 2));
-    console.groupEnd();
-
-    this.productoAEliminar = null;
-    document.body.style.overflow = 'auto';
-
-    // Muestra la notificación de inmediato y fuerza el refresco visual de Angular
-    this.mostrarNotificacion('¡Producto eliminado exitosamente!');
+  private resetFormulario(): void {
+    this.fNombre.set('');
+    this.fCategoria.set('');
+    this.fBodegaId.set(0);
+    this.fPrecio.set(0);
+    this.fStock.set(0);
+    this.fStockMinimo.set(0);
   }
-
-  mostrarNotificacion(mensaje: string) {
-    this.mensajeNotificacion = mensaje;
-    this.cdRef.detectChanges(); // Fuerza a la vista a renderizar el mensaje al instante
-
-    // Limpia la notificación después de 3.5 segundos
-    setTimeout(() => {
-      if (this.mensajeNotificacion === mensaje) {
-        this.mensajeNotificacion = null;
-        this.cdRef.detectChanges();
-      }
-    }, 3500);
-  }
-}
-
-function verificarSinCambios(p1: any, p2: any): boolean {
-  return (
-    p1.nombre === p2.nombre &&
-    p1.categoria === p2.categoria &&
-    p1.bodega === p2.bodega &&
-    p1.precio === p2.precio &&
-    p1.stock === p2.stock
-  );
 }

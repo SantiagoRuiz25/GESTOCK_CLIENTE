@@ -171,7 +171,7 @@
   font-weight: 600;
 }
 
-.prio-baja { background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.prio-baja { background-color: rgba(59, 130, 246, 0.15); color: #00ff62; }
 .prio-media { background-color: rgba(234, 179, 8, 0.15); color: #facc15; }
 .prio-alta { background-color: rgba(249, 115, 22, 0.15); color: #fb923c; }
 .prio-critica { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }

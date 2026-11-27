@@ -1,166 +1,312 @@
 <div class="contenedor-productos animar-desvanecer">
-  
-  <!-- CABECERA -->
-  <div class="cabecera-productos">
+
+  <!-- ===================== CABECERA ===================== -->
+  <header class="cabecera-productos">
     <div class="titulos-cabecera">
       <h2>Gestión de Inventario</h2>
       <p class="texto-subtitulo">Administra, edita y supervisa las existencias en tiempo real.</p>
     </div>
-    <div class="contador-productos">
-      Total Registrados: {{ productosFiltrados.length }}
-    </div>
-  </div>
 
-  <!-- BARRA DE BÚSQUEDA -->
+    <div class="contador-productos" role="status" aria-live="polite">
+      @if (cargando()) {
+        <span class="gs-skeleton gs-skeleton--texto" style="width: 140px;"></span>
+      } @else {
+        <span class="contador-dato">{{ resumen().total }} productos</span>
+        <span class="contador-separador" aria-hidden="true">·</span>
+        <span class="contador-dato">Valor {{ resumen().valorTotal | currency:'USD':'symbol':'1.0-0' }}</span>
+        @if (resumen().enAlerta > 0) {
+          <span class="contador-separador" aria-hidden="true">·</span>
+          <span class="contador-alerta">{{ resumen().enAlerta }} en alerta</span>
+        }
+      }
+    </div>
+  </header>
+
+  <!-- ===================== BÚSQUEDA ===================== -->
   <div class="contenedor-barra-busqueda">
     <div class="envoltorio-input-busqueda">
-      <span class="icono-busqueda">🔍</span>
-      <input 
-        type="text" 
-        class="input-busqueda" 
-        placeholder="Buscar por nombre, código, categoría o bodega..." 
-        [(ngModel)]="filtroBusqueda"
+      <span class="icono-busqueda" aria-hidden="true">🔍</span>
+      <label class="gs-sr-only" for="busqueda-productos">Buscar productos</label>
+      <input
+        id="busqueda-productos"
+        type="search"
+        class="input-busqueda"
+        placeholder="Buscar por nombre, código, categoría o bodega..."
+        [ngModel]="filtroBusqueda()"
+        (ngModelChange)="filtroBusqueda.set($event)"
+        autocomplete="off"
       />
     </div>
   </div>
 
-  <!-- TABLA RESPONSIVA ADAPTABLE A MÓVIL -->
+  <!-- ===================== TABLA ===================== -->
   <div class="tabla-responsiva">
-    <table class="tabla-productos">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre del Producto</th>
-          <th>Categoría</th>
-          <th>Bodega</th>
-          <th>Precio</th>
-          <th>Stock</th>
-          <th class="texto-centro">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (prod of productosFiltrados; track prod.codigo + '-' + idx; let idx = $index) {
-          <tr class="fila-tabla">
-            <td data-label="Código">
-              <span class="insignia-codigo">{{ prod.codigo }}</span>
-            </td>
-            <td data-label="Nombre del Producto"><strong>{{ prod.nombre }}</strong></td>
-            <td data-label="Categoría">
-              <span class="insignia-categoria">{{ prod.categoria }}</span>
-            </td>
-            <td data-label="Bodega">
-              <span class="texto-bodega-info">📍 {{ prod.bodega }}</span>
-            </td>
-            <td data-label="Precio">{{ prod.precio | currency:'USD':'symbol':'1.0-0' }}</td>
-            <td data-label="Stock">
-              <span class="insignia-stock" [ngClass]="prod.stock > 10 ? 'stock-alto' : 'stock-bajo'">
-                ● {{ prod.stock }} un.
-              </span>
-            </td>
-            <td data-label="Acciones" class="celda-acciones">
-              <button class="btn-accion-interactiva btn-editar-prod" (click)="abrirModalEditar(prod)" title="Editar producto">
-                ✏️ Editar
-              </button>
-              <button class="btn-accion-interactiva btn-eliminar-prod" (click)="confirmarEliminacion(prod)" title="Eliminar producto">
-                🗑️ Eliminar
-              </button>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="7" class="texto-centro estado-vacio">
-              No se encontraron productos que coincidan con la búsqueda.
-            </td>
-          </tr>
+
+    <!-- Estado de carga: esqueletos que respetan la forma real de la tabla,
+         en vez de un spinner que hace saltar el layout al llegar los datos. -->
+    @if (cargando() && productos().length === 0) {
+      <div class="gs-skeleton-filas" role="status" aria-live="polite">
+        <span class="gs-sr-only">Cargando productos…</span>
+        @for (fila of [1, 2, 3, 4, 5]; track fila) {
+          <div class="gs-skeleton-fila" aria-hidden="true">
+            <span class="gs-skeleton" style="width: 5rem; height: 0.85rem;"></span>
+            <span class="gs-skeleton" style="width: 14rem; height: 0.85rem;"></span>
+            <span class="gs-skeleton" style="width: 7rem; height: 0.85rem;"></span>
+            <span class="gs-skeleton" style="width: 8rem; height: 0.85rem;"></span>
+            <span class="gs-skeleton" style="width: 5rem; height: 0.85rem;"></span>
+            <span class="gs-skeleton" style="width: 4rem; height: 0.85rem;"></span>
+          </div>
         }
-      </tbody>
-    </table>
+      </div>
+    } @else {
+      <table class="tabla-productos">
+        <caption class="gs-sr-only">
+          Listado de productos del inventario con código, nombre, categoría, bodega, precio y stock.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Nombre del Producto</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Bodega</th>
+            <th scope="col" class="col-num">Precio</th>
+            <th scope="col" class="col-num">Stock</th>
+            <th scope="col" class="texto-centro">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (prod of productosFiltrados(); track prod.id) {
+            <tr class="fila-tabla">
+              <td data-label="Código">
+                <span class="insignia-codigo">{{ prod.codigo }}</span>
+              </td>
+              <td data-label="Nombre del Producto">
+                <strong>{{ prod.nombre }}</strong>
+              </td>
+              <td data-label="Categoría">
+                <span class="insignia-categoria">{{ prod.categoria }}</span>
+              </td>
+              <td data-label="Bodega">
+                <span class="texto-bodega-info">📍 {{ prod.bodegaNombre }}</span>
+              </td>
+              <td data-label="Precio" class="col-num">
+                {{ prod.precio | currency:'USD':'symbol':'1.0-0' }}
+              </td>
+              <td data-label="Stock" class="col-num">
+                <span [class]="claseStock(prod)">
+                  <span class="punto-stock" aria-hidden="true"></span>
+                  {{ prod.stock }} un.
+                </span>
+                <span class="gs-sr-only">{{ textoEstadoStock(prod) }}</span>
+              </td>
+              <td data-label="Acciones" class="celda-acciones">
+                <button
+                  type="button"
+                  class="btn-accion-interactiva btn-editar-prod"
+                  (click)="abrirModalEditar(prod)"
+                  [attr.aria-label]="'Editar ' + prod.nombre"
+                >
+                  <span aria-hidden="true">✏️</span> Editar
+                </button>
+                <button
+                  type="button"
+                  class="btn-accion-interactiva btn-eliminar-prod"
+                  (click)="confirmarEliminacion(prod)"
+                  [attr.aria-label]="'Eliminar ' + prod.nombre"
+                >
+                  <span aria-hidden="true">🗑️</span> Eliminar
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="estado-vacio">
+                <span class="estado-vacio-icono" aria-hidden="true">📦</span>
+                @if (filtroBusqueda().trim()) {
+                  <p class="estado-vacio-titulo">Sin resultados</p>
+                  <p class="estado-vacio-texto">
+                    Ningún producto coincide con «{{ filtroBusqueda() }}».
+                  </p>
+                  <button type="button" class="btn-enlace" (click)="filtroBusqueda.set('')">
+                    Limpiar búsqueda
+                  </button>
+                } @else {
+                  <p class="estado-vacio-titulo">Inventario vacío</p>
+                  <p class="estado-vacio-texto">
+                    Registra el primer producto para empezar a controlar tus existencias.
+                  </p>
+                  <a class="btn-enlace" routerLink="/app/gestion/inventario/registrar-productos">
+                    Registrar producto
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
   </div>
 
-  <!-- MODAL FLOTANTE DE EDICIÓN (FIJO ARRIBA) -->
-  @if (productoEnEdicion) {
-    <div class="superposicion-modal-superior">
-      <div class="tarjeta-modal-avanzada animate-slide-up">
-        <div class="cabecera-modal-avanzada">
-          <h3>Editar Producto</h3>
-          <p>Modifica los datos necesarios del artículo seleccionado.</p>
+  <!-- ===================== MODAL DE EDICIÓN =====================
+       `role="dialog"` + `aria-modal` + foco: los modales nativos del
+       navegador (alert/confirm) no permitían estilizar ni anunciar. -->
+  @if (productoEnEdicion(); as producto) {
+    <div class="superposicion-modal" (click)="cerrarModal()">
+      <div
+        class="tarjeta-modal animate-slide-up"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-edicion"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="cabecera-modal">
+          <h3 id="titulo-modal-edicion">Editar producto</h3>
+          <p>Modifica los datos del artículo seleccionado.</p>
+          <button
+            type="button"
+            class="btn-cerrar-modal"
+            (click)="cerrarModal()"
+            aria-label="Cerrar modal"
+          >
+            ✕
+          </button>
         </div>
 
-        <form #formEdicion="ngForm" (ngSubmit)="guardarEdicion(formEdicion)">
+        <form #formEdicion="ngForm" (ngSubmit)="guardar(formEdicion)" novalidate>
           <div class="rejilla-formulario-modal">
-            
+
             <div class="grupo-formulario-modal grupo-formulario-completo">
-              <label class="etiqueta-formulario-modal">Código del Producto</label>
-              <input 
-                type="text" 
-                class="input-oscuro-modal" 
-                [value]="productoEnEdicion.codigo" 
-                disabled 
-                style="opacity: 0.6; cursor: not-allowed;"
+              <label class="etiqueta-formulario-modal" for="campo-codigo">Código</label>
+              <input
+                id="campo-codigo"
+                type="text"
+                class="input-oscuro-modal"
+                [value]="producto.codigo"
+                readonly
+                aria-readonly="true"
               />
             </div>
 
             <div class="grupo-formulario-modal grupo-formulario-completo">
-              <label class="etiqueta-formulario-modal">Nombre del Producto</label>
-              <input 
-                type="text" 
-                class="input-oscuro-modal" 
-                name="nombre" 
-                [(ngModel)]="productoEnEdicion.nombre" 
-                required 
+              <label class="etiqueta-formulario-modal" for="campo-nombre">
+                Nombre del producto <span class="obligatorio" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="campo-nombre"
+                type="text"
+                class="input-oscuro-modal"
+                name="nombre"
+                [ngModel]="fNombre()"
+                (ngModelChange)="fNombre.set($event)"
+                required
+                maxlength="120"
+                [class.campo-invalido]="formEdicion.controls['nombre']?.invalid && formEdicion.controls['nombre']?.touched"
               />
+              @if (formEdicion.controls['nombre']?.invalid && formEdicion.controls['nombre']?.touched) {
+                <span class="error-campo" role="alert">El nombre es obligatorio.</span>
+              }
             </div>
 
             <div class="grupo-formulario-modal">
-              <label class="etiqueta-formulario-modal">Categoría</label>
-              <select class="input-oscuro-modal select-campo" name="categoria" [(ngModel)]="productoEnEdicion.categoria" required>
-                @for (cat of categoriasDisponibles; track cat) {
-                  <option [value]="cat">{{ cat }}</option>
+              <label class="etiqueta-formulario-modal" for="campo-categoria">
+                Categoría <span class="obligatorio" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="campo-categoria"
+                type="text"
+                class="input-oscuro-modal"
+                name="categoria"
+                list="lista-categorias"
+                [ngModel]="fCategoria()"
+                (ngModelChange)="fCategoria.set($event)"
+                required
+                maxlength="60"
+              />
+              <datalist id="lista-categorias">
+                @for (cat of categorias(); track cat) {
+                  <option [value]="cat"></option>
+                }
+              </datalist>
+            </div>
+
+            <div class="grupo-formulario-modal">
+              <label class="etiqueta-formulario-modal" for="campo-bodega">
+                Bodega asignada <span class="obligatorio" aria-hidden="true">*</span>
+              </label>
+              <select
+                id="campo-bodega"
+                class="input-oscuro-modal select-campo"
+                name="bodegaId"
+                [ngModel]="fBodegaId()"
+                (ngModelChange)="fBodegaId.set(+$event)"
+                required
+              >
+                <option [ngValue]="0" disabled>Selecciona una bodega…</option>
+                @for (bod of bodegas(); track bod.id) {
+                  @if (bod.activa || bod.id === producto.bodegaId) {
+                    <option [ngValue]="bod.id">{{ bod.nombre }}</option>
+                  }
                 }
               </select>
             </div>
 
             <div class="grupo-formulario-modal">
-              <label class="etiqueta-formulario-modal">Bodega Asignada</label>
-              <select class="input-oscuro-modal select-campo" name="bodega" [(ngModel)]="productoEnEdicion.bodega" required>
-                @for (bod of bodegasDisponibles; track bod) {
-                  <option [value]="bod">{{ bod }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="grupo-formulario-modal">
-              <label class="etiqueta-formulario-modal">Precio ($)</label>
-              <input 
-                type="number" 
-                class="input-oscuro-modal" 
-                name="precio" 
-                [(ngModel)]="productoEnEdicion.precio" 
-                min="0" 
-                required 
+              <label class="etiqueta-formulario-modal" for="campo-precio">Precio (USD)</label>
+              <input
+                id="campo-precio"
+                type="number"
+                class="input-oscuro-modal"
+                name="precio"
+                [ngModel]="fPrecio()"
+                (ngModelChange)="fPrecio.set(+$event)"
+                min="0"
+                step="0.01"
+                required
               />
             </div>
 
             <div class="grupo-formulario-modal">
-              <label class="etiqueta-formulario-modal">Stock / Cantidad</label>
-              <input 
-                type="number" 
-                class="input-oscuro-modal" 
-                name="stock" 
-                [(ngModel)]="productoEnEdicion.stock" 
-                min="0" 
-                required 
+              <label class="etiqueta-formulario-modal" for="campo-stock">Stock</label>
+              <input
+                id="campo-stock"
+                type="number"
+                class="input-oscuro-modal"
+                name="stock"
+                [ngModel]="fStock()"
+                (ngModelChange)="fStock.set(+$event)"
+                min="0"
+                step="1"
+                required
               />
+            </div>
+
+            <div class="grupo-formulario-modal">
+              <label class="etiqueta-formulario-modal" for="campo-stock-minimo">Stock mínimo</label>
+              <input
+                id="campo-stock-minimo"
+                type="number"
+                class="input-oscuro-modal"
+                name="stockMinimo"
+                [ngModel]="fStockMinimo()"
+                (ngModelChange)="fStockMinimo.set(+$event)"
+                min="0"
+                step="1"
+              />
+              <span class="pista-campo">Por debajo de este valor el producto entra en alerta.</span>
             </div>
 
           </div>
 
-          <div class="acciones-modal-avanzadas">
+          <div class="acciones-modal">
             <button type="button" class="btn-modal-cancelar" (click)="cerrarModal()">
               Cancelar
             </button>
-            <button type="submit" class="btn-modal-enviar" [disabled]="formEdicion.invalid">
-              💾 Guardar Cambios
+            <button type="submit" class="btn-modal-enviar" [disabled]="formEdicion.invalid || guardando()">
+              @if (guardando()) {
+                <span class="spinner-mini" aria-hidden="true"></span> Guardando…
+              } @else {
+                💾 Guardar cambios
+              }
             </button>
           </div>
         </form>
@@ -168,53 +314,39 @@
     </div>
   }
 
-  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN (FIJO ARRIBA) -->
-  @if (productoAEliminar) {
-    <div class="superposicion-modal-superior">
-      <div class="tarjeta-modal-avanzada animate-slide-up" style="max-width: 420px; text-align: center;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
-        <div class="cabecera-modal-avanzada">
-          <h3>¿Estás seguro?</h3>
-          <p>Vas a eliminar permanentemente el producto <strong>"{{ productoAEliminar.nombre }}"</strong> del inventario.</p>
-        </div>
-        <div class="acciones-modal-avanzadas" style="justify-content: center;">
+  <!-- ===================== MODAL DE CONFIRMACIÓN ===================== -->
+  @if (productoAEliminar(); as aEliminar) {
+    <div class="superposicion-modal" (click)="cancelarEliminacion()">
+      <div
+        class="tarjeta-modal modal-confirmacion animate-slide-up"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-eliminar"
+        aria-describedby="descripcion-modal-eliminar"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="icono-peligro" aria-hidden="true">⚠️</div>
+        <h3 id="titulo-modal-eliminar">¿Eliminar producto?</h3>
+        <p id="descripcion-modal-eliminar">
+          Vas a eliminar <strong>«{{ aEliminar.nombre }}»</strong> ({{ aEliminar.codigo }})
+          del inventario. Esta acción no se puede deshacer.
+        </p>
+        <div class="acciones-modal">
           <button type="button" class="btn-modal-cancelar" (click)="cancelarEliminacion()">
             Cancelar
           </button>
-          <button type="button" class="btn-modal-enviar btn-peligro-eliminar" (click)="ejecutarEliminacion()">
-            🗑️ Sí, Eliminar
+          <button
+            type="button"
+            class="btn-modal-peligro"
+            (click)="ejecutarEliminacion()"
+            [disabled]="guardando()"
+          >
+            @if (guardando()) {
+              <span class="spinner-mini" aria-hidden="true"></span> Eliminando…
+            } @else {
+              🗑️ Sí, eliminar
+            }
           </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- MODAL DE AVISO CENTRAL (FIJO ARRIBA) -->
-  @if (mensajeAlertaModal) {
-    <div class="superposicion-modal-superior">
-      <div class="tarjeta-modal-avanzada animate-slide-up" style="max-width: 400px; text-align: center;">
-        <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">⚠️</div>
-        <div class="cabecera-modal-avanzada">
-          <h3>Aviso Importante</h3>
-          <p>{{ mensajeAlertaModal }}</p>
-        </div>
-        <div class="acciones-modal-avanzadas" style="justify-content: center; margin-top: 1.5rem;">
-          <button type="button" class="btn-modal-enviar" (click)="mensajeAlertaModal = null">
-            Entendido
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- NOTIFICACIÓN / TOAST GRANDE FIJA ARRIBA -->
-  @if (mensajeNotificacion) {
-    <div class="superposicion-modal-superior animate-slide-up">
-      <div class="tarjeta-aviso-superior">
-        <div class="icono-aviso-grande">✨</div>
-        <div class="cabecera-aviso-superior">
-          <h3>Notificación del Sistema</h3>
-          <p>{{ mensajeNotificacion }}</p>
         </div>
       </div>
     </div>
