@@ -1,3 +1,10 @@
+import { finalize } from 'rxjs';
+import { ToastService } from '../../../core/services/toast.service';
+import type { EmpresaApi } from '../../../services/empresas.service';
+
+import { ChangeDetectorRef } from '@angular/core';
+import { EmpresasService, etiquetaMoneda } from '../../../services/empresas.service';
+
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -21,6 +28,12 @@ interface EmpresaItem {
   styleUrls: ['./empresa.css']
 })
 export class EmpresasComponent implements OnInit {
+  private readonly apiEmpresas = inject(EmpresasService);
+  private readonly cambiosVista = inject(ChangeDetectorRef);
+  private readonly toast = inject(ToastService);
+
+  guardando = false;
+  idEnEdicion: string | null = null;
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private estadisticasService = inject(EstadisticasService);
@@ -29,19 +42,24 @@ export class EmpresasComponent implements OnInit {
   mostrarModalCrear: boolean = false;
   nuevaEmpresaForm!: FormGroup;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.inicializarFormulario();
-    const guardados = localStorage.getItem('gestock_empresas');
-    if (guardados) {
-      try {
-        this.empresasLista = JSON.parse(guardados);
-      } catch (e) {
-        console.error('Error al parsear empresas del localStorage', e);
-        this.cargarDatosIniciales();
-      }
-    } else {
-      this.cargarDatosIniciales();
-    }
+    this.apiEmpresas.listar().subscribe({
+      next: (empresas) => {
+        this.empresasLista = empresas.map((empresa) => ({
+          id: String(empresa.id),
+          nombre: empresa.nombre,
+          email: empresa.correo,
+          moneda: etiquetaMoneda[empresa.moneda],
+          formatoFecha: empresa.formato_fecha,
+          estado: empresa.activo ? 'Activa' : 'Inactiva',
+        }));
+        this.cambiosVista.markForCheck();
+      },
+      error: (error: unknown) => {
+        console.error('No se pudieron cargar las empresas del MID', error);
+      },
+    });
   }
 
   inicializarFormulario() {
@@ -54,41 +72,8 @@ export class EmpresasComponent implements OnInit {
     });
   }
 
-  cargarDatosIniciales() {
-    this.empresasLista = [
-      {
-        id: 'EMP-001',
-        nombre: 'GESTOCK Inc.',
-        email: 'contacto@gestock.com',
-        moneda: 'USD - Dólar',
-        formatoFecha: 'DD/MM/YYYY',
-        estado: 'Activa'
-      },
-      {
-        id: 'EMP-002',
-        nombre: 'Logística del Llano SAS',
-        email: 'info@logisticallh.co',
-        moneda: 'COP - Peso Colombiano',
-        formatoFecha: 'YYYY-MM-DD',
-        estado: 'Activa'
-      },
-      {
-        id: 'EMP-003',
-        nombre: 'Distribuciones Globales',
-        email: 'ventas@distribucionesg.com',
-        moneda: 'USD - Dólar',
-        formatoFecha: 'MM/DD/YYYY',
-        estado: 'Inactiva'
-      }
-    ];
-    this.sincronizarStorage();
-  }
-
-  sincronizarStorage() {
-    localStorage.setItem('gestock_empresas', JSON.stringify(this.empresasLista));
-  }
-
   abrirModalCrear() {
+    this.idEnEdicion = null;
     this.inicializarFormulario();
     this.mostrarModalCrear = true;
   }
@@ -97,25 +82,47 @@ export class EmpresasComponent implements OnInit {
     this.mostrarModalCrear = false;
   }
 
-  crearNuevaEmpresa() {
-    if (this.nuevaEmpresaForm.invalid) return;
+  abrirModalEditar(event: Event, empresa: EmpresaItem): void {
+    event.stopPropagation();
+    if (this.guardando) return;
 
-    const nuevaEmpresa: EmpresaItem = {
-      id: `EMP-00${this.empresasLista.length + 1}`,
-      nombre: this.nuevaEmpresaForm.value.nombre,
-      email: this.nuevaEmpresaForm.value.email,
-      moneda: this.nuevaEmpresaForm.value.moneda,
-      formatoFecha: this.nuevaEmpresaForm.value.formatoFecha,
-      estado: 'Activa'
-    };
+    this.idEnEdicion = empresa.id;
+    this.inicializarFormulario();
+    this.nuevaEmpresaForm.patchValue({
+      nombre: empresa.nombre,
+      email: empresa.email,
+      moneda: empresa.moneda,
+      formatoFecha: empresa.formatoFecha,
+    });
+    this.mostrarModalCrear = true;
+  }
 
-    this.empresasLista.unshift(nuevaEmpresa);
-    this.sincronizarStorage();
+  crearNuevaEmpresa(): void {
+    if (this.guardando || this.nuevaEmpresaForm.invalid) return;
 
-    console.log('%c[GESTOCK] Nueva Empresa Creada (JSON):', 'color: #38bdf8; font-weight: bold;');
-    console.log(JSON.stringify(nuevaEmpresa, null, 2));
+    const id = this.idEnEdicion;
+    const formulario = this.nuevaEmpresaForm.getRawValue();
+    const peticion = id === null
+      ? this.apiEmpresas.crear(formulario)
+      : this.apiEmpresas.actualizar(id, formulario);
 
-    this.cerrarModalCrear();
+    this.guardando = true;
+    peticion.pipe(finalize(() => {
+      this.guardando = false;
+      this.cambiosVista.markForCheck();
+    })).subscribe({
+      next: (empresa) => {
+        const guardada = this.convertirEmpresa(empresa);
+        this.empresasLista = id === null
+          ? [guardada, ...this.empresasLista]
+          : this.empresasLista.map((actual) => actual.id === id ? guardada : actual);
+
+        this.cerrarModalCrear();
+        this.toast.exito(id === null ? 'Empresa creada con éxito.' : 'Empresa actualizada con éxito.');
+      },
+      error: (error: unknown) =>
+        this.toast.errorDesdeApi(error, 'No se pudo guardar la empresa.'),
+    });
   }
 
   seleccionarEmpresa(id: string) {
@@ -146,11 +153,35 @@ export class EmpresasComponent implements OnInit {
     }
   }
 
-  eliminarEmpresa(event: Event, id: string) {
+  eliminarEmpresa(event: Event, id: string): void {
     event.stopPropagation();
-    if (confirm('¿Está seguro de eliminar esta empresa?')) {
-      this.empresasLista = this.empresasLista.filter(e => e.id !== id);
-      this.sincronizarStorage();
-    }
+    const empresa = this.empresasLista.find((actual) => actual.id === id);
+    if (!empresa || empresa.estado !== 'Activa' || this.guardando) return;
+    if (!window.confirm(`¿Desactivar la empresa ${empresa.nombre}?`)) return;
+
+    this.guardando = true;
+    this.apiEmpresas.desactivar(id).pipe(finalize(() => {
+      this.guardando = false;
+      this.cambiosVista.markForCheck();
+    })).subscribe({
+      next: () => {
+        this.empresasLista = this.empresasLista.map((actual) =>
+          actual.id === id ? { ...actual, estado: 'Inactiva' } : actual);
+        this.toast.exito('Empresa desactivada con éxito.');
+      },
+      error: (error: unknown) =>
+        this.toast.errorDesdeApi(error, 'No se pudo desactivar la empresa.'),
+    });
+  }
+
+  private convertirEmpresa(empresa: EmpresaApi): EmpresaItem {
+    return {
+      id: String(empresa.id),
+      nombre: empresa.nombre,
+      email: empresa.correo,
+      moneda: etiquetaMoneda[empresa.moneda],
+      formatoFecha: empresa.formato_fecha,
+      estado: empresa.activo ? 'Activa' : 'Inactiva',
+    };
   }
 }

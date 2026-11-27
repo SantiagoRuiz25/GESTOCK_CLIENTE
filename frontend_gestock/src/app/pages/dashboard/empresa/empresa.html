@@ -45,9 +45,8 @@
             </span>
           </td>
           <td>
-            <button class="btn-delete" (click)="eliminarEmpresa($event, empresa.id)" title="Eliminar empresa">
-              🗑️
-            </button>
+            <button type="button" (click)="abrirModalEditar($event, empresa)" [disabled]="guardando">Editar</button>
+              <button type="button" (click)="eliminarEmpresa($event, empresa.id)" [disabled]="guardando || empresa.estado === 'Inactiva'">Desactivar</button>
           </td>
         </tr>
         <tr *ngIf="empresasLista.length === 0">
@@ -61,7 +60,7 @@
   <div class="modal-backdrop" *ngIf="mostrarModalCrear" (click)="cerrarModalCrear()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Crear Nueva Empresa</h3>
+        <h3>{{ idEnEdicion === null ? 'Registrar empresa' : 'Editar empresa' }}</h3>
         <button class="close-btn" (click)="cerrarModalCrear()">×</button>
       </div>
 
@@ -97,7 +96,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn-secondary" (click)="cerrarModalCrear()">Cancelar</button>
-          <button type="submit" class="btn-primary" [disabled]="nuevaEmpresaForm.invalid">Guardar Empresa</button>
+          <button type="submit" class="btn-primary" [disabled]="nuevaEmpresaForm.invalid || guardando">Guardar Empresa</button>
         </div>
       </form>
     </div>
